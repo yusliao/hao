@@ -310,7 +310,7 @@ namespace PushServer.Commands
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
                         db.OrderLogisticsDetailSet.Add(orderItem.OrderLogistics);
-                        db.OrderProductSet.Add(orderProductInfo);
+                      
                         db.SaveChanges();
                     }
                    
