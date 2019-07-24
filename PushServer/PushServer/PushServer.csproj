@@ -177,9 +177,10 @@
       <DependentUpon>PushServer.cs</DependentUpon>
     </Compile>
     <Compile Include="SelfInstaller.cs" />
-    <Compile Include="Service\CIBjidianStatisticServer.cs" />
-    <Compile Include="Service\CIBJifenStatisticMonthPandianServer.cs" />
-    <Compile Include="Service\IPandianServer.cs" />
+    <Compile Include="Service\CIBVIPStatisticServer.cs" />
+    <Compile Include="Service\CIBPCStatisticServer.cs" />
+    <Compile Include="Service\IProductStatisticServer.cs" />
+    <Compile Include="Service\ProductStatisticServerBase.cs" />
     <Compile Include="Service\StatisticServer.cs" />
     <Compile Include="WxPushNews.cs" />
   </ItemGroup>

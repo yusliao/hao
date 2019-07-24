@@ -118,6 +118,7 @@ namespace PushServer.Commands
                         TotalWeight = item.Products.Sum(p => p.ProductWeight)
                     };
                     db.OrderExtendInfoSet.Add(item.OrderExtendInfo);
+                    db.Set<OrderProductInfo>().AddRange(item.Products);
 
                 }
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
@@ -126,17 +127,20 @@ namespace PushServer.Commands
                 {
                     System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
                     stopwatch.Start();
-                    var temp = lst.Where(o => o.Consignee.CustomerId == 114820).Select(o => new { o.SourceSn, o.Consignee.Name, o.Consignee.CustomerId });
                     db.BulkInsert<OrderEntity>(lst);
                     stopwatch.Stop();
-                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"批量插入耗时ms:{stopwatch.ElapsedMilliseconds}");
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单表耗时ms:{stopwatch.ElapsedMilliseconds}");
+                    stopwatch.Start();
+                    db.SaveChanges();
+                    stopwatch.Stop();
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单商品表耗时ms:{stopwatch.ElapsedMilliseconds}");
 
                     return true;
                 }
                 catch (Exception ex)
                 {
                    
-                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"BulkInsert插入订单数据出错，content:{ex.Message}");
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"BulkInsert插入订单数据出错，订单数量:{lst.Count} ,content:{ex.Message}");
                     return false;
                 }
                 finally

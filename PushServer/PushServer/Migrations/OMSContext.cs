@@ -32,7 +32,7 @@ namespace OMS.Models
         public IDbSet<OrderLogisticsDetail> OrderLogisticsDetailSet { get; set; }
         public IDbSet<OrderPandianWithMonth> OrderPandianWithMonthsSet { get; set; }
         public IDbSet<OrderPandianProductInfo> OrderPandianProductInfoSet { get; set; }
-        public IDbSet<StatisticProduct> StatisticMonthPandianSet { get; set; }
-        
+        public IDbSet<StatisticProduct> StatisticProductSet { get; set; }
+        public IDbSet<ExceptionOrder> ExceptionOrders { get; set; }
     }
 }

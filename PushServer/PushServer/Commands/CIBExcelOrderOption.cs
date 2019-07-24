@@ -306,6 +306,18 @@ namespace PushServer.Commands
                             }
                            
                         }
+                        else //异常订单
+                        {
+                            ExceptionOrder exceptionOrder = new ExceptionOrder()
+                            {
+                                OrderFileName = file,
+                                OrderInfo = Util.Helpers.Json.ToJson(orderItem),
+                                Source = this.Name
+                            };
+                            db.ExceptionOrders.Add(exceptionOrder);
+                            db.SaveChanges();
+                            continue;
+                        }
                         var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == productsku);
                         if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
                         {
@@ -341,6 +353,7 @@ namespace PushServer.Commands
                             MonthNum = createdDate.Month,
                             weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
                             weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                            OrderSn = orderItem.OrderSn,
                             TotalAmount = 0,
                             ProductCount = quantity,
                             ProductWeight = weight,
@@ -399,6 +412,7 @@ namespace PushServer.Commands
                             MonthNum = createdDate.Month,
                             weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
                             weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                            OrderSn = item.OrderSn,
                             TotalAmount = totalAmount,
                             ProductCount = quantity,
                             ProductWeight = weight,

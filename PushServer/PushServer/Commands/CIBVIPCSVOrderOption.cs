@@ -256,6 +256,18 @@ namespace PushServer.Commands
                             }
                            
                         }
+                        else //异常订单
+                        {
+                            ExceptionOrder exceptionOrder = new ExceptionOrder()
+                            {
+                                OrderFileName = file,
+                                OrderInfo = Util.Helpers.Json.ToJson(orderItem),
+                                Source = this.Name
+                            };
+                            db.ExceptionOrders.Add(exceptionOrder);
+                            db.SaveChanges();
+                            continue;
+                        }
 
 
                         var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
@@ -292,6 +304,7 @@ namespace PushServer.Commands
                             MonthNum = createdDate.Month,
                             weightCode = foo.weightModel==null?0:foo.weightModel.Code,
                             weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                            OrderSn = orderItem.OrderSn,
                             TotalAmount = 0,
                             ProductCount = quantity,
                             ProductWeight = weight,
@@ -304,7 +317,7 @@ namespace PushServer.Commands
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
                         db.OrderLogisticsDetailSet.Add(orderItem.OrderLogistics);
-                        db.OrderProductSet.Add(orderProductInfo);
+                      //  db.OrderProductSet.Add(orderProductInfo);
                         db.SaveChanges();
                     }
 
@@ -359,6 +372,7 @@ namespace PushServer.Commands
                                 MonthNum = createdDate.Month,
                                 weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
                                 weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                                OrderSn = item.OrderSn,
                                 TotalAmount = 0,
                                 ProductCount = quantity,
                                 ProductWeight = weight,

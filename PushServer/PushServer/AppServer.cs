@@ -23,8 +23,8 @@ namespace PushServer
     {
         [ImportMany(typeof(IOrderOption))]
         private IEnumerable<IOrderOption> OrderOptSet { get; set; }
-        [ImportMany(typeof(IPandianServer))]
-        private IEnumerable<IPandianServer> PandianOptSet { get; set; }
+        [ImportMany(typeof(IProductStatisticServer))]
+        private IEnumerable<IProductStatisticServer> ProductStatisticOptSet { get; set; }
 
 
         /// <summary>
@@ -413,12 +413,12 @@ namespace PushServer
         /// <returns></returns>
         public static  bool PushPandianReport(int monthNum)
         {
-            var lst = AppServer.Instance.PandianOptSet.ToList();
+            var lst = AppServer.Instance.ProductStatisticOptSet.ToList();
             foreach (var item in lst)
             {
                 System.Threading.ThreadPool.QueueUserWorkItem(o =>
                 {
-                    var dt = item.PushPandianReport(monthNum);
+                    var dt = item.PushMonthReport(monthNum,DateTime.Now.Year);
                     if(dt!=null&&dt.Rows.Count>0)
                     {
                         var filename = System.IO.Path.Combine(instance.clientConfig.ExcelOrderFolder, "pandian", $"ERP-{item.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
@@ -440,14 +440,14 @@ namespace PushServer
         }
         public static bool CreatePandianReport(int monthNum)
         {
-            var lst = AppServer.Instance.PandianOptSet.ToList();
+            var lst = AppServer.Instance.ProductStatisticOptSet.ToList();
             foreach (var item in lst)
             {
                 System.Threading.ThreadPool.QueueUserWorkItem(o =>
                 {
                     try
                     {
-                        item.CreateMonthPandianReport(monthNum);
+                        item.CreateMonthReport(monthNum,DateTime.Now.Year);
                     }
                     catch (Exception ex)
                     {

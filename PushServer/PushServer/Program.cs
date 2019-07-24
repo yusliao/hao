@@ -146,7 +146,7 @@ namespace PushServer
                     return true;
                 case ("c1"):
                     int pdmonth = 6;
-                    if (int.TryParse(str[1], out month))
+                    if (int.TryParse(str[1], out pdmonth))
                     {
                         var createPandianReportResult = PushReportHelper.CreatePandianReport(pdmonth);
                         if (createPandianReportResult)
