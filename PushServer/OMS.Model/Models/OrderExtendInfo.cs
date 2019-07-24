@@ -42,7 +42,7 @@ namespace OMS.Models
         /// 下单日期
         /// </summary>
         public DateTime? CreatedDate { get; set; }
-        public int CurrentWeek { get; set; }
+ 
       
     }
 }

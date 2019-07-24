@@ -45,6 +45,7 @@
     <Compile Include="Models\AddressEntity.cs" />
     <Compile Include="Models\ChinaAreaData.cs" />
     <Compile Include="Models\CustomerEntity.cs" />
+    <Compile Include="Models\ExceptionOrder.cs" />
     <Compile Include="Models\OrderDateInfo.cs" />
     <Compile Include="Models\OrderRepurchase.cs" />
     <Compile Include="Models\LogisticsInfo.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Models\ProductCategory.cs" />
     <Compile Include="Models\ProductDictionary.cs" />
     <Compile Include="Models\Statistic.cs" />
+    <Compile Include="Models\StatisticDistrict.cs" />
     <Compile Include="Models\StatisticProduct.cs" />
     <Compile Include="Models\WeightCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
