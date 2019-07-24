@@ -177,8 +177,11 @@
       <DependentUpon>PushServer.cs</DependentUpon>
     </Compile>
     <Compile Include="SelfInstaller.cs" />
+    <Compile Include="Service\CIBAPPstatisticServer.cs" />
     <Compile Include="Service\CIBVIPStatisticServer.cs" />
     <Compile Include="Service\CIBPCStatisticServer.cs" />
+    <Compile Include="Service\DistrictStatisticServerBase.cs" />
+    <Compile Include="Service\IDistrictStatisticServer.cs" />
     <Compile Include="Service\IProductStatisticServer.cs" />
     <Compile Include="Service\ProductStatisticServerBase.cs" />
     <Compile Include="Service\StatisticServer.cs" />

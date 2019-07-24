@@ -103,7 +103,7 @@ namespace PushServer.Commands
 
                 var adc = db.Configuration.AutoDetectChangesEnabled;
                 
-                foreach (var item in lst)
+                foreach (var item in lst.AsParallel())
                 {
                     item.OrderExtendInfo = new OrderExtendInfo()
                     {
@@ -114,13 +114,14 @@ namespace PushServer.Commands
                         TotalAmount = item.Products.Sum(p => p.TotalAmount),
                         TotalProductCount = item.Products.Sum(p => p.ProductCount),
                         CreatedDate = item.CreatedDate.Date,
-                        CurrentWeek = Util.Helpers.Time.GetWeekNum(item.CreatedDate),
+                       
                         TotalWeight = item.Products.Sum(p => p.ProductWeight)
                     };
-                    db.OrderExtendInfoSet.Add(item.OrderExtendInfo);
-                    db.Set<OrderProductInfo>().AddRange(item.Products);
+                   // db.OrderExtendInfoSet.Add(item.OrderExtendInfo);
+                   // db.Set<OrderProductInfo>().AddRange(item.Products);
 
                 }
+                db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
 
                 try
