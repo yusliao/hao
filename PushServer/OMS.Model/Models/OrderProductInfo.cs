@@ -62,6 +62,7 @@ namespace OMS.Models
         /// 商品信息
         /// </summary>
         public string sku { get; set; }
+        public string OrderSn { get; set; }
         /// <summary>
         /// 平台商品ID
         /// </summary>

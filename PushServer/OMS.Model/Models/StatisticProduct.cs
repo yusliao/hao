@@ -24,7 +24,7 @@ namespace OMS.Models
         public int ProductCount { get; set; }
         public decimal ProductTotalAmount { get; set; }
         public decimal ProductTotalWeight { get; set; }
-        public int MonthNum { get; set; }
+        public int Year { get; set; }
         /// <summary>
         /// 报表日期值
         /// </summary>
