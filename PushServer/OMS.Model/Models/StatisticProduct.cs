@@ -24,6 +24,19 @@ namespace OMS.Models
         public int ProductCount { get; set; }
         public decimal ProductTotalAmount { get; set; }
         public decimal ProductTotalWeight { get; set; }
+        
+        /// <summary>
+        /// 复购商品数量
+        /// </summary>
+        public int TotalProductRepurchase { get; set; }
+        /// <summary>
+        /// 总购买人数
+        /// </summary>
+        public int TotalCustomers { get; set; }
+        /// <summary>
+        /// 总复购人数
+        /// </summary>
+        public int TotalCustomerRepurchase { get; set; }
         public int Year { get; set; }
         /// <summary>
         /// 报表日期值

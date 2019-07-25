@@ -11,6 +11,7 @@ namespace OMS.Models
         [Key]
         public long ID { get; set; }
         public DateTime  CreateTime { get; set; }
+
         /// <summary>
         /// 时间戳，北京时区
         /// </summary>
