@@ -12,7 +12,7 @@ namespace PushServer.Service
     /// </summary>
     interface IProductStatisticServer
     {
-        string ServerName { get;  }
+       
         bool CreateMonthReport(int monthnum,int year);
         bool CreateWeekReport(int weeknum,int year);
         bool CreateDailyReport(DateTime value);
@@ -24,5 +24,9 @@ namespace PushServer.Service
         DataTable PushSeasonReport(int seasonnum, int year);
 
         DataTable PushYearReport(int year);
+    }
+    interface IServerName
+    {
+        string ServerName { get; }
     }
 }

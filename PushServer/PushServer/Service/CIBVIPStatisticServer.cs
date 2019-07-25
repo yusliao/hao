@@ -11,8 +11,14 @@ using System.ComponentModel.Composition;
 
 namespace PushServer.Service
 {
+
     [Export(typeof(IProductStatisticServer))]
-    public class CIBVIPStatisticServer : ProductStatisticServerBase
+    public class CIBVIPProductStatisticServer : ProductStatisticServerBase
+    {
+        public override string ServerName => OrderSource.CIBVIP;
+    }
+    [Export(typeof(IDistrictStatisticServer))]
+    public class CIBVIPDistrictStatisticServer : DistrictStatisticServerBase
     {
         public override string ServerName => OrderSource.CIBVIP;
     }

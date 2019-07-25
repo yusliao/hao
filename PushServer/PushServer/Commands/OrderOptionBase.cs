@@ -100,9 +100,9 @@ namespace PushServer.Commands
         {
             using (var db = new OMSContext())
             {
-
+                System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
                 var adc = db.Configuration.AutoDetectChangesEnabled;
-                
+                stopwatch.Start();
                 foreach (var item in lst.AsParallel())
                 {
                     item.OrderExtendInfo = new OrderExtendInfo()
@@ -123,10 +123,11 @@ namespace PushServer.Commands
                 }
                 db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
-
+                stopwatch.Stop();
+                Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单扩展表耗时ms:{stopwatch.ElapsedMilliseconds}");
                 try
                 {
-                    System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+                   
                     stopwatch.Start();
                     db.BulkInsert<OrderEntity>(lst);
                     stopwatch.Stop();

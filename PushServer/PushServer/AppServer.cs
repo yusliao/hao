@@ -23,8 +23,10 @@ namespace PushServer
     {
         [ImportMany(typeof(IOrderOption))]
         private IEnumerable<IOrderOption> OrderOptSet { get; set; }
-        [ImportMany(typeof(IProductStatisticServer))]
-        private IEnumerable<IProductStatisticServer> ProductStatisticOptSet { get; set; }
+        [ImportMany(typeof(ProductStatisticServerBase))]
+        private IEnumerable<ProductStatisticServerBase> ProductStatisticServerOptSet { get; set; }
+        [ImportMany(typeof(DistrictStatisticServerBase))]
+        private IEnumerable<ProductStatisticServerBase> DistrictStatisticServerOptSet { get; set; }
 
 
         /// <summary>
@@ -60,6 +62,7 @@ namespace PushServer
         {
             if (Environment.UserInteractive)
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(obj);
             }
         }
@@ -193,6 +196,7 @@ namespace PushServer
                     {
                         if(Environment.UserInteractive)
                         {
+                            Console.ForegroundColor = ConsoleColor.White;
                             Console.WriteLine($"{item.clientConfig.Tag}开始导入...");
                         }
                         item.ImportToOMS();
@@ -200,7 +204,7 @@ namespace PushServer
                         {
                             var commcolor = Console.ForegroundColor;
                            
-                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.WriteLine($"{item.clientConfig.Tag}导入完毕...");
                             Console.ForegroundColor = commcolor;
                         }
@@ -209,7 +213,11 @@ namespace PushServer
                     {
                         if (Environment.UserInteractive)
                         {
-                            Console.WriteLine($"{item.clientConfig.Tag}导入失败...");
+                            var commcolor = Console.ForegroundColor;
+
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"{item.clientConfig.Tag}导入失败,msg:{ex.Message}");
+                            Console.ForegroundColor = commcolor;
                         }
                         Util.Logs.Log.GetLog(nameof(AppServer)).Error($"{item.clientConfig.Tag}导入订单失败.\r\n{ex.Message}\r\n{ex.StackTrace}");
                         
@@ -413,9 +421,10 @@ namespace PushServer
         /// <returns></returns>
         public static  bool PushPandianReport(int monthNum)
         {
-            var lst = AppServer.Instance.ProductStatisticOptSet.ToList();
+            var lst = AppServer.Instance.ProductStatisticServerOptSet.ToList();
             foreach (var item in lst)
             {
+
                 System.Threading.ThreadPool.QueueUserWorkItem(o =>
                 {
                     var dt = item.PushMonthReport(monthNum,DateTime.Now.Year);
@@ -440,7 +449,7 @@ namespace PushServer
         }
         public static bool CreatePandianReport(int monthNum)
         {
-            var lst = AppServer.Instance.ProductStatisticOptSet.ToList();
+            var lst = AppServer.Instance.ProductStatisticServerOptSet.ToList();
             foreach (var item in lst)
             {
                 System.Threading.ThreadPool.QueueUserWorkItem(o =>

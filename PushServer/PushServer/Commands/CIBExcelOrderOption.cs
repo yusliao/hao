@@ -60,7 +60,13 @@ namespace PushServer.Commands
                 using (var excel = new NPOIExcel(file.FullName))
                 {
                     var table = excel.ExcelToDataTable(null, true);
-                    this.ResolveOrders(table,file.FullName, ordersList);
+                    if (table != null)
+                        this.ResolveOrders(table, file.FullName, ordersList);
+                    else
+                    {
+                        OnUIMessageEventHandle($"兴业积分PC导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
+                        continue;
+                    }
                 }
                 OnUIMessageEventHandle($"兴业积分PC导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
             }
@@ -234,6 +240,7 @@ namespace PushServer.Commands
                         OrderDateInfo = new OrderDateInfo()
                         {
                             CreateTime = createdDate,
+                          
                             MonthNum = createdDate.Month,
                             WeekNum = Util.Helpers.Time.GetWeekNum(createdDate),
                             SeasonNum = Util.Helpers.Time.GetSeasonNum(createdDate),
@@ -321,7 +328,7 @@ namespace PushServer.Commands
                         var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == productsku);
                         if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
                         {
-                            Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品：{productName}未找到");
+                            Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品：{productsku}未找到");
                           //  Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Debug($"订单文件：{file}中平台商品：{productName}未找到.order:{Util.Helpers.Json.ToJson(orderItem)}");
                           
                             if (bar == null)

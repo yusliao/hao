@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 
 namespace PushServer.Service
 {
-    
     [Export(typeof(IProductStatisticServer))]
-    public class CIBAPPstatisticServer : ProductStatisticServerBase
+    public class CIBAPPProductStatisticServer: ProductStatisticServerBase
+    {
+        public override string ServerName => OrderSource.CIBAPP;
+    }
+    [Export(typeof(IDistrictStatisticServer))]
+    public class CIBAPPDistrictStatisticServer : DistrictStatisticServerBase
     {
         public override string ServerName => OrderSource.CIBAPP;
     }

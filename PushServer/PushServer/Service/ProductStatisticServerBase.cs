@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PushServer.Service
 {
-    public abstract class ProductStatisticServerBase : IProductStatisticServer
+    public abstract class ProductStatisticServerBase : IProductStatisticServer, IServerName
     {
         public abstract string ServerName { get; }
         public static event Action<string> UIMessageEventHandle;
@@ -40,19 +40,19 @@ namespace PushServer.Service
                     switch (statisticType)
                     {
                         case StatisticType.Day:
-                            orderEntities = db.OrderSet.Include(o=>o.OrderDateInfo).Include(o => o.Products).Where(s => s.CreatedDate.DayOfYear==statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
+                            orderEntities = db.OrderSet.Include(o=>o.Consignee).Include(o=>o.OrderDateInfo).Include(o => o.Products).Where(s => s.CreatedDate.DayOfYear==statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
                             break;
                         case StatisticType.Week:
-                            orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.WeekNum == statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.WeekNum == statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
                             break;
                         case StatisticType.Month:
-                            orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.MonthNum == statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.MonthNum == statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
                             break;
                         case StatisticType.Quarter:
-                            orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.SeasonNum == statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.SeasonNum == statisticValue && s.CreatedDate.Year == year && s.Source == ServerName).ToList();
                             break;
                         case StatisticType.Year:
-                            orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.Year == statisticValue&& s.Source == ServerName).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.Products).Where(s => s.OrderDateInfo.Year == statisticValue&& s.Source == ServerName).ToList();
                             break;
                         default:
                             break;

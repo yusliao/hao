@@ -393,7 +393,7 @@ namespace PushServer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception: " + ex.Message);
+                Util.Logs.Log.GetLog(nameof(NPOIExcel)).Error($"method:{ex.TargetSite.Name},msg:{ex.Message},stack:{ex.StackTrace}");
                 return null;
             }
         }

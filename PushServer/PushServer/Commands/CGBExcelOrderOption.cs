@@ -62,7 +62,14 @@ namespace PushServer.Commands
                 using (var excel = new NPOIExcel(file.FullName))
                 {
                     var table = excel.ExcelToDataTable(null, 3);
-                    var orderItems = this.ResolveOrders(table,file.FullName,ordersList);
+                    if (table != null)
+                        this.ResolveOrders(table, file.FullName, ordersList);
+                    else
+                    {
+                        OnUIMessageEventHandle($"广发银行商城导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
+                        continue;
+                    }
+                   
                 }
              //   file.FileName = file.
             }
@@ -182,6 +189,7 @@ namespace PushServer.Commands
                             WeekNum = Util.Helpers.Time.GetWeekNum(createdDate),
                             SeasonNum = Util.Helpers.Time.GetSeasonNum(createdDate),
                             Year = createdDate.Year,
+                          
                             TimeStamp = Util.Helpers.Time.GetUnixTimestamp(createdDate)
                         },
                         OrderLogistics = new OrderLogisticsDetail()

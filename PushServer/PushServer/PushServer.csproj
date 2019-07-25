@@ -36,6 +36,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>server_128px_1202172_easyicon.net.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsvHelper, Version=12.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>..\packages\CsvHelper.12.1.2\lib\net45\CsvHelper.dll</HintPath>
@@ -177,7 +180,8 @@
       <DependentUpon>PushServer.cs</DependentUpon>
     </Compile>
     <Compile Include="SelfInstaller.cs" />
-    <Compile Include="Service\CIBAPPstatisticServer.cs" />
+    <Compile Include="Service\ALLStatisticServer.cs" />
+    <Compile Include="Service\CIBAPPStatisticServer.cs" />
     <Compile Include="Service\CIBVIPStatisticServer.cs" />
     <Compile Include="Service\CIBPCStatisticServer.cs" />
     <Compile Include="Service\DistrictStatisticServerBase.cs" />
@@ -188,7 +192,9 @@
     <Compile Include="WxPushNews.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="server_128px_1202172_easyicon.net.ico" />
     <None Include="App.config" />
+    <Content Include="Dragonball_Goku_boy_128px_1100254_easyicon.net.ico" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

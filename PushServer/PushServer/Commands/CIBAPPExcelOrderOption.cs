@@ -59,7 +59,17 @@ namespace PushServer.Commands
             {
                 using (var excel = new NPOIExcel(file.FullName))
                 {
+
                     var table = excel.ExcelToDataTable(null, 1);
+                    if (table != null)
+                        this.ResolveOrders(table, file.FullName, ordersList);
+                    else
+                    {
+                        OnUIMessageEventHandle($"兴业积分APP导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
+                        continue;
+                    }
+
+                   
                     this.ResolveOrders(table,file.FullName, ordersList);
                    
                 }
@@ -223,6 +233,7 @@ namespace PushServer.Commands
                         OrderDateInfo = new OrderDateInfo()
                         {
                             CreateTime = createdDate,
+                            
                             MonthNum = createdDate.Month,
                             WeekNum = Util.Helpers.Time.GetWeekNum(createdDate),
                             SeasonNum = Util.Helpers.Time.GetSeasonNum(createdDate),

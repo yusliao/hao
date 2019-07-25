@@ -128,7 +128,9 @@ namespace PushServer.Service
             using (var db = new OMSContext())
             {
                 //根据OrderExtendInfo信息生成记录
-                var lst = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderExtendInfo).Include(o => o.OrderRepurchase).Where(o => o.CreatedDate == dateTime.Date).ToList();
+                DateTime start = dateTime.Date;
+                DateTime end = start.AddDays(1);
+                var lst = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderExtendInfo).Include(o => o.OrderRepurchase).Where(o => o.CreatedDate> start && o.CreatedDate< end&&o.CreatedDate.Year==dateTime.Year).ToList();
                 if (lst != null && lst.Any())
                 {
                     Statistic statistic = new Statistic()
