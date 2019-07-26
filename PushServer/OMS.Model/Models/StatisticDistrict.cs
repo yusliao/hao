@@ -11,9 +11,9 @@ namespace OMS.Models
     {
         [Key]
         public long ID { get; set; }
-        public long StatisticDistrictID { get; set; }
+
         public ChinaAreaData AddressID { get; set; }
-        public int OrderCount { get; set; }
+       
         /// <summary>
         /// 订单总金额
         /// </summary>
@@ -22,6 +22,7 @@ namespace OMS.Models
         /// 总商品数量
         /// </summary>
         public int TotalProductCount { get; set; }
+        public int TotalRepurchase { get; set; }
         /// <summary>
         /// 订单总重量
         /// </summary>
@@ -30,6 +31,8 @@ namespace OMS.Models
         /// 订单优惠额
         /// </summary>
         public decimal DiscountFee { get; set; }
+        public int TotalOrders { get; set; }
+
         /// <summary>
         /// 复购订单数量
         /// </summary>

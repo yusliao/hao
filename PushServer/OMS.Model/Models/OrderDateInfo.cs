@@ -16,6 +16,7 @@ namespace OMS.Models
         /// 时间戳，北京时区
         /// </summary>
         public long TimeStamp { get; set; }
+        public int DayNum { get; set; }
 
         public int WeekNum { get; set; }
         public int MonthNum { get; set; }
