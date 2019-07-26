@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PushServer.Service
 {
-    public abstract class DistrictStatisticServerBase : IDistrictStatisticServer, IServerName
+    public abstract class DistrictStatisticServerBase : IDistrictStatisticServer
     {
         public abstract string ServerName { get; }
 
@@ -24,7 +24,10 @@ namespace PushServer.Service
                     switch (statisticType)
                     {
                         case StatisticType.Day:
-                            orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o=>o.OrderRepurchase).Include(o => o.OrderExtendInfo).Include(o => o.ConsigneeAddress).Where(s => s.CreatedDate.DayOfYear == statisticValue && s.CreatedDate.Year == year).ToList();
+                            DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+                            DateTime end = start.AddDays(1);
+
+                            orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o=>o.OrderRepurchase).Include(o => o.OrderExtendInfo).Include(o => o.ConsigneeAddress).Where(o => o.OrderDateInfo.CreateTime >= start && o.OrderDateInfo.CreateTime < end && o.CreatedDate.Year == year).ToList();
                             break;
                         case StatisticType.Week:
                             orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.OrderExtendInfo).Include(o => o.ConsigneeAddress).Where(s => s.OrderDateInfo.WeekNum == statisticValue && s.CreatedDate.Year == year).ToList();

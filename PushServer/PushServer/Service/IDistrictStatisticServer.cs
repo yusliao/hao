@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PushServer.Service
 {
-    interface IDistrictStatisticServer
+    interface IDistrictStatisticServer: IServerName
     {
         bool CreateDistrictMonthReport(int monthnum, int year);
         bool CreateDistrictWeekReport(int weeknum, int year);

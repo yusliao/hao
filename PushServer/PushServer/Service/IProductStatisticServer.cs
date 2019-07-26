@@ -10,7 +10,7 @@ namespace PushServer.Service
     /// <summary>
     /// 商品报表服务
     /// </summary>
-    interface IProductStatisticServer
+    interface IProductStatisticServer: IServerName
     {
        
         bool CreateMonthReport(int monthnum,int year);

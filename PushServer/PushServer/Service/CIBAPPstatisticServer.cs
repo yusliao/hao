@@ -18,4 +18,9 @@ namespace PushServer.Service
     {
         public override string ServerName => OrderSource.CIBAPP;
     }
+    [Export(typeof(IOrderStatisticServer))]
+    public class CIBAPPOrderStatisticServer : OrderStatisticServerBase
+    {
+        public override string ServerName => OrderSource.CIBAPP;
+    }
 }
