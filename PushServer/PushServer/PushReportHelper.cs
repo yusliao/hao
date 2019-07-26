@@ -14,7 +14,7 @@ namespace PushServer
         }
         public static bool PushPandianReport(int monthNum)
         {
-            return AppServer.PushPandianReport(monthNum);
+            return AppServer.Instance.PushPandianReport(monthNum);
         }
         public static bool CreateReport(bool isAll=false)
         {

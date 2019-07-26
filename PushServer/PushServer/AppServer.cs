@@ -23,10 +23,7 @@ namespace PushServer
     {
         [ImportMany(typeof(IOrderOption))]
         private IEnumerable<IOrderOption> OrderOptSet { get; set; }
-        [ImportMany(typeof(ProductStatisticServerBase))]
-        private IEnumerable<ProductStatisticServerBase> ProductStatisticServerOptSet { get; set; }
-        [ImportMany(typeof(DistrictStatisticServerBase))]
-        private IEnumerable<ProductStatisticServerBase> DistrictStatisticServerOptSet { get; set; }
+       
 
 
         /// <summary>
@@ -83,6 +80,7 @@ namespace PushServer
                 dt.Columns.Add("商品代码");
                 dt.Columns.Add("规格代码");
                 dt.Columns.Add("规格名称");
+                dt.Columns.Add("是否赠品");
                 dt.Columns.Add("数量");
                 dt.Columns.Add("价格");
                 dt.Columns.Add("商品备注");
@@ -419,56 +417,21 @@ namespace PushServer
         /// <param name="monthNum">月份</param>
         /// <param name="ordersource">订单来源</param>
         /// <returns></returns>
-        public static  bool PushPandianReport(int monthNum)
+        public  bool PushPandianReport(int monthNum)
         {
-            var lst = AppServer.Instance.ProductStatisticServerOptSet.ToList();
-            foreach (var item in lst)
-            {
-
-                System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                {
-                    var dt = item.PushMonthReport(monthNum,DateTime.Now.Year);
-                    if(dt!=null&&dt.Rows.Count>0)
-                    {
-                        var filename = System.IO.Path.Combine(instance.clientConfig.ExcelOrderFolder, "pandian", $"ERP-{item.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
-                        NPOIExcel.Export(dt, filename);
-                        if (Environment.UserInteractive)
-                        {
-                            Console.WriteLine($"ERP-{item.ServerName}-{monthNum}月份盘点订单生成成功。文件名:{filename}");
-                        }
-                    }
-                });
-            }
+            return StatisticServer.Instance.PushPandianReport(monthNum, clientConfig.ExcelOrderFolder);
          
            
-            return true;
+            
         }
         public static bool CreateReport(DateTime dateTime,bool isAll =false)
         {
-            return StatisticServer.CreateReport(dateTime, isAll);
+            return StatisticServer.Instance.CreateReport(dateTime, isAll);
+            
         }
         public static bool CreatePandianReport(int monthNum)
         {
-            var lst = AppServer.Instance.ProductStatisticServerOptSet.ToList();
-            foreach (var item in lst)
-            {
-                System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                {
-                    try
-                    {
-                        item.CreateMonthReport(monthNum,DateTime.Now.Year);
-                    }
-                    catch (Exception ex)
-                    {
-                        Util.Logs.Log.GetLog($"生成盘点报表失败，来源:{item.ServerName},message:{ex.Message},StackTrace:{ex.StackTrace}");
-                        
-                    }
-                    
-                });
-            }
-
-            return true;
-         
+           return StatisticServer.Instance.CreatePandianReport(monthNum);
             
         }
 
