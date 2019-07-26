@@ -182,7 +182,7 @@ namespace PushServer.Commands
                         OrderDateInfo = new OrderDateInfo()
                         {
                             CreateTime = createdDate,
-                         
+                            DayNum = createdDate.DayOfYear,
                             MonthNum = createdDate.Month,
                             WeekNum = Util.Helpers.Time.GetWeekNum(createdDate),
                             SeasonNum  =Util.Helpers.Time.GetSeasonNum(createdDate),

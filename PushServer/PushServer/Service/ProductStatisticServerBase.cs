@@ -86,8 +86,9 @@ namespace PushServer.Service
                                 ProductCount = item.Sum(o => o.ProductCount),
                                 CreateDate = DateTime.Now,
                                 StatisticType = (int)statisticType,
-                                StatisticValue = statisticValue
-
+                                StatisticValue = statisticValue,
+                                TotalCustomers = orderEntities.GroupBy(o => o.Consignee).ToList().Count(),//总计客户数量
+                                TotalOrders = orderEntities.Count()
                             };
                            
                             
@@ -95,28 +96,28 @@ namespace PushServer.Service
                             {
                                 case StatisticType.Day:
                                     statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Count();
-                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).GroupBy(o => o.Consignee).Count();
+                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
                                     
                                     statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Sum(o => o.Products.FirstOrDefault(p=>p.sku==item.Key.sku).ProductCount);
                                     break;
                                 case StatisticType.Week:
                                     statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.WeekRepurchase == true).Count();
-                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.WeekRepurchase == true).GroupBy(o => o.Consignee).Count();
+                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.WeekRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
                                     statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Sum(o => o.Products.FirstOrDefault(p => p.sku == item.Key.sku).ProductCount);
                                     break;
                                 case StatisticType.Month:
                                     statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.MonthRepurchase == true).Count();
-                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.MonthRepurchase == true).GroupBy(o => o.Consignee).Count();
+                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.MonthRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
                                     statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Sum(o => o.Products.FirstOrDefault(p => p.sku == item.Key.sku).ProductCount);
                                     break;
                                 case StatisticType.Quarter:
                                     statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.SeasonRepurchase == true).Count();
-                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.SeasonRepurchase == true).GroupBy(o => o.Consignee).Count();
+                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.SeasonRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
                                     statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Sum(o => o.Products.FirstOrDefault(p => p.sku == item.Key.sku).ProductCount);
                                     break;
                                 case StatisticType.Year:
                                     statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.YearRepurchase == true).Count();
-                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.YearRepurchase == true).GroupBy(o => o.Consignee).Count();
+                                    statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.YearRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
                                     statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Sum(o => o.Products.FirstOrDefault(p => p.sku == item.Key.sku).ProductCount);
                                     break;
                                 default:

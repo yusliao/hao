@@ -65,7 +65,7 @@ namespace PushServer.Service
                                 {
                                     CreateDate = DateTime.Now,
                                     DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
-                                    OrderCount = item.Count(),
+                                    TotalOrders = item.Count(),
                                     TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
                                     TotalProductCount = item.Sum(a => a.OrderExtendInfo.TotalProductCount),
                                     TotalWeight = item.Sum(a => a.OrderExtendInfo.TotalWeight),
@@ -86,7 +86,7 @@ namespace PushServer.Service
                                 {
                                     CreateDate = DateTime.Now,
                                     DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
-                                    OrderCount = item.Count(),
+                                    TotalOrders = item.Count(),
                                     TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
                                     TotalProductCount = item.Sum(a => a.OrderExtendInfo.TotalProductCount),
                                     TotalWeight = item.Sum(a => a.OrderExtendInfo.TotalWeight),
@@ -102,16 +102,28 @@ namespace PushServer.Service
                             StatisticDistrictriCityItems = cityitems,
                             StatisticDistrictriProvinceItems = provinceitems,
                             StatisticType = (int)statisticType,
+                            Source = ServerName,
+                            SourceDesc=Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName),
                             StatisticValue = statisticValue,
                             CreateDate = DateTime.Now,
                             Year = year
                             
                         };
 
-                        var removeobj = db.StatisticDistricts.FirstOrDefault(s => s.Year == year && s.Source == ServerName && s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue);
-                        var delobj = db.StatisticDistrictItems.Where(s => s.StatisticDistrictID == removeobj.StatisticDistrictID);
-                        db.BulkDelete<StatisticDistrictItem>(delobj);
-                        db.StatisticDistricts.Remove(removeobj);
+                        var removeobj = db.StatisticDistricts.Include(s=>s.StatisticDistrictriProvinceItems).Include(s=>s.StatisticDistrictriCityItems).FirstOrDefault(s => s.Year == year && s.Source == ServerName && s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue);
+                        if (removeobj != null)
+                        {
+                            //var delobj = db.StatisticDistrictItems.Where(s => s. == removeobj.StatisticDistrictID);
+                            //if (delobj != null)
+                            //    db.Set<StatisticDistrictItem>().RemoveRange(delobj);
+                            db.StatisticDistricts.Remove(removeobj);
+                           
+                           // db.SaveChanges();
+                        }
+                       // db.StatisticDistricts.Remove(removeobj);
+                        db.Set<StatisticDistrictItem>().AddRange(provinceitems);
+                        db.Set<StatisticDistrictItem>().AddRange(cityitems);
+                        
                         db.StatisticDistricts.Add(statisticDistrict);
                         db.SaveChanges();
                     }
