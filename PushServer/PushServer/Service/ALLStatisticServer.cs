@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 namespace PushServer.Service
 {
     
-    [Export(typeof(ProductStatisticServerBase))]
+    [Export(typeof(IProductStatisticServer))]
     public class ALLProductStatisticServer : ProductStatisticServerBase
     {
         public override string ServerName => OrderSource.ALL;
     }
-    [Export(typeof(DistrictStatisticServerBase))]
+    [Export(typeof(IDistrictStatisticServer))]
     public class ALLDistrictStatisticServer : DistrictStatisticServerBase
     {
         public override string ServerName => OrderSource.ALL;
     }
-    [Export(typeof(OrderStatisticServerBase))]
+    [Export(typeof(IOrderStatisticServer))]
     public class ALLOrderStatisticServer:OrderStatisticServerBase
     {
         public override string ServerName => OrderSource.ALL;

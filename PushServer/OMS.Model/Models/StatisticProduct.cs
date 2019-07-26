@@ -29,6 +29,15 @@ namespace OMS.Models
         /// 复购商品数量
         /// </summary>
         public int TotalProductRepurchase { get; set; }
+        public int TotalCustomerRepurchase { get; set; }
+        /// <summary>
+        /// 总复购订单数
+        /// </summary>
+        public int TotalOrderRepurchase { get; set; }
+        /// <summary>
+        /// 总计复购盒数
+        /// </summary>
+      
         /// <summary>
         /// 总购买人数
         /// </summary>
@@ -36,8 +45,9 @@ namespace OMS.Models
         /// <summary>
         /// 总复购人数
         /// </summary>
-        public int TotalCustomerRepurchase { get; set; }
+      
         public int Year { get; set; }
+        
         /// <summary>
         /// 报表日期值
         /// </summary>

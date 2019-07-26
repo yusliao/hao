@@ -53,9 +53,8 @@ namespace PushServer.Service
                        
                         List<StatisticDistrictItem> provinceitems = new List<StatisticDistrictItem>();
                         List<StatisticDistrictItem> cityitems = new List<StatisticDistrictItem>();
-                        Task[] tasks = new Task[2];
-                        Task t1 = Task.Run(() =>
-                        {
+
+                       
                             var q1 = plst.GroupBy(p => new { p.ConsigneeAddress.Province });//按省份统计
                             foreach (var item in q1)
                             {
@@ -75,14 +74,12 @@ namespace PushServer.Service
                                 };
                                 provinceitems.Add(statistic);
                             }
-                        });
-                        tasks[0] = t1;
-                        Task t2 = Task.Run(() =>
-                        {
+                     
+                        
                             var q2 = plst.GroupBy(p => new { p.ConsigneeAddress.Province, p.ConsigneeAddress.City });//按省份，地级市统计
                             foreach (var item in q2)
                             {
-                                var cad = db.ChinaAreaDatas.FirstOrDefault(a => a.MergerName.Contains(item.Key.City)&&a.MergerName.Contains(item.Key.Province));
+                                var cad = db.ChinaAreaDatas.FirstOrDefault(a => a.MergerName.Contains(item.Key.City) && a.MergerName.Contains(item.Key.Province));
                                 if (cad == null)
                                     cad = db.ChinaAreaDatas.Find(100000);//中国
                                 StatisticDistrictItem statistic = new StatisticDistrictItem()
@@ -98,16 +95,16 @@ namespace PushServer.Service
                                 };
                                 cityitems.Add(statistic);
                             }
-                        });
-                        tasks[1] = t2;
-                        Task.WaitAll(tasks);
+                      
+                      
                         StatisticDistrict statisticDistrict = new StatisticDistrict()
                         {
                             StatisticDistrictriCityItems = cityitems,
                             StatisticDistrictriProvinceItems = provinceitems,
                             StatisticType = (int)statisticType,
                             StatisticValue = statisticValue,
-                            CreateDate = DateTime.Now
+                            CreateDate = DateTime.Now,
+                            Year = year
                             
                         };
 
@@ -150,7 +147,7 @@ namespace PushServer.Service
 
         public virtual bool CreateDistrictWeekReport(int weeknum, int year)
         {
-            return CreateReport(StatisticType.Month, weeknum, year);
+            return CreateReport(StatisticType.Week, weeknum, year);
         }
 
         public virtual bool CreateDistrictYearReport(int year)

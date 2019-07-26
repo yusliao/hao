@@ -21,4 +21,9 @@ namespace PushServer.Service
     {
         public override string ServerName => OrderSource.CIB;
     }
+    [Export(typeof(IOrderStatisticServer))]
+    public class CIBPCOrderStatisticServer : OrderStatisticServerBase
+    {
+        public override string ServerName => OrderSource.CIB;
+    }
 }

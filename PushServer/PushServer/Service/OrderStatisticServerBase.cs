@@ -55,6 +55,7 @@ namespace PushServer.Service
                         Statistic statistic = new Statistic()
                         {
                             CreateDate = DateTime.Now,
+                            Year = year,
                             PromotionalOrderCount = orderEntities.Where(o => o.OrderExtendInfo.IsPromotional == true).Count(),//总计优惠订单数
                             Source = ServerName,
                             SourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName),
@@ -138,7 +139,7 @@ namespace PushServer.Service
 
         public virtual bool CreateSeasonReport(int seasonnum, int year)
         {
-            return CreateReport(StatisticType.Month, seasonnum, year);
+            return CreateReport(StatisticType.Quarter, seasonnum, year);
         }
 
         public virtual bool CreateWeekReport(int weeknum, int year)
