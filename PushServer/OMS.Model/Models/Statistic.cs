@@ -16,6 +16,7 @@ namespace OMS.Models
         public long ID { get; set; }
         public string Source { get; set; }
         public string SourceDesc { get; set; }
+        
         /// <summary>
         /// 总订单数
         /// </summary>
@@ -41,9 +42,17 @@ namespace OMS.Models
         /// </summary>
         public int TotalCustomer { get; set; }
         /// <summary>
-        /// 总回头客数量
+        /// 总复购人数
         /// </summary>
-        public int TotalReturningCustomer { get; set; }
+        public int TotalCustomerRepurchase { get; set; }
+        /// <summary>
+        /// 总复购订单数
+        /// </summary>
+        public int TotalOrderRepurchase { get; set; }
+        /// <summary>
+        /// 总计复购盒数
+        /// </summary>
+        public int TotalProductRepurchase { get; set; }
         /// <summary>
         /// 报表日期值
         /// </summary>
@@ -53,5 +62,6 @@ namespace OMS.Models
         /// </summary>
         public int StatisticType { get; set; }
         public int StatisticValue { get; set; }
+        public int Year { get; set; }
     }
 }
