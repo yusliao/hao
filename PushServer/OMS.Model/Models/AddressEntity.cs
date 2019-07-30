@@ -21,7 +21,7 @@ namespace OMS.Models
         public string ZipCode { get; set; }
         public string Address { get; set; }
         /// <summary>
-        /// 地址指纹
+        /// 地址指纹，对Address字段进行MD5计算
         /// </summary>
         public string MD5 { get; set; }
     }

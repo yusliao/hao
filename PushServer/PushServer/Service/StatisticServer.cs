@@ -57,14 +57,14 @@ namespace PushServer.Service
             var picUrl = WxNewsPicUrl;
             using (var db = new OMSContext())
             {
-                Statistic foo = null;
+                Statistic foo = new Statistic();
                 string title = string.Empty;
                 switch (statisticType)
                 {
                     case StatisticType.Day:
 
                         var daynum = dateTime.DayOfYear;
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Day && s.StatisticValue == daynum).FirstOrDefault();
+                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Day && s.StatisticValue == daynum&&s.Year==dateTime.Year).FirstOrDefault();
 
                         if (foo == null || foo.TotalOrderCount <= 0)
                             title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
@@ -117,17 +117,17 @@ namespace PushServer.Service
                     new WxArticle( title,url,picUrl,string.Empty)
                 };
 
-                if (foo.TotalOrderCount > 0)
+                if (foo!=null&&foo.TotalOrderCount > 0)
                     wxArticles.AddRange(new List<WxArticle>()
                 {
                     new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,string.Empty,string.Empty),
                     new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,string.Empty,string.Empty),
                     new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,string.Empty,string.Empty),
                     new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
+                   // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
                     new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,string.Empty,string.Empty),
-                   
-                    new WxArticle(string.Format("总计复购率：{0}%", (foo.TotalCustomerRepurchase/foo.TotalCustomer)*100),url,string.Empty,string.Empty),
+                    new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,string.Empty,string.Empty),
+                    new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,string.Empty,string.Empty),
 
                 });
                 try

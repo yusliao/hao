@@ -189,7 +189,7 @@ namespace PushServer.Commands
                             WeekNum = Util.Helpers.Time.GetWeekNum(createdDate),
                             SeasonNum = Util.Helpers.Time.GetSeasonNum(createdDate),
                             Year = createdDate.Year,
-                          
+                            DayNum = createdDate.DayOfYear,
                             TimeStamp = Util.Helpers.Time.GetUnixTimestamp(createdDate)
                         },
                         OrderLogistics = new OrderLogisticsDetail()
