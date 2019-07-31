@@ -42,7 +42,7 @@ namespace PushServer
         /// <param name="o"></param>
         private static void TimerCallBack(object o)
         {
-            int timespan =   DateTime.Now.Hour-16;
+            int timespan =   DateTime.Now.Hour-14;
             if (Math.Abs(timespan) > 2)
                 return;
             else if (Math.Abs(timespan) == 2)
@@ -59,9 +59,12 @@ namespace PushServer
                 if(AppServer.CreateReport(DateTime.Now.AddDays(-1)))
                 {
                     AppServer.PushReport();
+                    Util.Logs.Log.GetLog(nameof(PushServer)).Info("定时报表推送完毕");
                 }
-                
-                Util.Logs.Log.GetLog(nameof(PushServer)).Info("定时报表推送完毕");
+                else
+                {
+                    Util.Logs.Log.GetLog(nameof(PushServer)).Info("定时报表推送失败");
+                }
                 timer.Change(3 * 1000 * 60 * 60, 2 * 1000 * 60 * 60);
             }
 

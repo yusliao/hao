@@ -69,7 +69,7 @@ namespace PushServer.Service
                         if (foo == null || foo.TotalOrderCount <= 0)
                             title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
                         else
-                            title = string.Format("{0} #{1}#", foo.CreateDate.ToString("yyyy年MM月dd日"), OrderSource);
+                            title = string.Format("{0} #{1}#", dateTime.ToString("yyyy年MM月dd日"), OrderSource);
                         break;
                     case StatisticType.Week:
                         int week = Util.Helpers.Time.GetWeekNum(DateTime.Now);
@@ -95,7 +95,7 @@ namespace PushServer.Service
                         int quarter = Util.Helpers.Time.GetSeasonNum(DateTime.Now);
                         foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Quarter && s.StatisticValue == quarter).FirstOrDefault();
                         if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", foo.CreateDate.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
+                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
                         else
                             title = $"{DateTime.Now.Year}年#{quarter}季度#{OrderSource}";
                         break;
@@ -118,7 +118,7 @@ namespace PushServer.Service
                 };
 
                 if (foo!=null&&foo.TotalOrderCount > 0)
-                    wxArticles.AddRange(new List<WxArticle>()
+                    wxArticles.AddRange(new List<WxArticle>()//上限为七
                 {
                     new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,string.Empty,string.Empty),
                     new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,string.Empty,string.Empty),
