@@ -11,6 +11,7 @@ namespace OMS.Models
     {
         [Key]
         public int ID { get; set; }
+        public string OrderSn { get; set; }
         /// <summary>
         /// 物流名称
         /// </summary>

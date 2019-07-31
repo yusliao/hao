@@ -60,7 +60,7 @@ namespace OMS.Models
         /// 商品信息
         /// </summary>
         public ICollection<OrderProductInfo> Products { get; set; }
-        public OrderLogisticsDetail OrderLogistics { get; set; }
+        public ICollection<OrderLogisticsDetail> OrderLogistics { get; set; }
 
         /// <summary>
         /// 备注

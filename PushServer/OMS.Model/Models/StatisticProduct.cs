@@ -43,9 +43,7 @@ namespace OMS.Models
         /// </summary>
         public int TotalCustomers { get; set; }
         public int TotalOrders { get; set; }
-                                           /// <summary>
-                                           /// 总复购人数
-                                           /// </summary>
+                                          
 
         public int Year { get; set; }
         
