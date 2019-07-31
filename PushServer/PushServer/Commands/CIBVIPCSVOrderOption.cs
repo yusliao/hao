@@ -189,10 +189,7 @@ namespace PushServer.Commands
                             Year = createdDate.Year,
                             TimeStamp =  Util.Helpers.Time.GetUnixTimestamp(createdDate)
                         },
-                        OrderLogistics = new OrderLogisticsDetail()
-                        {
-                            Logistics = consigneeProvince == "新疆维吾尔自治区" ? "顺丰速运" : "中通快递"
-                        },
+                       
 
                         OrderStatus = (int)orderStatus,
                         OrderStatusDesc = sourceStatus,
@@ -317,7 +314,7 @@ namespace PushServer.Commands
 
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
-                        db.OrderLogisticsDetailSet.Add(orderItem.OrderLogistics);
+                      
                       //  db.OrderProductSet.Add(orderProductInfo);
                         db.SaveChanges();
                     }

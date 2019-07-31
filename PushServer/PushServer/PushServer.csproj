@@ -161,9 +161,9 @@
     <Compile Include="Configuration\ClientElement.cs" />
     <Compile Include="Configuration\ClientListSection.cs" />
     <Compile Include="ImportExcelHelper.cs" />
-    <Compile Include="Migrations\201907260655160_s.cs" />
-    <Compile Include="Migrations\201907260655160_s.Designer.cs">
-      <DependentUpon>201907260655160_s.cs</DependentUpon>
+    <Compile Include="Migrations\201907300328047_orderinfo.cs" />
+    <Compile Include="Migrations\201907300328047_orderinfo.Designer.cs">
+      <DependentUpon>201907300328047_orderinfo.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\OMSContext.cs" />
@@ -200,7 +200,6 @@
   <ItemGroup>
     <Content Include="server_128px_1202172_easyicon.net.ico" />
     <None Include="App.config" />
-    <Content Include="Dragonball_Goku_boy_128px_1100254_easyicon.net.ico" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -210,8 +209,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201907260655160_s.resx">
-      <DependentUpon>201907260655160_s.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201907300328047_orderinfo.resx">
+      <DependentUpon>201907300328047_orderinfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>

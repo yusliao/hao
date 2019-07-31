@@ -192,10 +192,7 @@ namespace PushServer.Commands
                             DayNum = createdDate.DayOfYear,
                             TimeStamp = Util.Helpers.Time.GetUnixTimestamp(createdDate)
                         },
-                        OrderLogistics = new OrderLogisticsDetail()
-                        {
-                            Logistics = consigneeProvince == "新疆维吾尔自治区" ? "顺丰标准快递" : "中通快递"
-                        },
+                     
 
                         OrderStatus = (int)OrderStatus.Confirmed,
                         OrderStatusDesc = Util.Helpers.Enum.GetDescription(typeof(OrderStatus), OrderStatus.Confirmed),
@@ -317,7 +314,7 @@ namespace PushServer.Commands
                         items.Add(orderItem);
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
-                        db.OrderLogisticsDetailSet.Add(orderItem.OrderLogistics);
+                       
                       
                         db.SaveChanges();
                     }
@@ -409,14 +406,22 @@ namespace PushServer.Commands
                 {
                     foreach (var item in orders)
                     {
-                        var dr = dt.NewRow();
-                        dr["订单号"] = item.SourceSn;
-                        dr["货单号"] = item.OrderLogistics.LogisticsNo;
-                        dr["发货日期"] = item.OrderLogistics.SendingTime.HasValue ? item.OrderLogistics.SendingTime.Value.ToShortDateString() : item.OrderLogistics.PickingTime.Value.ToShortDateString();
-                        dr["发货时间"] = item.OrderLogistics.SendingTime.HasValue ? item.OrderLogistics.SendingTime.Value.ToShortTimeString() : item.OrderLogistics.PickingTime.Value.ToShortTimeString();
-                        dr["物流公司编码"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == item.OrderLogistics.Logistics).BankLogisticsCode;
-                        dr["物流公司"] = item.OrderLogistics.Logistics;
-                        dt.Rows.Add(dr);
+                        if (item.OrderLogistics != null && item.OrderLogistics.Any())
+                        {
+                            foreach (var logisticsDetail in item.OrderLogistics)
+                            {
+                                var dr = dt.NewRow();
+                                dr["订单号"] = item.SourceSn;
+                                dr["货单号"] = logisticsDetail.LogisticsNo;
+                                dr["发货日期"] = logisticsDetail.SendingTime.HasValue ? logisticsDetail.SendingTime.Value.ToShortDateString() : logisticsDetail.PickingTime.Value.ToShortDateString();
+                                dr["发货时间"] = logisticsDetail.SendingTime.HasValue ? logisticsDetail.SendingTime.Value.ToShortTimeString() : logisticsDetail.PickingTime.Value.ToShortTimeString();
+                                dr["物流公司编码"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == logisticsDetail.Logistics).BankLogisticsCode;
+                                dr["物流公司"] = logisticsDetail.Logistics;
+                                dt.Rows.Add(dr);
+                            }
+                        }
+
+                       
                     }
                 }
             }

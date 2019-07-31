@@ -38,13 +38,20 @@ namespace PushServer.Commands
 
                     foreach (var item in orders)
                     {
-                        var dr = dt.NewRow();
-                        dr["订单号"] = item.SourceSn;
-                        dr["物流单号"] = item.OrderLogistics.LogisticsNo;
+                        if(item.OrderLogistics!=null&&item.OrderLogistics.Any())
+                        {
+                            foreach (var logisticsDetail in item.OrderLogistics)
+                            {
+                                var dr = dt.NewRow();
+                                dr["订单号"] = item.SourceSn;
+                                dr["物流单号"] = logisticsDetail.LogisticsNo;
 
-                        dr["物流编号"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == item.OrderLogistics.Logistics).BankLogisticsCode;
+                                dr["物流编号"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == logisticsDetail.Logistics).BankLogisticsCode;
 
-                        dt.Rows.Add(dr);
+                                dt.Rows.Add(dr);
+                            }
+                        }
+                        
                     }
                 }
             }
@@ -247,10 +254,7 @@ namespace PushServer.Commands
                             Year = createdDate.Year,
                             TimeStamp = Util.Helpers.Time.GetUnixTimestamp(createdDate)
                         },
-                        OrderLogistics = new OrderLogisticsDetail()
-                        {
-                            Logistics = consigneeProvince== "新疆维吾尔自治区"? "顺丰速运": "中通速递"
-                        },
+                       
                         OrderStatus = (int)orderStatus,
                         OrderStatusDesc = Util.Helpers.Enum.GetDescription(typeof(OrderStatus), orderStatus),
 
@@ -371,7 +375,7 @@ namespace PushServer.Commands
                         items.Add(orderItem);
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
-                        db.OrderLogisticsDetailSet.Add(orderItem.OrderLogistics);
+                     
                        
                         db.SaveChanges();
                     }

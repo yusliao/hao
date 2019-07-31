@@ -369,11 +369,15 @@ namespace PushServer
                             p1.ProductCount = count;
                             
                         }
-                        order.OrderLogistics.Logistics = csv.GetField<string>("物流公司");
-                        order.OrderLogistics.LogisticsNo = csv.GetField<string>("物流单号");
-                        order.OrderLogistics.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
+                        OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
+                        orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
+                        orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号");
+                        orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                        orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                         //发货时间为空时，从配货时间中取日期作为发货时间
-                        order.OrderLogistics.RecvTime = csv.GetField<string>("发货时间") =="" ? order.OrderLogistics.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
+                        orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") =="" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
+                        order.OrderLogistics.Add(orderLogisticsDetail);
+                        db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
                         db.SaveChanges();
                         items.Add(order);
                     }

@@ -61,7 +61,7 @@ namespace PushServer
                     AppServer.PushReport();
                 }
                 
-                Util.Logs.Log.GetLog(nameof(PushServer)).Info("订单统计完毕");
+                Util.Logs.Log.GetLog(nameof(PushServer)).Info("定时报表推送完毕");
                 timer.Change(3 * 1000 * 60 * 60, 2 * 1000 * 60 * 60);
             }
 
