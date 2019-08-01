@@ -195,7 +195,7 @@ namespace PushServer
                         if(Environment.UserInteractive)
                         {
                             Console.ForegroundColor = ConsoleColor.White;
-                            Console.WriteLine($"{item.clientConfig.Tag}开始导入...");
+                            Console.WriteLine($"{item.clientConfig.Tag}开始导入".PadRight(30,'>'));
                         }
                         item.ImportToOMS();
                         if (Environment.UserInteractive)
@@ -203,7 +203,7 @@ namespace PushServer
                             var commcolor = Console.ForegroundColor;
                            
                             Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine($"{item.clientConfig.Tag}导入完毕...");
+                            Console.WriteLine($"{item.clientConfig.Tag}导入完毕".PadRight(30, '<'));
                             Console.ForegroundColor = commcolor;
                         }
                     }

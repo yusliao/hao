@@ -133,7 +133,8 @@ namespace PushServer.Commands
                     stopwatch.Stop();
                     Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单表耗时ms:{stopwatch.ElapsedMilliseconds}");
                     stopwatch.Start();
-                    db.SaveChanges();
+                    //  db.SaveChanges();
+                    db.BulkInsert<OrderProductInfo>(lst.SelectMany(o => o.Products));
                     stopwatch.Stop();
                     Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单商品表耗时ms:{stopwatch.ElapsedMilliseconds}");
 

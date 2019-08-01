@@ -10,7 +10,10 @@ namespace PushServer
     {
         public static bool PushReport()
         {
-            return AppServer.PushReport();
+          
+             return AppServer.PushReport();
+           
+            
         }
         public static bool PushPandianReport(int monthNum)
         {
