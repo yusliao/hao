@@ -14,36 +14,41 @@ namespace PushServer.Service
     [Export(typeof(IPandianServer))]
     public class CIBJifenStatisticMonthPandianServer : IPandianServer
     {
-        public string ServerName => OrderSource.CIB;
+        public string ServerName => OrderSource.CIBJifenPanDian;
 
-        public  bool CreateMonthPandianReport(int monthnum)
+        public  bool CreateMonthPandianReport(int monthnum, int year)
         {
 
             using (var db = new OMSContext())
             {
 
-                //根据OrderExtendInfo信息生成记录
-                var lst = db.OrderPandianProductInfoSet.Where(s => s.MonthNum==monthnum).ToList();
+                
+                var lst = db.OrderPandianProductInfoSet.Where(s => s.MonthNum==monthnum&&s.Year==year).ToList();
                 var q = lst.GroupBy(p => new { p.ProductPlatName, p.sku, p.weightCode,p.weightCodeDesc, p.MonthNum });
                 List<StatisticProduct> smp = new List<StatisticProduct>();
                 foreach (var item in q)
                 {
+                  
                     StatisticProduct statistic = new StatisticProduct()
                     {
 
-                        Source = OrderSource.CIBJifenPanDian,
-                        SourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIBJifenPanDian),
-                        MonthNum = monthnum,
+                        Source = ServerName,
+                        SourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName),
+                        Year = year,
                         ProductPlatName = item.Key.ProductPlatName,
+
+                        ProductTotalAmount = item.Sum(o => o.TotalAmount),
                         weightCode = item.Key.weightCode,
                         weightCodeDesc = item.Key.weightCodeDesc,
-                        ProductTotalAmount = item.Sum(o=>o.TotalAmount),
-                    
-                        ProductTotalWeight = item.Sum(o => o.ProductWeight)/1000,
-                        ProductCount = item.Sum(o => o.ProductCount)
-                        
-
+                        ProductTotalWeight = item.Sum(o => o.ProductWeight) / 1000,
+                        ProductCount = item.Sum(o => o.ProductCount),
+                        CreateDate = DateTime.Now,
+                        StatisticType = (int)StatisticType.Month,
+                        StatisticValue = monthnum
+                       
                     };
+
+
                     smp.Add(statistic);
                 }
                 if(Environment.UserInteractive)
@@ -53,7 +58,7 @@ namespace PushServer.Service
                         Console.WriteLine($"{item.SourceDesc}\t{item.ProductPlatName}\t{item.weightCodeDesc}\t{item.ProductTotalWeight}\t{item.ProductTotalAmount}\t{item.ProductCount}");
                     }
                 }
-                var removeobj = db.StatisticMonthPandianSet.Where(s => s.MonthNum == monthnum && s.Source == OrderSource.CIB);
+                var removeobj = db.StatisticProductSet.Where(s => s.Year == year && s.Source == ServerName && s.StatisticType == (int)StatisticType.Month && s.StatisticValue == monthnum);
                 db.Set<StatisticProduct>().RemoveRange(removeobj);
                 db.SaveChanges();
                 db.Set<StatisticProduct>().AddRange(smp);
@@ -61,12 +66,12 @@ namespace PushServer.Service
             }
             return true;
         }
-        public  DataTable PushPandianReport(int monthNum)
+        public  DataTable PushPandianReport(int monthNum,int year)
         {
             DataTable dt = new DataTable();
             using (var db = new OMSContext())
             {
-                var lst = db.StatisticMonthPandianSet.Where(s => s.MonthNum == monthNum && s.Source == ServerName);
+                var lst = db.StatisticProductSet.Where(s => s.StatisticValue == monthNum && s.Source == ServerName&&s.Year==year);
                 if (lst != null && lst.Any())
                 {
 

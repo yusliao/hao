@@ -161,9 +161,9 @@
     <Compile Include="Configuration\ClientElement.cs" />
     <Compile Include="Configuration\ClientListSection.cs" />
     <Compile Include="ImportExcelHelper.cs" />
-    <Compile Include="Migrations\201907300328047_orderinfo.cs" />
-    <Compile Include="Migrations\201907300328047_orderinfo.Designer.cs">
-      <DependentUpon>201907300328047_orderinfo.cs</DependentUpon>
+    <Compile Include="Migrations\201908060423518_20160201003.cs" />
+    <Compile Include="Migrations\201908060423518_20160201003.Designer.cs">
+      <DependentUpon>201908060423518_20160201003.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\OMSContext.cs" />
@@ -186,11 +186,13 @@
     <Compile Include="SelfInstaller.cs" />
     <Compile Include="Service\ALLStatisticServer.cs" />
     <Compile Include="Service\CIBAPPStatisticServer.cs" />
+    <Compile Include="Service\CIBJifenStatisticMonthPandianServer.cs" />
     <Compile Include="Service\CIBVIPStatisticServer.cs" />
     <Compile Include="Service\CIBPCStatisticServer.cs" />
     <Compile Include="Service\DistrictStatisticServerBase.cs" />
     <Compile Include="Service\IDistrictStatisticServer.cs" />
     <Compile Include="Service\IOrderStatisticServer.cs" />
+    <Compile Include="Service\IPandianServer.cs" />
     <Compile Include="Service\IProductStatisticServer.cs" />
     <Compile Include="Service\OrderStatisticServerBase.cs" />
     <Compile Include="Service\ProductStatisticServerBase.cs" />
@@ -209,8 +211,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201907300328047_orderinfo.resx">
-      <DependentUpon>201907300328047_orderinfo.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201908060423518_20160201003.resx">
+      <DependentUpon>201908060423518_20160201003.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>

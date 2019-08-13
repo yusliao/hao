@@ -17,11 +17,11 @@ namespace PushServer.Commands
         /// <returns></returns>
         bool ImportToOMS();
         /// <summary>
-        /// 创建EXCEL文件
+        /// EXCEL文件，导出银行回传单
         /// </summary>
         /// <returns></returns>
         DataTable ExportExcel(List<OrderEntity> orders);
-        bool PushReport();
+       
         
     }
 }

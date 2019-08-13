@@ -47,7 +47,7 @@ namespace PushServer
                 return;
             else if (Math.Abs(timespan) == 2)
             {
-                timer.Change(1 * 1000 * 60 * 60, 3 * 1000 * 60 * 10);
+                timer.Change(1 * 1000 * 60 * 60, 2 * 1000 * 60 * 10);
                 AppServer.CreateReport(DateTime.Now.AddDays(-1));
             }
             else if (Math.Abs(timespan) == 1)

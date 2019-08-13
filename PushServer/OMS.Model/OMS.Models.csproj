@@ -45,6 +45,7 @@
     <Compile Include="Models\AddressEntity.cs" />
     <Compile Include="Models\ChinaAreaData.cs" />
     <Compile Include="Models\CustomerEntity.cs" />
+    <Compile Include="Models\CustomStrategy.cs" />
     <Compile Include="Models\ExceptionOrder.cs" />
     <Compile Include="Models\OrderDateInfo.cs" />
     <Compile Include="Models\OrderRepurchase.cs" />

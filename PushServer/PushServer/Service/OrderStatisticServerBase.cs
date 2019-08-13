@@ -155,7 +155,8 @@ namespace PushServer.Service
         {
             var wxTargets = System.Configuration.ConfigurationManager.AppSettings["WxNewsTargets"].Split(new char[] { ',' }).ToList();
             var WxNewsUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsUrl"];
-            var WxNewsPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsPicUrl"];
+            var WxNewsPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsPicUrl"]; 
+            var WxNewssmallPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewssmallPicUrl"];
 
             var redirectUri = string.Format("{0}?date={1}&mode=day&source={2}", WxNewsUrl, DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), ServerName);
 
@@ -163,58 +164,112 @@ namespace PushServer.Service
 
             var url = WxPushNews.CreateWxNewsOAuthUrl(redirectUri);
             var picUrl = WxNewsPicUrl;
+            var smallpicUrl = WxNewssmallPicUrl;
             using (var db = new OMSContext())
             {
-                Statistic foo = null;
+                Statistic foo = new Statistic();
                 string title = string.Empty;
-                DateTime dateTime = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+              
+                List<Statistic> lst = new List<Statistic>();
+                var nameDesc =  Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName);
                 switch (statisticType)
                 {
                     case StatisticType.Day:
-
-                       
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue&&s.Year==year).FirstOrDefault();
-
+                        
+                        DateTime dateTime = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        
+                        foreach (var s in lst)
+                        {
+                            foo.TotalAmount += s.TotalAmount;
+                            foo.TotalCustomer += s.TotalCustomer;
+                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
+                            foo.TotalOrderCount += s.TotalOrderCount;
+                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
+                            foo.TotalProductCount += s.TotalProductCount;
+                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
+                            foo.TotalWeight += s.TotalWeight;
+                        }
                         if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), ServerName, Environment.NewLine);
+                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), nameDesc, Environment.NewLine);
                         else
-                            title = string.Format("{0} #{1}#", foo.CreateDate.ToString("yyyy年MM月dd日"), ServerName);
+                            title = string.Format("{0} #{1}#", dateTime.ToString("yyyy年MM月dd日"), nameDesc);
                         break;
                     case StatisticType.Week:
-                        int week = Util.Helpers.Time.GetWeekNum(DateTime.Now);
-                        if (week > 1)
-                            week -= 1;//发送上周的报表
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Week && s.StatisticValue == week).FirstOrDefault();
+                       
+                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Week && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        foreach (var s in lst)
+                        {
+                            foo.TotalAmount += s.TotalAmount;
+                            foo.TotalCustomer += s.TotalCustomer;
+                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
+                            foo.TotalOrderCount += s.TotalOrderCount;
+                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
+                            foo.TotalProductCount += s.TotalProductCount;
+                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
+                            foo.TotalWeight += s.TotalWeight;
+                        }
                         if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), ServerName, Environment.NewLine);
+                            title = string.Format("{0} #{1}#{2}(本周无单）", $"{year}年{statisticValue}周", nameDesc, Environment.NewLine);
                         else
-                            title = $"{DateTime.Now.Year}年#{week}周#{ServerName}";
+                            title = $"{year}年#{statisticValue}周#{nameDesc}";
                         break;
                     case StatisticType.Month:
-                        int month = DateTime.Now.Month;
-                        if (month > 1)
-                            month -= 1;//发送上个月的报表
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == month).FirstOrDefault();
+
+                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        foreach (var s in lst)
+                        {
+                            foo.TotalAmount += s.TotalAmount;
+                            foo.TotalCustomer += s.TotalCustomer;
+                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
+                            foo.TotalOrderCount += s.TotalOrderCount;
+                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
+                            foo.TotalProductCount += s.TotalProductCount;
+                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
+                            foo.TotalWeight += s.TotalWeight;
+                        }
                         if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), ServerName, Environment.NewLine);
+                            title = string.Format("{0} #{1}#{2}(本月无单）", $"{year}年{statisticValue}月", nameDesc, Environment.NewLine);
                         else
-                            title = $"{DateTime.Now.Year}年#{month}月份#{ServerName}";
+                            title = $"{year}年#{statisticValue}月份#{nameDesc}";
                         break;
                     case StatisticType.Quarter:
-                        int quarter = Util.Helpers.Time.GetSeasonNum(DateTime.Now);
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Quarter && s.StatisticValue == quarter).FirstOrDefault();
+
+                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Quarter && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        foreach (var s in lst)
+                        {
+                            foo.TotalAmount += s.TotalAmount;
+                            foo.TotalCustomer += s.TotalCustomer;
+                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
+                            foo.TotalOrderCount += s.TotalOrderCount;
+                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
+                            foo.TotalProductCount += s.TotalProductCount;
+                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
+                            foo.TotalWeight += s.TotalWeight;
+                        }
                         if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", foo.CreateDate.ToString("yyyy年MM月dd日"), ServerName, Environment.NewLine);
+                            title = string.Format("{0} #{1}#{2}(本季无单）", $"{year}年{statisticValue}季", nameDesc, Environment.NewLine);
                         else
-                            title = $"{DateTime.Now.Year}年#{quarter}季度#{ServerName}";
+                            title = $"{year}年#{statisticValue}季度#{nameDesc}";
                         break;
                     case StatisticType.Year:
 
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == DateTime.Now.Year).FirstOrDefault();
+                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Year && s.StatisticValue == year&& s.SourceDesc == nameDesc).ToList();
+                        foreach (var s in lst)
+                        {
+                            foo.TotalAmount += s.TotalAmount;
+                            foo.TotalCustomer += s.TotalCustomer;
+                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
+                            foo.TotalOrderCount += s.TotalOrderCount;
+                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
+                            foo.TotalProductCount += s.TotalProductCount;
+                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
+                            foo.TotalWeight += s.TotalWeight;
+                        }
                         if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), ServerName, Environment.NewLine);
+                            title = string.Format("{0} #{1}#{2}(本年无单）", $"{year}年", nameDesc, Environment.NewLine);
                         else
-                            title = $"{DateTime.Now.Year}年#{ServerName}";
+                            title = $"{year}年#{nameDesc}";
                         break;
                     default:
                         break;
@@ -226,19 +281,17 @@ namespace PushServer.Service
                     new WxArticle( title,url,picUrl,string.Empty)
                 };
 
-                if (foo.TotalOrderCount > 0)
+                if (foo!=null&&foo.TotalOrderCount > 0)
                     wxArticles.AddRange(new List<WxArticle>()
                 {
-                    new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,string.Empty,string.Empty),
-                     new WxArticle(string.Format("总计复购单数：{0}", foo.TotalOrderRepurchase),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计人数复购率：{0}%", (foo.TotalCustomerRepurchase/foo.TotalCustomer)*100),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计单数复购率：{0}%", (foo.TotalOrderRepurchase/foo.TotalOrderCount)*100),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计盒数复购率：{0}%", (foo.TotalProductRepurchase/foo.TotalProductCount)*100),url,string.Empty,string.Empty),
+                    new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,smallpicUrl,string.Empty),
+                    new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,smallpicUrl,string.Empty),
+                    new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,smallpicUrl,string.Empty),
+                    new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,smallpicUrl,string.Empty),
+                   // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
+                    new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,smallpicUrl,string.Empty),
+                    new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,smallpicUrl,string.Empty),
+                    new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,smallpicUrl,string.Empty),
 
                 });
                 try

@@ -15,7 +15,7 @@ namespace OMS.Models
         public const string CIBAPP = "CIBAPP";
         [Description("兴业分期商城")]
         public const string CIBSTM = "CIBSTM";
-        [Description("银行-兴业银行积点商城")]
+        [Description("银行-重庆兴业银行黑白金客户")]
         public const string CIBVIP = "CIBVIP";
         [Description("兴业活动")]
         public const string CIBEVT = "CIBEVT";

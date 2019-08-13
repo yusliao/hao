@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace PushServer.Models
+namespace OMS.Models
 {
     
     public enum ProductCategory

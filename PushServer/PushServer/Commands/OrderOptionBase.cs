@@ -117,11 +117,8 @@ namespace PushServer.Commands
                        
                         TotalWeight = item.Products.Sum(p => p.ProductWeight)
                     };
-                   // db.OrderExtendInfoSet.Add(item.OrderExtendInfo);
-                   // db.Set<OrderProductInfo>().AddRange(item.Products);
-
                 }
-                db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
+                
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
                 stopwatch.Stop();
                 Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单扩展表耗时ms:{stopwatch.ElapsedMilliseconds}");
@@ -133,6 +130,7 @@ namespace PushServer.Commands
                     stopwatch.Stop();
                     Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单表耗时ms:{stopwatch.ElapsedMilliseconds}");
                     stopwatch.Start();
+                    db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
                     //  db.SaveChanges();
                     db.BulkInsert<OrderProductInfo>(lst.SelectMany(o => o.Products));
                     stopwatch.Stop();

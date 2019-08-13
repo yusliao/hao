@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PushServer.Models
+namespace OMS.Models
 {
     /// <summary>
     /// 物流信息

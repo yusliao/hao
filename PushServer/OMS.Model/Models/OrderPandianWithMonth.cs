@@ -50,6 +50,7 @@ namespace OMS.Models
     public class OrderPandianProductInfo
     {
         public int MonthNum { get; set; }
+        public int Year { get; set; }
         [Key]
         public long Id { get; set; }
         /// <summary>

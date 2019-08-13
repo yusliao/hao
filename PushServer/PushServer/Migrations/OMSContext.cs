@@ -1,4 +1,4 @@
-﻿using PushServer.Models;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -14,7 +14,7 @@ namespace OMS.Models
              Database.SetInitializer<OMSContext>(null);
             //  Database.SetInitializer<OMSContext>(new CreateDatabaseIfNotExists<OMSContext>());
            //   Database.SetInitializer<OMSContext>(new DropCreateDatabaseIfModelChanges<OMSContext>());
-            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<OMSContext, PushServer.Migrations.Configuration>());
+          //  Database.SetInitializer(new MigrateDatabaseToLatestVersion<OMSContext, PushServer.Migrations.Configuration>());
         }
         public IDbSet<AddressEntity> AddressSet { get; set; }
         public IDbSet<ProductEntity> ProductsSet { get; set; }
@@ -37,5 +37,6 @@ namespace OMS.Models
         public IDbSet<StatisticDistrict> StatisticDistricts { get; set; }
         public IDbSet<ExceptionOrder> ExceptionOrders { get; set; }
         public IDbSet<ChinaAreaData> ChinaAreaDatas  { get; set; }
+        public IDbSet<CustomStrategy> CustomStrategies { get; set; }
     }
 }

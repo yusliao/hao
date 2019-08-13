@@ -10,7 +10,7 @@ namespace PushServer.Service
     interface IPandianServer
     {
         string ServerName { get;  }
-        bool CreateMonthPandianReport(int monthnum);
-        DataTable PushPandianReport(int monthNum);
+        bool CreateMonthPandianReport(int monthnum, int year);
+        DataTable PushPandianReport(int monthNum,int year);
     }
 }

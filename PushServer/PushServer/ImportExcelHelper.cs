@@ -28,12 +28,16 @@ namespace PushServer
             else
                 return AppServer.ExportExcel();
         }
+        /// <summary>
+        /// 导出银行回传单
+        /// </summary>
+        /// <param name="isInput"></param>
+        /// <returns></returns>
         public static bool ExportExcel(bool isInput = true)
         {
-            
              return AppServer.ImportErpToOMS();
-            
         }
+       
 
     }
 }

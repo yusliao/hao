@@ -59,10 +59,12 @@ namespace PushServer
             Console.WriteLine("-[u]: 卸载服务;");
             Console.WriteLine("-[p]: 推送报表;");
             Console.WriteLine("-[p1]: 推送盘点报表;后跟具体的月份值  exp: p1 6");
-            Console.WriteLine("-[c]: 生成报表; 默认生成昨天的报表。 -a 整月.exp: c -a");
+            Console.WriteLine("-[c]: 生成报表; exp: c ");
             Console.WriteLine("-[c2]: 生成回传订单; exp: c2 ");
+            Console.WriteLine("-[c3]: 生成历史报表; exp: c3 1 ");
             Console.WriteLine("-[c1]: 生成盘点报表; 后跟具体的月份值 exp: c1 6");
             Console.WriteLine("-[in]: 导入订单");
+         
             //Console.WriteLine("-[out]: 导出订单;");
             Console.ForegroundColor = commcolor;
         }
@@ -72,6 +74,9 @@ namespace PushServer
             string[] str = exeArg.Trim().Replace('-',' ').Split(' ');
             switch (str[0].ToLower())
             {
+                #region 基础服务
+
+               
                 case ("i"):
                     SelfInstaller.InstallMe();
                     return true;
@@ -99,6 +104,7 @@ namespace PushServer
                         Console.WriteLine("停止服务失败");
                     }
                     return true;
+                #endregion
                 case ("p"):
                     var pushReportResult = PushReportHelper.PushReport();
                     if (pushReportResult)
@@ -109,7 +115,7 @@ namespace PushServer
                     }
                     return true;
                 case ("p1"):
-                    int month = 6;
+                    int month = DateTime.Now.Month;
                     if (int.TryParse(str[1], out month))
                     {
                         
@@ -127,16 +133,8 @@ namespace PushServer
                     }
                     return true;
                 case ("c"):
-                    bool isAll = false;
-                    for (int i = 1; i < str.Length; i++)
-                    {
-                        if (string.IsNullOrEmpty(str[i]))
-                            continue;
-                        else if (str[i]== "a")
-                            isAll = true;
-
-                    }
-                    var createReportResult = PushReportHelper.CreateReport(isAll);
+                   
+                    var createReportResult = PushReportHelper.CreateReport();
                     if (createReportResult)
                         Console.WriteLine("报表生成成功！");
                     else
@@ -145,10 +143,10 @@ namespace PushServer
                     }
                     return true;
                 case ("c1"):
-                    int pdmonth = 6;
-                    if (int.TryParse(str[1], out pdmonth))
+                    int c1month = 6;
+                    if (int.TryParse(str[1], out c1month))
                     {
-                        var createPandianReportResult = PushReportHelper.CreatePandianReport(pdmonth);
+                        var createPandianReportResult = PushReportHelper.CreatePandianReport(c1month);
                         if (createPandianReportResult)
                             Console.WriteLine("报表生成成功！");
                         else
@@ -161,6 +159,24 @@ namespace PushServer
                         Console.WriteLine($"输入的命令有误，请重新输入");
                     }
                    
+                    return true;
+                case ("c3"):
+                    int c3month = DateTime.Now.Month;
+                    if (int.TryParse(str[1], out c3month))
+                    {
+                        var createPandianReportResult = PushReportHelper.CreateHistoryReport(c3month);
+                        if (createPandianReportResult)
+                            Console.WriteLine("报表生成成功！");
+                        else
+                        {
+                            Console.WriteLine("报表生成失败");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"输入的命令有误，请重新输入");
+                    }
+
                     return true;
                 case ("c2"):
                     
@@ -181,6 +197,7 @@ namespace PushServer
                         Console.WriteLine("导入订单失败");
                     }
                     return true;
+               
                 //case ("out"):
                 //    var exportExcelResult = ExcelHelper.Dowork(false);
                 //    if (exportExcelResult)

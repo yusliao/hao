@@ -180,7 +180,7 @@ namespace PushServer.Commands
                     using (var db = new OMSContext())
                     {
                         int weight=0;
-                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == productsku);
+                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
                         if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
                         {
                             Util.Logs.Log.GetLog(nameof(CIBVIPCSVOrderOption)).Error($"订单文件：{file}中平台商品：{productName}未找到");
@@ -209,6 +209,7 @@ namespace PushServer.Commands
                         {
                             
                             ProductPlatName = productName,
+                            Year=createdDate.Year,
                             MonthNum = createdDate.Month,
                             TotalAmount = totalAmount,
                             ProductCount = quantity,
@@ -229,7 +230,7 @@ namespace PushServer.Commands
                     using (var db = new OMSContext())
                     {
                         int weight = 0;
-                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == productsku);
+                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
                         if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
                         {
                             Util.Logs.Log.GetLog(nameof(CIBVIPCSVOrderOption)).Error($"订单文件：{file}中平台商品：{productName}未找到");
@@ -258,6 +259,7 @@ namespace PushServer.Commands
                         {
                            
                             ProductPlatName = productName,
+                           
                             MonthNum = createdDate.Month,
                             TotalAmount = totalAmount,
                             ProductCount = quantity,
@@ -305,10 +307,9 @@ namespace PushServer.Commands
                     try
                     {
 
-                        db.Set<OrderPandianWithMonth>().AddRange(lst);
-                        
-                        db.BulkSaveChanges();
-                        //db.SaveChanges();
+                        db.BulkInsert(lst);
+                        db.Set<OrderPandianProductInfo>().AddRange(lst.SelectMany(o => o.Products));
+                        db.BulkInsert<OrderPandianProductInfo>(lst.SelectMany(o => o.Products));
                         result = true;
                     }
                     catch (Exception ex)

@@ -30,6 +30,7 @@ namespace PushServer
         /// 平台信息配置字典
         /// </summary>
         public readonly Dictionary<string, Configuration.IClientConfig> ConfigDictionary = new Dictionary<string, Configuration.IClientConfig>();
+        private readonly List<CustomerEntity> EmptyPackagePersonList = new List<CustomerEntity>();
         private static readonly AppServer instance = new AppServer();
         protected Util.Files.FileScanner FileScanner { get; set; } = new Util.Files.FileScanner();
         public static AppServer Instance
@@ -50,6 +51,7 @@ namespace PushServer
             }
             OrderOptionBase.OnPostCompletedEventHandle += OrderOptionBase_OnPostCompletedEventHandle;
             OrderOptionBase.UIMessageEventHandle += OrderOptionBase_OnUIMessageEventHandle;
+            
             #region MEF配置
             MyComposePart();
             #endregion
@@ -63,7 +65,10 @@ namespace PushServer
                 Console.WriteLine(obj);
             }
         }
-
+        /// <summary>
+        /// 生成ERP导出单
+        /// </summary>
+        /// <param name="obj"></param>
         private void OrderOptionBase_OnPostCompletedEventHandle(List<OMS.Models.OrderEntity> obj)
         {
             if (obj != null&&obj.Any())
@@ -145,7 +150,9 @@ namespace PushServer
                             dr["市"] = item.ConsigneeAddress.City;
                             dr["区"] = item.ConsigneeAddress.County;
                             dr["邮编"] = item.ConsigneeAddress.ZipCode;
-                          //  dr["物流公司"] = item.OrderLogistics.Logistics;
+                            var foo = db.CustomStrategies.Include(c => c.Customer).FirstOrDefault(c => c.Customer.CustomerId == item.Consignee.CustomerId);
+                            if(foo!=null&&Util.Helpers.Enum.Parse<CustomStrategyEnum>(foo.StrategyValue).HasFlag(CustomStrategyEnum.EmptyPackage))
+                                dr["卖家备注"] = Util.Helpers.Enum.GetDescription<CustomStrategyEnum>(CustomStrategyEnum.EmptyPackage);
                             //dr["仓库名称"] = productInfo.Warehouse;
                             dt.Rows.Add(dr);
 
@@ -358,36 +365,70 @@ namespace PushServer
                     if (order != null)
                     {
                         string warehouse = csv.GetField<string>("仓库名称");
-                        string sku = csv.GetField<string>("商品代码");
+                        string pcode = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码
                         decimal weight = csv.GetField<string>("总重量").ToInt();
                         int count = csv.GetField<string>("数量").ToInt();
-                        var p1 = order.Products.FirstOrDefault(p => p.sku == sku);
-                        if(p1!=null)
+
+                        var p1 = order.Products.FirstOrDefault(p => p.sku == pcode);
+                        if(p1!=null)//修改已有商品汇总信息
                         {
                             p1.Warehouse = warehouse;
                             p1.ProductWeight = weight;
                             p1.ProductCount = count;
                             
                         }
+                        else//新增订单商品
+                        {
+                            OrderProductInfo orderProductInfo = new OrderProductInfo()
+                            {
+                                ProductPlatName = csv.GetField<string>("商品名称").Trim(),
+                                ProductPlatId = pcode,
+                                MonthNum = order.CreatedDate.Month,
+                                Warehouse = warehouse,
+                                
+                                weightCode = csv.GetField<string>("规格代码").ToInt(),
+                                weightCodeDesc = csv.GetField<string>("规格名称").Trim(),
+                                OrderSn = order.OrderSn,
+                                //  TotalAmount = csv.GetField<string>("规格名称"),
+                                ProductCount = count,
+                                ProductWeight = weight,
+                                Source = order.Source,
+
+                            };
+                            db.OrderProductSet.Add(orderProductInfo);
+                            order.Products.Add(orderProductInfo);
+                            
+                        }
+                       
                         OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
                         orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
-                        orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号");
+                        orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
                         orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
                         orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                         //发货时间为空时，从配货时间中取日期作为发货时间
                         orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") =="" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
-                        order.OrderLogistics.Add(orderLogisticsDetail);
-                        db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                        var templ = order.OrderLogistics.FirstOrDefault(o => o.LogisticsNo == orderLogisticsDetail.LogisticsNo);//是否已经存在该物流信息，防止重复添加
+                        if (templ == null)
+                        {
+                            if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
+                            {
+                                db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                                order.OrderLogistics.Add(orderLogisticsDetail);
+                            }
+                            
+                        }
                         db.SaveChanges();
                         items.Add(order);
                     }
                     else
                     {
                         Util.Logs.Log.GetLog(nameof(AppServer)).Error($"ERP导出单：{file}。该文件中订单编号：{sn}在OMS系统中不存在");
-                        if(Environment.UserInteractive)
-                        {
-                            Console.WriteLine($"ERP导出单：{file}。该文件中订单编号：{sn}在OMS系统中不存在");
-                        }
+                        
+
+                    }
+                    if (Environment.UserInteractive)
+                    {
+                        Console.WriteLine($"ERP导出单：{file}。该文件中订单编号：{sn}解析完毕");
                     }
                 }
             }
@@ -408,12 +449,9 @@ namespace PushServer
         }
         public  static bool PushReport()
         {
-            StatisticServer.SendStatisticMessage(StatisticType.Day, DateTime.Now.AddDays(-1));
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Monday)
-                StatisticServer.SendStatisticMessage(StatisticType.Week, DateTime.Now);
-            if (DateTime.Now.Day == 1)
-                StatisticServer.SendStatisticMessage(StatisticType.Month, DateTime.Now);
-            return true;
+            var serverNames = instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i=>i.Name).ToArray();
+            return StatisticServer.Instance.PushReport(serverNames);
+
         }
         /// <summary>
         /// 发布盘点报告
@@ -428,10 +466,15 @@ namespace PushServer
            
             
         }
-        public static bool CreateReport(DateTime dateTime,bool isAll =false)
+        public static bool CreateReport(DateTime dateTime)
         {
-            return StatisticServer.Instance.CreateReport(dateTime, isAll);
+            return StatisticServer.Instance.CreateReport(dateTime);
             
+        }
+        public static bool CreateHistoryReport(int month,int year)
+        {
+            return StatisticServer.Instance.CreateHistoryReport(month, year);
+
         }
         public static bool CreatePandianReport(int monthNum)
         {

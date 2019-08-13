@@ -49,8 +49,10 @@ namespace PushServer.Configuration
         public string ServerUrl => this["ServerUrl"] as string;
         [ConfigurationProperty("Tag", IsRequired = false)]
         public string Tag => this["Tag"] as string;
+        [ConfigurationProperty("Enabled", IsRequired = false)]
+        public bool? Enabled => this["Enabled"] as bool?;
 
-        
+
     }
      public interface IClientConfig
     {
@@ -62,5 +64,9 @@ namespace PushServer.Configuration
         string AppSecret { get; }
         string SessionKey { get; }
         string ServerUrl { get; }
+        /// <summary>
+        /// 是否激活该渠道，影响推送报表
+        /// </summary>
+        bool? Enabled { get; }
     }
 }

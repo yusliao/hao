@@ -115,8 +115,9 @@ namespace PushServer.Commands
 
                 var source = OrderSource.CIB;
                 var sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIB);
-                var sourceSN = $"pc{DateTime.Now.ToString("yyyyMMddHHmmssfff")}";
-                var orderSN = string.Format("{0}-{1}", source, sourceSN); //订单SN=来源+原来的SN
+                var id = Convert.ToString(row["兑换流水编号"]);
+              
+               
 
                 var sOrderDate = Convert.ToString(row["兑换登记日期"]);
                 var createdDate = DateTime.Parse(sOrderDate.Insert(4, "-").Insert(7, "-"));
@@ -172,7 +173,8 @@ namespace PushServer.Commands
                     customerPhone=consigneePhone = Convert.ToString(row["手机号码"]);
                 else
                     customerPhone = consigneePhone;//NOTE: no necessery!
-
+                var sourceSN = $"{id}_{createdDate.ToString("yyyyMMdd")}_{customerPhone}_{productsku}";
+                var orderSN = string.Format("{0}-{1}", source, sourceSN); //订单SN=来源+原来的SN
                 if (excelTable.Columns.Contains("领取人所在省份"))
                     consigneeProvince = Convert.ToString(row["领取人所在省份"]);
 
@@ -329,7 +331,7 @@ namespace PushServer.Commands
                             db.SaveChanges();
                             continue;
                         }
-                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == productsku);
+                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
                         if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
                         {
                             Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品：{productsku}未找到");
@@ -387,7 +389,7 @@ namespace PushServer.Commands
 
                     using (var db = new OMSContext())
                     {
-                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == productsku);
+                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
                         if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
                         {
                             Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品：{productName}未找到");
