@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using OMS.Models;
+using OMS.Models.DTO;
 using PushServer.Configuration;
 
 namespace PushServer.Commands
@@ -103,8 +104,9 @@ namespace PushServer.Commands
         protected  List<OrderEntity> ResolveOrders(DataTable excelTable,string file, List<OrderEntity> items)
         {
 
-            var orderStatus = OrderStatus.Confirmed;
-
+            OrderDTO orderDTO = new OrderDTO();
+            orderDTO.orderStatus = OrderStatus.Confirmed;
+            orderDTO.fileName = file;
 
             foreach (DataRow row in excelTable.Rows)
             {
@@ -113,35 +115,30 @@ namespace PushServer.Commands
                    || row["领取人姓名"] == DBNull.Value)
                     continue;
 
-                var source = OrderSource.CIB;
-                var sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIB);
+                orderDTO.source = OrderSource.CIB;
+                orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIB);
                 var id = Convert.ToString(row["兑换流水编号"]);
               
                
 
                 var sOrderDate = Convert.ToString(row["兑换登记日期"]);
-                var createdDate = DateTime.Parse(sOrderDate.Insert(4, "-").Insert(7, "-"));
+                orderDTO.createdDate = DateTime.Parse(sOrderDate.Insert(4, "-").Insert(7, "-"));
 
                 var sourceAccount = string.Empty;
                 if (excelTable.Columns.Contains("持卡人证件号码"))
                     sourceAccount = Convert.ToString(row["持卡人证件号码"]);
 
-                var productName = Convert.ToString(row["礼品名称"]);
-                var productsku = Convert.ToString(row["礼品编号"]);
-                var quantity = Convert.ToInt32(row["兑换礼品数量"]);
+                orderDTO.productName = Convert.ToString(row["礼品名称"]);
+                orderDTO.productsku = Convert.ToString(row["礼品编号"]);
+                orderDTO.count = Convert.ToInt32(row["兑换礼品数量"]);
 
                 var customerName = string.Empty;
                 var customerPhone = string.Empty;
                 var customerPhone2 = string.Empty;
 
-                var consigneeName = Convert.ToString(row["领取人姓名"]);
-                var consigneePhone = string.Empty;
-                var consigneePhone2 = string.Empty;
+                orderDTO.consigneeName = Convert.ToString(row["领取人姓名"]);
 
-                var consigneeProvince = string.Empty;
-                var consigneeCity = string.Empty;
-                var consigneeCounty = string.Empty;
-                var consigneeAddress = Convert.ToString(row["递送地址"]);
+                orderDTO.consigneeAddress = Convert.ToString(row["递送地址"]);
 
                 var consigneeAddressUnit = string.Empty;
                 if (excelTable.Columns.Contains("单位"))
@@ -152,9 +149,9 @@ namespace PushServer.Commands
                 //合并详细地址和单位地址，并且将单位地址设置为空（解决地址被分开，识别度降低问题）
 
                 if (!string.IsNullOrEmpty(consigneeAddressUnit))
-                    consigneeAddress = string.Format("{0}{1}", consigneeAddress, consigneeAddressUnit);
+                    orderDTO.consigneeAddress = string.Format("{0}{1}", orderDTO.consigneeAddress, consigneeAddressUnit);
 
-                var consigneeZipCode = Convert.ToString(row["递送地址邮编"]);
+                orderDTO.consigneeZipCode = Convert.ToString(row["递送地址邮编"]);
 
                 if (excelTable.Columns.Contains("持卡人姓名"))
                     customerName = Convert.ToString(row["持卡人姓名"]);
@@ -167,35 +164,35 @@ namespace PushServer.Commands
                 //    consigneePhone = Convert.ToString(row["领取人联系手机"]);
 
                 if (excelTable.Columns.Contains("分机"))
-                    consigneePhone2 = Convert.ToString(row["分机"]);
+                    orderDTO.consigneePhone2 = Convert.ToString(row["分机"]);
 
                 if (excelTable.Columns.Contains("手机号码"))
-                    customerPhone=consigneePhone = Convert.ToString(row["手机号码"]);
+                    customerPhone= orderDTO.consigneePhone = Convert.ToString(row["手机号码"]);
                 else
-                    customerPhone = consigneePhone;//NOTE: no necessery!
-                var sourceSN = $"{id}_{createdDate.ToString("yyyyMMdd")}_{customerPhone}_{productsku}";
-                var orderSN = string.Format("{0}-{1}", source, sourceSN); //订单SN=来源+原来的SN
+                    customerPhone = orderDTO.consigneePhone;//NOTE: no necessery!
+                orderDTO.sourceSN = $"{id}_{orderDTO.createdDate.ToString("yyyyMMdd")}_{customerPhone}_{orderDTO.productsku}";
+                orderDTO.orderSN = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN); //订单SN=来源+原来的SN
                 if (excelTable.Columns.Contains("领取人所在省份"))
-                    consigneeProvince = Convert.ToString(row["领取人所在省份"]);
+                    orderDTO.consigneeProvince = Convert.ToString(row["领取人所在省份"]);
 
                 if (excelTable.Columns.Contains("领取人所在城市"))
-                    consigneeCity = Convert.ToString(row["领取人所在城市"]);
+                    orderDTO.consigneeCity = Convert.ToString(row["领取人所在城市"]);
 
                 if (excelTable.Columns.Contains("领取人所在县区"))
-                    consigneeCounty = Convert.ToString(row["领取人所在县区"]);
+                    orderDTO.consigneeCounty = Convert.ToString(row["领取人所在县区"]);
 
                 //
-                if (string.IsNullOrEmpty(consigneeProvince)
-                    && string.IsNullOrEmpty(consigneeCity) && !string.IsNullOrEmpty(consigneeAddress))
+                if (string.IsNullOrEmpty(orderDTO.consigneeProvince)
+                    && string.IsNullOrEmpty(orderDTO.consigneeCity) && !string.IsNullOrEmpty(orderDTO.consigneeAddress))
                 {
-                    var addrInfo = DistrictService.DistrictService.ResolveAddress(consigneeAddress);
-                    consigneeProvince = addrInfo.Province;
-                    consigneeCity = addrInfo.City;
-                    consigneeCounty = addrInfo.County;
+                    var addrInfo = DistrictService.DistrictService.ResolveAddress(orderDTO.consigneeAddress);
+                    orderDTO.consigneeProvince = addrInfo.Province;
+                    orderDTO.consigneeCity = addrInfo.City;
+                    orderDTO.consigneeCounty = addrInfo.County;
                   //  consigneeAddress = addrInfo.Address;
                 }
 
-                consigneeName = consigneeName.Split(' ').First();
+                orderDTO.consigneeName = orderDTO.consigneeName.Split(' ').First();
                 customerName = customerName.Split(' ').First();
 
                 //修正处理：
@@ -207,7 +204,7 @@ namespace PushServer.Commands
                
                 using (var db = new OMSContext())
                 {
-                    var foo = db.OrderSet.Find(orderSN);
+                    var foo = db.OrderSet.Find(orderDTO.orderSN);
                     if (foo != null)
                     {
                         Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单{foo.OrderSn}已经存在");
@@ -215,50 +212,50 @@ namespace PushServer.Commands
 
                     }
                 }
-                var item = items.Find(o => o.OrderSn == orderSN);
+                var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
                     var orderItem = new OrderEntity()
                     {
-                        SourceSn = sourceSN,
-                        Source = source,
-                        SourceDesc = sourceDesc,
-                        CreatedDate = createdDate,
-                        OrderSn = orderSN,
+                        SourceSn = orderDTO.sourceSN,
+                        Source = orderDTO.source,
+                        SourceDesc = orderDTO.sourceDesc,
+                        CreatedDate = orderDTO.createdDate,
+                        OrderSn = orderDTO.orderSN,
                         Customer = new CustomerEntity()
                         {
                             Name = customerName,
                             Phone = customerPhone,
                             Phone2 = customerPhone2,
-                            CreateDate = createdDate
+                            CreateDate = orderDTO.createdDate
                         },
                         Consignee = new CustomerEntity()
                         {
-                            Name = consigneeName,
-                            Phone = consigneePhone,
-                            Phone2 = consigneePhone2
+                            Name = orderDTO.consigneeName,
+                            Phone = orderDTO.consigneePhone,
+                            Phone2 = orderDTO.consigneePhone2
                         },
                         ConsigneeAddress = new AddressEntity()
                         {
-                            Address = consigneeAddress,
-                            City = consigneeCity,
-                            County = consigneeCounty,
-                            Province = consigneeProvince,
-                            ZipCode = consigneeZipCode
+                            Address = orderDTO.consigneeAddress,
+                            City = orderDTO.consigneeCity,
+                            County = orderDTO.consigneeCounty,
+                            Province = orderDTO.consigneeProvince,
+                            ZipCode = orderDTO.consigneeZipCode
                         },
                         OrderDateInfo = new OrderDateInfo()
                         {
-                            CreateTime = createdDate,
-                            DayNum = createdDate.DayOfYear,
-                            MonthNum = createdDate.Month,
-                            WeekNum = Util.Helpers.Time.GetWeekNum(createdDate),
-                            SeasonNum = Util.Helpers.Time.GetSeasonNum(createdDate),
-                            Year = createdDate.Year,
-                            TimeStamp = Util.Helpers.Time.GetUnixTimestamp(createdDate)
+                            CreateTime = orderDTO.createdDate,
+                            DayNum = orderDTO.createdDate.DayOfYear,
+                            MonthNum = orderDTO.createdDate.Month,
+                            WeekNum = Util.Helpers.Time.GetWeekNum(orderDTO.createdDate),
+                            SeasonNum = Util.Helpers.Time.GetSeasonNum(orderDTO.createdDate),
+                            Year = orderDTO.createdDate.Year,
+                            TimeStamp = Util.Helpers.Time.GetUnixTimestamp(orderDTO.createdDate)
                         },
                        
-                        OrderStatus = (int)orderStatus,
-                        OrderStatusDesc = Util.Helpers.Enum.GetDescription(typeof(OrderStatus), orderStatus),
+                        OrderStatus = (int)orderDTO.orderStatus,
+                        OrderStatusDesc = Util.Helpers.Enum.GetDescription(typeof(OrderStatus), orderDTO.orderStatus),
 
 
                         Remarks = string.Empty
@@ -331,49 +328,9 @@ namespace PushServer.Commands
                             db.SaveChanges();
                             continue;
                         }
-                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
-                        if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
-                        {
-                            Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品：{productsku}未找到");
-                          //  Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Debug($"订单文件：{file}中平台商品：{productName}未找到.order:{Util.Helpers.Json.ToJson(orderItem)}");
-                          
-                            if (bar == null)
-                            {
-                                ProductDictionary productDictionary = new ProductDictionary()
-                                {
-                                    ProductId = productsku,
-                                    ProductNameInPlatform = productName
-                                };
-                                db.ProductDictionarySet.Add(productDictionary);
-                                db.SaveChanges();
-                            }
-                            continue;
-                        }
-                        var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku == bar.ProductCode);
-                        if (foo == null)
-                        {
-                            Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品名称：{productName}对应系统商品未找到");
-                         //   Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Debug($"订单文件：{file}中平台商品名称：{productName}对应系统商品未找到.order:{Util.Helpers.Json.ToJson(orderItem)}");
-                            continue;
-                        }
 
-                        decimal weight = foo==null?0:foo.QuantityPerUnit * quantity;
-                        OrderProductInfo orderProductInfo = new OrderProductInfo()
-                        {
-                            ProductPlatId = productsku,
-                            ProductPlatName = productName,
-                         //   Warehouse = orderItem.OrderLogistics.Logistics,
-                            MonthNum = createdDate.Month,
-                            weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
-                            weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
-                            OrderSn = orderItem.OrderSn,
-                            TotalAmount = 0,
-                            ProductCount = quantity,
-                            ProductWeight = weight,
-                            Source = source,
-                            sku = foo.sku
-                        };
-                        orderItem.Products.Add(orderProductInfo);
+                        InsertOrUpdateProductInfo(db, orderDTO, orderItem);
+
                         items.Add(orderItem);
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
@@ -385,59 +342,11 @@ namespace PushServer.Commands
                 }
                 else
                 {
-                    var totalAmount = 0 * quantity;
+                  
 
                     using (var db = new OMSContext())
                     {
-                        var bar = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == productName);
-                        if (bar == null || string.IsNullOrEmpty(bar.ProductCode))
-                        {
-                            Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品：{productName}未找到");
-                          //  Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Debug($"订单文件：{file}中平台商品：{productName}未找到.order:{Util.Helpers.Json.ToJson(item)}");
-                           
-                            if (bar == null)
-                            {
-                                ProductDictionary productDictionary = new ProductDictionary()
-                                {
-                                    ProductId = productsku,
-                                    ProductNameInPlatform = productName
-                                };
-                                db.ProductDictionarySet.Add(productDictionary);
-                                db.SaveChanges();
-                            }
-                            continue;
-                        }
-                        var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku == bar.ProductCode);
-                        if (foo == null)
-                        {
-                            Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Error($"订单文件：{file}中平台商品名称：{productName}对应系统商品未找到");
-                           // Util.Logs.Log.GetLog(nameof(CIBExcelOrderOption)).Debug($"订单文件：{file}中平台商品名称：{productName}对应系统商品未找到.order:{Util.Helpers.Json.ToJson(item)}");
-                            continue;
-                        }
-
-
-                        decimal weight = foo == null ? 0 : foo.QuantityPerUnit * quantity;
-                        OrderProductInfo orderProductInfo = new OrderProductInfo()
-                        {
-                            ProductPlatId = productsku,
-                            ProductPlatName = productName,
-                          //  Warehouse = item.OrderLogistics.Logistics,
-                            MonthNum = createdDate.Month,
-                            weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
-                            weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
-                            OrderSn = item.OrderSn,
-                            TotalAmount = totalAmount,
-                            ProductCount = quantity,
-                            ProductWeight = weight,
-                            Source = source,
-                            sku = foo.sku
-                        };
-                        if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
-                        {
-                            item.Products.Add(orderProductInfo);
-                            db.OrderProductSet.Add(orderProductInfo);
-                            db.SaveChanges();
-                        }
+                        InsertOrUpdateProductInfo(db, orderDTO, item);
                        
                     }
                     

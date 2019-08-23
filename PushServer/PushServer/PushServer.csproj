@@ -155,8 +155,10 @@
     <Compile Include="Commands\CIBjifenOrderOption.cs" />
     <Compile Include="Commands\CIBVIPCSVOrderOption.cs" />
     <Compile Include="Commands\CIBAPPExcelOrderOption.cs" />
+    <Compile Include="Commands\ERPExcelOrderOption.cs" />
     <Compile Include="Commands\IOrderOption.cs" />
     <Compile Include="Commands\OrderOptionBase.cs" />
+    <Compile Include="Commands\TMExcelOrderOption.cs" />
     <Compile Include="Configuration\ClientCollection.cs" />
     <Compile Include="Configuration\ClientElement.cs" />
     <Compile Include="Configuration\ClientListSection.cs" />

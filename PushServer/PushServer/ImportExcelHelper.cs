@@ -21,12 +21,11 @@ namespace PushServer
         /// </summary>
         /// <param name="isInput">是否导入订单</param>
         /// <returns></returns>
-        public static bool Dowork(bool isInput=true)
+        public static bool Dowork()
         {
-            if (isInput)
-                return AppServer.ImportToOMS();
-            else
-                return AppServer.ExportExcel();
+           
+            return AppServer.ImportToOMS();
+          
         }
         /// <summary>
         /// 导出银行回传单

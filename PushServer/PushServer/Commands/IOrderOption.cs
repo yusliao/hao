@@ -12,7 +12,7 @@ namespace PushServer.Commands
     {
         IClientConfig clientConfig { get; }
         /// <summary>
-        /// 导入OMS
+        /// 导入OMS,生成ERP导入单
         /// </summary>
         /// <returns></returns>
         bool ImportToOMS();
@@ -21,6 +21,7 @@ namespace PushServer.Commands
         /// </summary>
         /// <returns></returns>
         DataTable ExportExcel(List<OrderEntity> orders);
+       
        
         
     }
