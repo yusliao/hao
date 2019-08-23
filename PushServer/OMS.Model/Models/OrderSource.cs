@@ -7,6 +7,7 @@ using System.ComponentModel;
 
 namespace OMS.Models
 {
+    
     public class OrderSource
     {
         [Description("银行-兴业银行积分")]
@@ -15,8 +16,10 @@ namespace OMS.Models
         public const string CIBAPP = "CIBAPP";
         [Description("兴业分期商城")]
         public const string CIBSTM = "CIBSTM";
-        [Description("银行-重庆兴业银行黑白金客户")]
+        [Description("银行-兴业银行积点商城")]
         public const string CIBVIP = "CIBVIP";
+        [Description("银行-重庆兴业银行黑白金客户")]
+        public const string CIBVIP_CHONGQING = "CIBVIP_CHONGQING";
         [Description("兴业活动")]
         public const string CIBEVT = "CIBEVT";
         [Description("兴业生活商城")]
@@ -26,17 +29,19 @@ namespace OMS.Models
         [Description("民生银行")]
         public const string CMBC = "CMBC";
         [Description("水清清官方旗舰店")]
-        public const string JingDong = "JD";
+        public const string JINGDONG = "JINGDONG";
         [Description("水清清官方优品农铺")]
-        public const string TaoBao = "TB";
+        public const string TAOBAO = "TAOBAO";
+        [Description("电商-天猫商城旗舰店")]
+        public const string TIANMAO = "TIANMAO";
         [Description("水清清官方旗舰店")]
-        public const string WeiDian = "WD";
+        public const string WeiDian = "WeiDian";
         [Description("水清清旗舰店")]
         public const string YHD = "YHD";
         [Description("兴业积分")]
         public const string CMPMC = "CMPMC";
         [Description("水清清优选")]
-        public const string YouZan = "YZ";
+        public const string YouZan = "YouZan";
         [Description("工行融E购")]
         public const string ICBC = "ICBC";
         [Description("工行爱购")]
