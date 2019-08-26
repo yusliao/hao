@@ -19,9 +19,9 @@ namespace OMS.Models
         [Description("银行-兴业银行积点商城")]
         public const string CIBVIP = "CIBVIP";
         [Description("银行-重庆兴业银行黑白金客户")]
-        public const string CIBVIP_CHONGQING = "CIBVIP_CHONGQING";
-        [Description("兴业活动")]
-        public const string CIBEVT = "CIBEVT";
+        public const string CIBVIP_CQ = "CIBVIP_CQ";
+        [Description("客情-周期配送")]
+        public const string Friend = "Friend";
         [Description("兴业生活商城")]
         public const string CIBLFM = "CIBLFM";
         [Description("广发银行商城")]
