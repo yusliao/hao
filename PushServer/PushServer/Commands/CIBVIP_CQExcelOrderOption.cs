@@ -16,10 +16,10 @@ using Util.Files;
 namespace PushServer.Commands
 {
     [Export(typeof(IOrderOption))]
-    public class TMExcelOrderOption : OrderOptionBase
+    public class CIBVIP_CQExcelOrderOption : OrderOptionBase
     {
-        public override string Name => OMS.Models.OrderSource.TIANMAO;
-        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.TIANMAO);
+        public override string Name => OMS.Models.OrderSource.CIBVIP_CQ;
+        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIBVIP_CQ);
 
 
         public override IClientConfig clientConfig => AppServer.Instance.ConfigDictionary[Name];

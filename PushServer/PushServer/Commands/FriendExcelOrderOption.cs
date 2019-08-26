@@ -16,10 +16,10 @@ using Util.Files;
 namespace PushServer.Commands
 {
     [Export(typeof(IOrderOption))]
-    public class TMExcelOrderOption : OrderOptionBase
+    public class FriendExcelOrderOption : OrderOptionBase
     {
-        public override string Name => OMS.Models.OrderSource.TIANMAO;
-        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.TIANMAO);
+        public override string Name => OMS.Models.OrderSource.Friend;
+        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.Friend);
 
 
         public override IClientConfig clientConfig => AppServer.Instance.ConfigDictionary[Name];

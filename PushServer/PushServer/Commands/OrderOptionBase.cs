@@ -95,10 +95,12 @@ namespace PushServer.Commands
               
             }
         }
-        /// <summary>
-        /// 上传完毕
-        /// </summary>
-        /// <param name="postResult">上传成功与否</param>
+       /// <summary>
+       /// 入库完毕
+       /// </summary>
+       /// <param name="postResult">入库结果</param>
+       /// <param name="lst">订单集合</param>
+       /// <param name="optionType" cref="OptionType">生成操作</param>
         protected virtual void OnPostCompleted(bool postResult,List<OrderEntity> lst,OptionType optionType= OptionType.ErpExcel)
         {
             if (postResult)
@@ -122,7 +124,7 @@ namespace PushServer.Commands
                 if(OnPostCompletedEventHandle!=null)
                 {
                     var handle = OnPostCompletedEventHandle;
-                    handle.BeginInvoke(lst,OptionType.ErpExcel,null,null);
+                    handle.BeginInvoke(lst, optionType, null,null);
                     
                 }
                 

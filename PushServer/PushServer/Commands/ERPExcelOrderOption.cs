@@ -99,7 +99,7 @@ namespace PushServer.Commands
 
                     string sn = csv.GetField<string>("平台单号").Trim();
                     var order = db.OrderSet.Include(o => o.OrderLogistics).Include(o => o.Products).FirstOrDefault(o => o.SourceSn == sn);
-                    if (order != null)
+                    if (order != null)//
                     {
                         string warehouse = csv.GetField<string>("仓库名称");
                         string pcode = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码
@@ -162,7 +162,7 @@ namespace PushServer.Commands
                     {
                         // Util.Logs.Log.GetLog(nameof(AppServer)).Error($"ERP导出单：{file}。该文件中订单编号：{sn}在OMS系统中不存在");
                      
-                        var item = ResolveOrdersNext(csv, file, items);
+                        var item = ResolveOrdersFromERPExcel(csv, file, items);
                         if (item != null)
                             newOrderlst.Add(item);
                         
@@ -180,7 +180,7 @@ namespace PushServer.Commands
 
 
         }
-        private OrderEntity ResolveOrdersNext(CsvReader csv, string file, List<OrderEntity> items)
+        private OrderEntity ResolveOrdersFromERPExcel(CsvReader csv, string file, List<OrderEntity> items)
         {
             var desc = csv.GetField<string>("店铺名称").Trim();
             var opt = this.OrderOptSet.FirstOrDefault(o => Util.Helpers.Reflection.GetDescription<OrderSource>(o.clientConfig.Name.ToUpper()) == desc);
@@ -193,10 +193,13 @@ namespace PushServer.Commands
                 }
                 return null;
             }
-            if (opt.clientConfig.Name.ToUpper() == OrderSource.TIANMAO)
+#if CESHI
+             if (opt.clientConfig.Name.ToUpper() == OrderSource.TIANMAO)
             {
                 Console.WriteLine("TM");
             }
+#endif
+
             var source = opt.clientConfig.Name;
             var sourcedesc = desc;
             var sourceSN = csv.GetField<string>("平台单号").Trim();
@@ -369,6 +372,7 @@ namespace PushServer.Commands
 
 
                     OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
+                    orderLogisticsDetail.OrderSn = orderItem.OrderSn;
                     orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                     orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
                     orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
@@ -379,7 +383,7 @@ namespace PushServer.Commands
                         orderItem.OrderLogistics = new List<OrderLogisticsDetail>();
                     if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
                     {
-                        db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                   //     db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
                        
                         orderItem.OrderLogistics.Add(orderLogisticsDetail);
                     }
@@ -401,6 +405,7 @@ namespace PushServer.Commands
                 using (var db = new OMSContext())
                 {
                     OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
+                    orderLogisticsDetail.OrderSn = item.OrderSn;
                     orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                     orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
                     orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();

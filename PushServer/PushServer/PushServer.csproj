@@ -155,8 +155,11 @@
     <Compile Include="Commands\CIBjifenOrderOption.cs" />
     <Compile Include="Commands\CIBVIPCSVOrderOption.cs" />
     <Compile Include="Commands\CIBAPPExcelOrderOption.cs" />
+    <Compile Include="Commands\CIBVIP_CQExcelOrderOption.cs" />
     <Compile Include="Commands\ERPExcelOrderOption.cs" />
+    <Compile Include="Commands\FriendExcelOrderOption.cs" />
     <Compile Include="Commands\IOrderOption.cs" />
+    <Compile Include="Commands\JDExcelOrderOption.cs" />
     <Compile Include="Commands\OrderOptionBase.cs" />
     <Compile Include="Commands\TMExcelOrderOption.cs" />
     <Compile Include="Configuration\ClientCollection.cs" />
@@ -186,19 +189,23 @@
       <DependentUpon>PushServer.cs</DependentUpon>
     </Compile>
     <Compile Include="SelfInstaller.cs" />
-    <Compile Include="Service\ALLStatisticServer.cs" />
-    <Compile Include="Service\CIBAPPStatisticServer.cs" />
-    <Compile Include="Service\CIBJifenStatisticMonthPandianServer.cs" />
-    <Compile Include="Service\CIBVIPStatisticServer.cs" />
-    <Compile Include="Service\CIBPCStatisticServer.cs" />
-    <Compile Include="Service\DistrictStatisticServerBase.cs" />
-    <Compile Include="Service\IDistrictStatisticServer.cs" />
-    <Compile Include="Service\IOrderStatisticServer.cs" />
-    <Compile Include="Service\IPandianServer.cs" />
-    <Compile Include="Service\IProductStatisticServer.cs" />
-    <Compile Include="Service\OrderStatisticServerBase.cs" />
-    <Compile Include="Service\ProductStatisticServerBase.cs" />
-    <Compile Include="Service\StatisticServer.cs" />
+    <Compile Include="Service\BLL\ALLStatisticServer.cs" />
+    <Compile Include="Service\BLL\CIBAPPStatisticServer.cs" />
+    <Compile Include="Service\BLL\CIBCQstatisticServer.cs" />
+    <Compile Include="Service\BLL\CIBJifenStatisticMonthPandianServer.cs" />
+    <Compile Include="Service\BLL\CIBVIPStatisticServer.cs" />
+    <Compile Include="Service\BLL\CIBPCStatisticServer.cs" />
+    <Compile Include="Service\BLL\FriendstatisticServer.cs" />
+    <Compile Include="Service\BLL\JDstatisticServer.cs" />
+    <Compile Include="Service\BLL\TMstatisticServer.cs" />
+    <Compile Include="Service\Core\DistrictStatisticServerBase.cs" />
+    <Compile Include="Service\Core\IDistrictStatisticServer.cs" />
+    <Compile Include="Service\Core\IOrderStatisticServer.cs" />
+    <Compile Include="Service\Core\IPandianServer.cs" />
+    <Compile Include="Service\Core\IProductStatisticServer.cs" />
+    <Compile Include="Service\Core\OrderStatisticServerBase.cs" />
+    <Compile Include="Service\Core\ProductStatisticServerBase.cs" />
+    <Compile Include="Service\BLL\StatisticServer.cs" />
     <Compile Include="WxPushNews.cs" />
   </ItemGroup>
   <ItemGroup>

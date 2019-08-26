@@ -115,7 +115,7 @@ namespace PushServer.Commands
                    || row["领取人姓名"] == DBNull.Value)
                     continue;
 
-                orderDTO.source = OrderSource.CIB;
+                orderDTO.source = Name;
                 orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIB);
                 var id = Convert.ToString(row["兑换流水编号"]);
               
