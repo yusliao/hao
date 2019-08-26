@@ -14,16 +14,16 @@ namespace OMS.Models
         public const string CIB = "CIB";
         [Description("银行-兴业银行积分")]
         public const string CIBAPP = "CIBAPP";
-        [Description("兴业分期商城")]
-        public const string CIBSTM = "CIBSTM";
+        [Description("银行-招商银行网上商城")]
+        public const string CMB = "CMB";
         [Description("银行-兴业银行积点商城")]
         public const string CIBVIP = "CIBVIP";
         [Description("银行-重庆兴业银行黑白金客户")]
         public const string CIBVIP_CQ = "CIBVIP_CQ";
         [Description("客情-周期配送")]
         public const string Friend = "Friend";
-        [Description("兴业生活商城")]
-        public const string CIBLFM = "CIBLFM";
+        [Description("其他-零售仓")]
+        public const string Retail = "Retail";
         [Description("广发银行商城")]
         public const string CGB = "CGB";
         [Description("民生银行")]
@@ -38,9 +38,9 @@ namespace OMS.Models
         public const string WeiDian = "WeiDian";
         [Description("水清清旗舰店")]
         public const string YHD = "YHD";
-        [Description("兴业积分")]
-        public const string CMPMC = "CMPMC";
-        [Description("水清清优选")]
+        [Description("银行-迅销科技代发")]
+        public const string XunXiao = "XunXiao";
+        [Description("电商-有赞商城")]
         public const string YouZan = "YouZan";
         [Description("工行融E购")]
         public const string ICBC = "ICBC";
