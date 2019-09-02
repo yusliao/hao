@@ -40,111 +40,7 @@ namespace PushServer.Service
             //将部件（part）和宿主程序添加到组合容器
             container.ComposeParts(this);
         }
-        /// <summary>
-        /// 发送报表消息
-        /// </summary>
-        /// <param name="statisticType"></param>
-        /// <param name="OrderSource"></param>
-        public static void SendStatisticMessage(StatisticType statisticType, DateTime dateTime, string OrderSource = "所有订单")
-        {
-            var wxTargets = System.Configuration.ConfigurationManager.AppSettings["WxNewsTargets"].Split(new char[] { ',' }).ToList();
-            var WxNewsUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsUrl"];
-            var WxNewsPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsPicUrl"];
-
-            var redirectUri = string.Format("{0}?date={1}&mode=day&source={2}", WxNewsUrl, DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), "ALL");
-
-            redirectUri = System.Web.HttpUtility.UrlEncode(redirectUri);
-
-            var url = WxPushNews.CreateWxNewsOAuthUrl(redirectUri);
-            var picUrl = WxNewsPicUrl;
-            using (var db = new OMSContext())
-            {
-                Statistic foo = new Statistic();
-                string title = string.Empty;
-                switch (statisticType)
-                {
-                    case StatisticType.Day:
-
-                        var daynum = dateTime.DayOfYear;
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Day && s.StatisticValue == daynum&&s.Year==dateTime.Year).FirstOrDefault();
-
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
-                        else
-                            title = string.Format("{0} #{1}#", dateTime.ToString("yyyy年MM月dd日"), OrderSource);
-                        break;
-                    case StatisticType.Week:
-                        int week = Util.Helpers.Time.GetWeekNum(DateTime.Now);
-                        if (week > 1)
-                            week -= 1;//发送上周的报表
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Week && s.StatisticValue == week).FirstOrDefault();
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
-                        else
-                            title = $"{DateTime.Now.Year}年#{week}周#{OrderSource}";
-                        break;
-                    case StatisticType.Month:
-                        int month = DateTime.Now.Month;
-                        if (month > 1)
-                            month -= 1;//发送上个月的报表
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == month).FirstOrDefault();
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
-                        else
-                            title = $"{DateTime.Now.Year}年#{month}月份#{OrderSource}";
-                        break;
-                    case StatisticType.Quarter:
-                        int quarter = Util.Helpers.Time.GetSeasonNum(DateTime.Now);
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Quarter && s.StatisticValue == quarter).FirstOrDefault();
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
-                        else
-                            title = $"{DateTime.Now.Year}年#{quarter}季度#{OrderSource}";
-                        break;
-                    case StatisticType.Year:
-                        
-                        foo = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == DateTime.Now.Year).FirstOrDefault();
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), OrderSource, Environment.NewLine);
-                        else
-                            title = $"{DateTime.Now.Year}年#{OrderSource}";
-                        break;
-                    default:
-                        break;
-                }
-
-               
-                var wxArticles = new List<WxArticle>()
-                {
-                    new WxArticle( title,url,picUrl,string.Empty)
-                };
-
-                if (foo!=null&&foo.TotalOrderCount > 0)
-                    wxArticles.AddRange(new List<WxArticle>()//上限为七
-                {
-                    new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,string.Empty,string.Empty),
-                   // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,string.Empty,string.Empty),
-
-                });
-                try
-                {
-                    WxPushNews.OrderStatistic(wxArticles);
-                    Util.Logs.Log.GetLog(nameof(WxPushNews)).Info($"消息推送成功：{wxArticles[0].Title}");
-                }
-                catch (Exception ex)
-                {
-                    Util.Logs.Log.GetLog(nameof(WxPushNews)).Error($"消息推送失败：{wxArticles[0].Title}，error:{ex.Message},stackTrace：{ex.StackTrace}");
-                    
-                }
-               
-            }
-        }
+     
         /// <summary>
         /// 生成日报表
         /// </summary>
@@ -312,7 +208,7 @@ namespace PushServer.Service
 
                 System.Threading.ThreadPool.QueueUserWorkItem(o =>
                 {
-                    var dt = item.PushPandianReport(monthNum, DateTime.Now.Year);
+                    var dt = item.PushMonthReport(monthNum, DateTime.Now.Year);
                     if (dt != null && dt.Rows.Count > 0)
                     {
                         var filename = System.IO.Path.Combine(pandianFolder, "pandian", $"ERP-{item.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
@@ -353,7 +249,7 @@ namespace PushServer.Service
         /// </summary>
         /// <param name="serverNames">可推送的条目列表</param>
         /// <returns></returns>
-        public bool PushReport(string[] serverNames)
+        public bool PushReport(string[] serverNames,DateTime dateTime)
         {
             /*推送报表规则
              * 推送OrderSource对象指定的条目的推送报表
@@ -365,7 +261,7 @@ namespace PushServer.Service
             {
                 if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
                     continue;
-                var dt = DateTime.Now.AddDays(-1);
+                var dt = dateTime;
                 OrderStatisticServerOptSet.FirstOrDefault(i=>i.ServerName==item)?.PushDailyReport(dt);
                 if (DateTime.Now.DayOfWeek == DayOfWeek.Monday)
                     OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
@@ -384,7 +280,7 @@ namespace PushServer.Service
                 {
                     try
                     {
-                        item.CreateMonthPandianReport(monthNum, DateTime.Now.Year);
+                        item.CreateMonthReport(monthNum, DateTime.Now.Year);
                     }
                     catch (Exception ex)
                     {
