@@ -212,6 +212,7 @@
     <Compile Include="Service\Core\IPandianServer.cs" />
     <Compile Include="Service\Core\IProductStatisticServer.cs" />
     <Compile Include="Service\Core\OrderStatisticServerBase.cs" />
+    <Compile Include="Service\Core\ProductPandianStatisticServerBase.cs" />
     <Compile Include="Service\Core\ProductStatisticServerBase.cs" />
     <Compile Include="Service\BLL\StatisticServer.cs" />
     <Compile Include="WxPushNews.cs" />

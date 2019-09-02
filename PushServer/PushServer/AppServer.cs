@@ -202,10 +202,10 @@ namespace PushServer
         }
 
 
-        public  static bool PushReport()
+        public  static bool PushReport(DateTime dateTime)
         {
             var serverNames = instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i=>i.Name).ToArray();
-            return StatisticServer.Instance.PushReport(serverNames);
+            return StatisticServer.Instance.PushReport(serverNames, dateTime);
 
         }
         /// <summary>

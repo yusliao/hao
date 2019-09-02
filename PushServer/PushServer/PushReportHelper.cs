@@ -8,10 +8,10 @@ namespace PushServer
 {
     class PushReportHelper
     {
-        public static bool PushReport()
+        public static bool PushReport(DateTime dateTime)
         {
           
-             return AppServer.PushReport();
+             return AppServer.PushReport(dateTime);
            
             
         }
@@ -22,6 +22,10 @@ namespace PushServer
         public static bool CreateReport()
         {
             return AppServer.CreateReport(DateTime.Now.AddDays(-1));
+        }
+        public static bool CreateDayReport(DateTime dateTime)
+        {
+            return AppServer.CreateReport(dateTime);
         }
         public static bool CreateHistoryReport(int month)
         {

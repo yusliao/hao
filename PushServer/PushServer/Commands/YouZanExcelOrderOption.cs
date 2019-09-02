@@ -18,8 +18,8 @@ namespace PushServer.Commands
     [Export(typeof(IOrderOption))]
     public class YouZanExcelOrderOption : OrderOptionBase
     {
-        public override string Name => OMS.Models.OrderSource.YouZan;
-        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.YouZan);
+        public override string Name => OMS.Models.OrderSource.YOUZAN;
+        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.YOUZAN);
 
 
         public override IClientConfig clientConfig => AppServer.Instance.ConfigDictionary[Name];
@@ -31,22 +31,22 @@ namespace PushServer.Commands
             var excelFileList = new List<DataFileInfo>();
 
            
-            FileScanner.ScanAllFiles(new DirectoryInfo(clientConfig.ExcelOrderFolder), "*.xlsx");
-            if (FileScanner.ScannedFiles.Any())
-            {
-                FileScanner.ScannedFiles.ForEach(file =>
-                {
-                    var dateStr = file.Name.Split('.').First().Split('_').Last().Substring(0, 8);
-                    var fileDate = DateTime.ParseExact(dateStr, "yyyyMMdd", CultureInfo.InvariantCulture);
+            //FileScanner.ScanAllFiles(new DirectoryInfo(clientConfig.ExcelOrderFolder), "*.xlsx");
+            //if (FileScanner.ScannedFiles.Any())
+            //{
+            //    FileScanner.ScannedFiles.ForEach(file =>
+            //    {
+            //        var dateStr = file.Name.Split('.').First().Split('_').Last().Substring(0, 8);
+            //        var fileDate = DateTime.ParseExact(dateStr, "yyyyMMdd", CultureInfo.InvariantCulture);
 
-                    excelFileList.Add(new DataFileInfo(fileDate, file.Name, file.FullName));
-                });
-                var dt = string.IsNullOrEmpty(clientConfig.LastSyncDate) == true ? DateTime.Now : DateTime.Parse(clientConfig.LastSyncDate);
-                if (!string.IsNullOrEmpty(clientConfig.LastSyncDate))
-                    excelFileList = excelFileList.Where(e => e.FileDate > dt).ToList();
-            }
+            //        excelFileList.Add(new DataFileInfo(fileDate, file.Name, file.FullName));
+            //    });
+            //    var dt = string.IsNullOrEmpty(clientConfig.LastSyncDate) == true ? DateTime.Now : DateTime.Parse(clientConfig.LastSyncDate);
+            //    if (!string.IsNullOrEmpty(clientConfig.LastSyncDate))
+            //        excelFileList = excelFileList.Where(e => e.FileDate > dt).ToList();
+            //}
 
-            excelFileList = excelFileList.OrderBy(f => f.FileDate).ToList();
+            //excelFileList = excelFileList.OrderBy(f => f.FileDate).ToList();
            
             return excelFileList;
         }

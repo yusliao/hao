@@ -58,22 +58,22 @@ namespace PushServer.Commands
 
             var ordersList = new List<OrderEntity>();
 
-            foreach (var file in this.GetExcelFiles())
-            {
-                using (var excel = new NPOIExcel(file.FullName))
-                {
-                    var table = excel.ExcelToDataTable(null, 3);
-                    if (table != null)
-                        this.ResolveOrders(table, file.FullName, ordersList);
-                    else
-                    {
-                        OnUIMessageEventHandle($"{NameDesc}导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
-                        continue;
-                    }
+            //foreach (var file in this.GetExcelFiles())
+            //{
+            //    using (var excel = new NPOIExcel(file.FullName))
+            //    {
+            //        var table = excel.ExcelToDataTable(null, 3);
+            //        if (table != null)
+            //            this.ResolveOrders(table, file.FullName, ordersList);
+            //        else
+            //        {
+            //            OnUIMessageEventHandle($"{NameDesc}导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
+            //            continue;
+            //        }
                    
-                }
-             //   file.FileName = file.
-            }
+            //    }
+          
+            //}
 
             return ordersList;
         }

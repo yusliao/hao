@@ -72,6 +72,8 @@ namespace PushServer
         private static bool Run(string exeArg, string[] startArgs)
         {
             string[] str = exeArg.Trim().Replace('-',' ').Split(' ');
+            if (str.Length == 1)
+                str = new string[2] { str[0], "" };
             switch (str[0].ToLower())
             {
                 #region 基础服务
@@ -106,13 +108,31 @@ namespace PushServer
                     return true;
                 #endregion
                 case ("p"):
-                    var pushReportResult = PushReportHelper.PushReport();
-                    if (pushReportResult)
-                        Console.WriteLine("报表推送成功！");
+
+                    DateTime dateTime;
+                    if (DateTime.TryParse(str[1], out dateTime))
+                    {
+                        var pushReportResult = PushReportHelper.PushReport(dateTime);
+                        if (pushReportResult)
+                            Console.WriteLine("报表推送成功！");
+                        else
+                        {
+                            Console.WriteLine("报表推送失败");
+                        }
+                    }
                     else
                     {
-                        Console.WriteLine("报表推送失败");
+                        var pushReportResult = PushReportHelper.PushReport(DateTime.Now.AddDays(-1));
+                        if (pushReportResult)
+                            Console.WriteLine("报表推送成功！");
+                        else
+                        {
+                            Console.WriteLine("报表推送失败");
+                        }
                     }
+
+
+                   
                     return true;
                 case ("p1"):
                     int month = DateTime.Now.Month;
@@ -133,13 +153,27 @@ namespace PushServer
                     }
                     return true;
                 case ("c"):
-                   
-                    var createReportResult = PushReportHelper.CreateReport();
-                    if (createReportResult)
-                        Console.WriteLine("报表生成成功！");
+                    DateTime cdateTime;
+                    
+                    if (DateTime.TryParse(str[1], out cdateTime))
+                    {
+                        var createReportResult = PushReportHelper.CreateDayReport(cdateTime);
+                        if (createReportResult)
+                            Console.WriteLine("报表生成成功！");
+                        else
+                        {
+                            Console.WriteLine("报表生成失败");
+                        }
+                    }
                     else
                     {
-                        Console.WriteLine("报表生成失败");
+                        var createReportResult = PushReportHelper.CreateReport();
+                        if (createReportResult)
+                            Console.WriteLine("报表生成成功！");
+                        else
+                        {
+                            Console.WriteLine("报表生成失败");
+                        }
                     }
                     return true;
                 case ("c1"):
@@ -198,15 +232,7 @@ namespace PushServer
                     }
                     return true;
                
-                //case ("out"):
-                //    var exportExcelResult = ExcelHelper.Dowork(false);
-                //    if (exportExcelResult)
-                //        Console.WriteLine("导出报表成功！");
-                //    else
-                //    {
-                //        Console.WriteLine("导入报表失败");
-                //    }
-                //    return true;
+             
                 default:
                     Console.WriteLine("Invalid argument!");
                     return false;

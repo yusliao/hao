@@ -29,6 +29,7 @@ namespace PushServer.Commands
         protected abstract List<OrderEntity> FetchOrders();
         protected virtual void OnUIMessageEventHandle(string msg)
         {
+            Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Debug(msg);
             var handle = UIMessageEventHandle;
             if (handle != null)
                 handle(msg);
@@ -42,15 +43,26 @@ namespace PushServer.Commands
         protected void InsertOrUpdateProductInfo(OMSContext db, OrderDTO orderDTO,OrderEntity item)
         {
           
-            var bar = db.ProductDictionarySet.FirstOrDefault(p => (p.ProductNameInPlatform == orderDTO.productName || p.ProductId == orderDTO.productsku) && p.ProductCode != null);
+            var bar = db.ProductDictionarySet.FirstOrDefault(p => (p.ProductNameInPlatform == orderDTO.productName.Trim()&&orderDTO.productName!=null || p.ProductId == orderDTO.productsku.Trim()&&orderDTO.productsku!=null) && p.ProductCode != null);
             if (bar == null)
             {
-                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
-                Util.Logs.Log.GetLog(nameof(CIBAPPExcelOrderOption)).Error($"订单文件：{orderDTO.fileName}中平台商品：{orderDTO.productName}未找到");
-             
-
-                if (bar == null)
+                if (string.IsNullOrEmpty(orderDTO.productsku))
                 {
+                    OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productName}）录入失败");
+                    if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == orderDTO.productName) == null)
+                    {
+                        ProductDictionary productDictionary = new ProductDictionary()
+                        {
+                            ProductId = orderDTO.productsku,
+                            ProductNameInPlatform = orderDTO.productName
+                        };
+                        db.ProductDictionarySet.Add(productDictionary);
+                        db.SaveChanges();
+                    }
+                }
+                else
+                {
+                    OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
                     if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
                     {
                         ProductDictionary productDictionary = new ProductDictionary()
@@ -62,13 +74,28 @@ namespace PushServer.Commands
                         db.SaveChanges();
                     }
                 }
+
+
+
+                
+                if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                {
+                    ProductDictionary productDictionary = new ProductDictionary()
+                    {
+                        ProductId = orderDTO.productsku,
+                        ProductNameInPlatform = orderDTO.productName
+                    };
+                    db.ProductDictionarySet.Add(productDictionary);
+                    db.SaveChanges();
+                }
+                
                 return;
             }
             var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku == bar.ProductCode);
             if (foo == null)
             {
                 OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");
-                Util.Logs.Log.GetLog(nameof(CIBAPPExcelOrderOption)).Error($"订单文件：{orderDTO.fileName}中平台商品名称：{orderDTO.productName}对应系统商品未找到");
+               
 
                 return;
             }
@@ -94,6 +121,7 @@ namespace PushServer.Commands
                 item.Products.Add(orderProductInfo);
               
             }
+            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
         }
        /// <summary>
        /// 入库完毕
@@ -191,27 +219,34 @@ namespace PushServer.Commands
                 
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
                 stopwatch.Stop();
-                Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单扩展表耗时ms:{stopwatch.ElapsedMilliseconds}");
+                OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单扩展表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+                
                 try
                 {
                    
                     stopwatch.Start();
                     db.BulkInsert<OrderEntity>(lst);
                     stopwatch.Stop();
-                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单表耗时ms:{stopwatch.ElapsedMilliseconds}");
+                    OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+                  
                     stopwatch.Start();
                     db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
                     
                     db.BulkInsert<OrderProductInfo>(lst.SelectMany(o => o.Products));
                     stopwatch.Stop();
-                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单商品表耗时ms:{stopwatch.ElapsedMilliseconds}");
+                    OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单商品表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+                 
                     stopwatch.Start();
-                    db.Set<OrderLogisticsDetail>().AddRange(lst.SelectMany<OrderEntity, OrderLogisticsDetail>(o => o.OrderLogistics));
-
-                    db.BulkInsert<OrderLogisticsDetail>(lst.SelectMany(o => o.OrderLogistics));
-                    stopwatch.Stop();
-                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Info($"订单数量:{lst.Count} 批量插入订单物流表耗时ms:{stopwatch.ElapsedMilliseconds}");
-
+               
+                    var templst = lst.SelectMany(o => o.OrderLogistics??new List<OrderLogisticsDetail>());
+                    if (templst!=null&&templst.Any())
+                    {
+                        db.Set<OrderLogisticsDetail>().AddRange(lst.SelectMany<OrderEntity, OrderLogisticsDetail>(o => o.OrderLogistics));
+                        db.BulkInsert<OrderLogisticsDetail>(lst.SelectMany(o => o.OrderLogistics));
+                        stopwatch.Stop();
+                        OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单物流表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+                       
+                    }
                     return true;
                 }
                 catch (Exception ex)
@@ -229,25 +264,7 @@ namespace PushServer.Commands
             }
         }
 
-        /// <summary>
-        /// 推送报表
-        /// </summary>
-        /// <returns></returns>
-        public bool PushReport()
-        {
-            /* 发送昨天的日报表
-             * 如果昨天是周日，发送周报表
-             * 如果昨天是当月最后一天，发送月报表 
-             * 
-             */
-
-            StatisticServer.SendStatisticMessage(StatisticType.Day,DateTime.Now.AddDays(-1),clientConfig.Tag);
-            if (DateTime.Now.DayOfWeek == DayOfWeek.Monday)
-                StatisticServer.SendStatisticMessage(StatisticType.Week, DateTime.Now, clientConfig.Tag);
-            if (DateTime.Now.Day == 1)
-                StatisticServer.SendStatisticMessage(StatisticType.Month, DateTime.Now, clientConfig.Tag);
-            return true;
-        }
+        
 
       
 

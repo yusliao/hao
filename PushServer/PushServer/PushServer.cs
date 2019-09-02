@@ -48,6 +48,7 @@ namespace PushServer
             else if (Math.Abs(timespan) == 2)
             {
                 timer.Change(1 * 1000 * 60 * 60, 2 * 1000 * 60 * 10);
+                Util.Logs.Log.GetLog(nameof(PushServer)).Info("定时报表统计业务正在生成统计报表...");
                 AppServer.CreateReport(DateTime.Now.AddDays(-1));
             }
             else if (Math.Abs(timespan) == 1)
@@ -58,7 +59,7 @@ namespace PushServer
                 //TODO:
                 //统计服务
                
-                AppServer.PushReport();
+                AppServer.PushReport(DateTime.Now.AddDays(-1));
                 Util.Logs.Log.GetLog(nameof(PushServer)).Info("定时报表推送完毕");
                 
                 timer.Change(4 * 1000 * 60 * 60, 2 * 1000 * 60 * 60);

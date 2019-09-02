@@ -46,10 +46,8 @@ namespace PushServer.Commands
             var lst = FetchOrders();
             if (lst != null && lst.Any())
             {
-                if (Environment.UserInteractive)
-                {
-                    Console.WriteLine($"正在生成ERP回传物流订单,订单数量：{lst.Count}");
-                }
+                OnUIMessageEventHandle($"正在生成ERP回传物流订单,订单数量：{lst.Count}");
+               
                 OnPostCompleted(true, lst,OptionType.LogisticsExcel);
                 return true;
             }
@@ -64,10 +62,8 @@ namespace PushServer.Commands
 
             foreach (var file in this.GetExcelFiles())
             {
-                if (Environment.UserInteractive)
-                {
-                    Console.WriteLine($"正在解析ERP导出单文件：{file.FullName}");
-                }
+                OnUIMessageEventHandle($"正在解析ERP导出单文件：{file.FullName}");
+                
                 using (var csv = new CsvReader(new StreamReader(file.FullName, Encoding.Default)))
                 {
                     ResolveOrders(csv, file.FullName, ref ordersList);
@@ -169,10 +165,8 @@ namespace PushServer.Commands
                        
 
                     }
-                    if (Environment.UserInteractive)
-                    {
-                        Console.WriteLine($"ERP导出单：{file}。该文件中订单编号：{sn}解析完毕");
-                    }
+                    OnUIMessageEventHandle($"ERP导出单：{file}。该文件中订单编号：{sn}解析完毕");
+                   
                 }
             }
             if(newOrderlst.Any())
@@ -186,11 +180,10 @@ namespace PushServer.Commands
             var opt = this.OrderOptSet.FirstOrDefault(o => Util.Helpers.Reflection.GetDescription<OrderSource>(o.clientConfig.Name.ToUpper()) == desc);
             if (opt == null)
             {
+
                 Util.Logs.Log.GetLog(nameof(AppServer)).Error($"ERP导出单：{file},未识别的订单渠道：{desc}");
-                if (Environment.UserInteractive)
-                {
-                    Console.WriteLine($"ERP导出单：{file}。未识别的订单渠道：{desc}");
-                }
+                OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
+                
                 return null;
             }
 #if CESHI
@@ -562,10 +555,9 @@ namespace PushServer.Commands
             }
             var filename = System.IO.Path.Combine(clientConfig.ExcelOrderFolder, "import", $"ERP-{obj[0].Source}导入订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
             NPOIExcel.Export(dt, filename);
-            if (Environment.UserInteractive)
-            {
-                Console.WriteLine($"ERP-{obj[0].Source}导入订单生成成功。文件名:{filename}");
-            }
+            OnUIMessageEventHandle($"ERP-{obj[0].Source}导入订单生成成功。文件名:{filename}");
+           
+            
         }
         protected void CreateLogisticsExcel(List<OMS.Models.OrderEntity> lst)
         {
@@ -592,14 +584,12 @@ namespace PushServer.Commands
                         }
                         else
                         {
-                            if (dt != null)
+                            if (dt != null&&dt.Rows.Count>0)
                             {
                                 string filename = Path.Combine(clientConfig.ExcelOrderFolder, "logistics", $"ERP-{item.Key}回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
                                 NPOIExcel.Export(dt, filename);
-                                if (Environment.UserInteractive)
-                                {
-                                    Console.WriteLine($"ERP-{item.Key}回传订单生成成功。文件名:{filename}");
-                                }
+                                OnUIMessageEventHandle($"ERP-{item.Key}回传订单生成成功。文件名:{filename}");
+                               
                             }
                         }
                         taskcount--;
@@ -614,10 +604,8 @@ namespace PushServer.Commands
             {
                 string filename = Path.Combine(clientConfig.ExcelOrderFolder, "logistics", $"ERP-兴业银行积分回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
                 NPOIExcel.Export(cib_dt, filename);
-                if (Environment.UserInteractive)
-                {
-                    Console.WriteLine($"ERP-兴业银行积分回传订单生成成功。文件名:{filename}");
-                }
+                OnUIMessageEventHandle($"ERP-兴业银行积分回传订单生成成功。文件名:{filename}");
+               
             }
         }
     }

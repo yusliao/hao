@@ -55,8 +55,9 @@ namespace PushServer.Commands
             {
                 FileScanner.ScannedFiles.ForEach(file =>
                 {
-                    var dateStr = file.Name.Split('.').First().Replace("预约报表", "").Trim();
-                    var fileDate = DateTime.ParseExact(dateStr, "yyyyMMddHHmm", CultureInfo.InvariantCulture);
+                    var dateStr = file.Name.Split('.').First().Replace("预约报表", "").Trim().Substring(0,"yyyyMMddHHmm".Length);
+                    
+                    var fileDate = DateTime.ParseExact(dateStr,"yyyyMMddHHmm",CultureInfo.CurrentCulture.DateTimeFormat);
 
                     excelFileList.Add(new DataFileInfo(fileDate, file.Name, file.FullName));
                 });
