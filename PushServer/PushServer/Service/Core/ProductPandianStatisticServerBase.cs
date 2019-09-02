@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PushServer.Service
 {
-    public abstract class ProductStatisticServerBase : IProductStatisticServer
+    public abstract class ProductPandianStatisticServerBase : IPandianServer
     {
         public abstract string ServerName { get; }
         public static event Action<string> UIMessageEventHandle;
@@ -24,11 +24,12 @@ namespace PushServer.Service
         {
             return CreateReport(StatisticType.Day, value.DayOfYear, value.Year);
         }
-
         public virtual bool CreateMonthReport(int monthnum,int year)
         {
             return CreateReport(StatisticType.Month, monthnum, year);
         }
+
+       
         private bool CreateReport(StatisticType statisticType, int statisticValue,int year)
         {
             try
@@ -60,8 +61,15 @@ namespace PushServer.Service
                         default:
                             break;
                     }
-                    if (ServerName != OrderSource.ALL)
-                        orderEntities = orderEntities.Where(o => o.Source == ServerName).ToList();
+                    switch (ServerName)
+                    {
+                        case OrderSource.CIBJifenPanDian:
+                            orderEntities = orderEntities.Where(o => o.Source == OrderSource.CIB||o.Source==OrderSource.CIBAPP).ToList();
+                            break;
+                        default:
+                            break;
+                    }
+                
                     if (orderEntities.Any())
                     {
                       
@@ -270,5 +278,9 @@ namespace PushServer.Service
         {
             return PushReport(StatisticType.Year, year, year);
         }
+
+       
+
+       
     }
 }

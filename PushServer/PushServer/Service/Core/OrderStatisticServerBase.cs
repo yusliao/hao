@@ -153,7 +153,7 @@ namespace PushServer.Service
         }
         private  void PushReport(StatisticType statisticType, int statisticValue,int year)
         {
-            var wxTargets = System.Configuration.ConfigurationManager.AppSettings["WxNewsTargets"].Split(new char[] { ',' }).ToList();
+         
             var WxNewsUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsUrl"];
             var WxNewsPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsPicUrl"]; 
             var WxNewssmallPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewssmallPicUrl"];
@@ -169,7 +169,7 @@ namespace PushServer.Service
             {
                 Statistic foo = new Statistic();
                 string title = string.Empty;
-              
+                
                 List<Statistic> lst = new List<Statistic>();
                 var nameDesc =  Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName);
                 switch (statisticType)
@@ -280,23 +280,65 @@ namespace PushServer.Service
                 {
                     new WxArticle( title,url,picUrl,string.Empty)
                 };
-
-                if (foo!=null&&foo.TotalOrderCount > 0)
-                    wxArticles.AddRange(new List<WxArticle>()
+                int rangvalue = 7;
+                switch (statisticType)
                 {
-                    new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,smallpicUrl,string.Empty),
-                    new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,smallpicUrl,string.Empty),
-                    new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,smallpicUrl,string.Empty),
-                    new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,smallpicUrl,string.Empty),
-                   // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
-                    new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,smallpicUrl,string.Empty),
-                    new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,smallpicUrl,string.Empty),
-                    new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,smallpicUrl,string.Empty),
+                   
+                    case StatisticType.Week:
+                        rangvalue = 7;
+                        break;
+                    case StatisticType.Month:
+                        rangvalue = DateTime.DaysInMonth(year, statisticValue);
+                        break;
+                    case StatisticType.Quarter:
+                        rangvalue = Util.Helpers.Time.GetDaysInSeason(year, statisticValue);
+                        break;
+                    case StatisticType.Year:
+                        rangvalue = Util.Helpers.Time.GetDaysInYear(year);
+                        break;
+                    default:
+                        break;
+                }
+                if (foo != null && foo.TotalOrderCount > 0 && statisticType != StatisticType.Day)
+                {
+                    wxArticles.AddRange(new List<WxArticle>()
+                    {
+                          new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,smallpicUrl,string.Empty),
+                        new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,smallpicUrl,string.Empty),
+                       
 
-                });
+                        new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,smallpicUrl,string.Empty),
+                         new WxArticle(string.Format("日均单数：{0}", Math.Round((double)foo.TotalOrderCount/rangvalue,2)),url,smallpicUrl,string.Empty),
+                        new WxArticle(string.Format("日均盒数：{0}",Math.Round((double)foo.TotalProductCount/rangvalue,2)),url,smallpicUrl,string.Empty),
+                       // new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,smallpicUrl,string.Empty),
+                       // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
+                      //  new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,smallpicUrl,string.Empty),
+
+                        new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,smallpicUrl,string.Empty),
+                        new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,smallpicUrl,string.Empty),
+
+                    });
+                }
+                else if (foo != null && foo.TotalOrderCount > 0 && statisticType == StatisticType.Day)
+                {
+                    wxArticles.AddRange(new List<WxArticle>()
+                    {
+
+                        new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,smallpicUrl,string.Empty),
+                          new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,smallpicUrl,string.Empty),
+                        new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,smallpicUrl,string.Empty),
+                        new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,smallpicUrl,string.Empty),
+                       // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
+                        new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,smallpicUrl,string.Empty),
+
+                        new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,smallpicUrl,string.Empty),
+                        new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,smallpicUrl,string.Empty),
+
+                    });
+                }
                 try
                 {
-                    WxPushNews.OrderStatistic(wxArticles);
+                    WxPushNews.OrderStatistic(wxArticles,ServerName);
                     Util.Logs.Log.GetLog(nameof(WxPushNews)).Info($"消息推送成功：{wxArticles[0].Title}");
                 }
                 catch (Exception ex)
