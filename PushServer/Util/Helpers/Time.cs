@@ -144,6 +144,25 @@ namespace Util.Helpers {
             }
         
         }
+        public static int GetDaysInSeason(int year, int season)
+        {
+            DateTime dt = new DateTime();
+            DateTime startTime, endTime;
+            if (season > 0 && season < 5)
+            {
+                startTime = dt.AddYears(year - 1).AddMonths(3 * (season - 1));
+
+                endTime = startTime.AddMonths(3);
+              
+            }
+            else
+            {
+                startTime = dt.AddYears(year - 1);
+                endTime = startTime.AddMonths(3);
+            }
+            return endTime.Subtract(startTime).Days;
+
+        }
         public static void GetTimeByYear(int year, out DateTime startTime, out DateTime endTime)
         {
             DateTime dt = new DateTime();
@@ -151,6 +170,17 @@ namespace Util.Helpers {
             startTime = dt.AddYears(year - 1);
             endTime = startTime.AddYears(1);
             
+        }
+        public static int GetDaysInYear(int year)
+        {
+            if (DateTime.IsLeapYear(year))
+            {
+                return 366;
+            }
+            else
+                return 365;
+           
+
         }
         public static int GetWeekNum(DateTime dateTime)
         {
