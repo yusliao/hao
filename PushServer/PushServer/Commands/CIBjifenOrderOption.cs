@@ -114,6 +114,7 @@ namespace PushServer.Commands
                         orderStatus = OrderStatus.Finished;
                         break;
                     case "取消":
+                    case "退款":
                         orderStatus = OrderStatus.Cancelled;
                         break;
                     default:

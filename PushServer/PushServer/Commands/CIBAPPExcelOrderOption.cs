@@ -12,11 +12,13 @@ using System.Threading.Tasks;
 using OMS.Models;
 using OMS.Models.DTO;
 using PushServer.Configuration;
+using PushServer.ModelServer;
 
 namespace PushServer.Commands
 {
     /// <summary>
     /// 兴业银行积分
+    /// 特点：通过订单编号和订单商品编号编写逻辑
     /// </summary>
     [Export(typeof(IOrderOption))]
     class CIBAPPExcelOrderOption : OrderOptionBase
@@ -77,10 +79,7 @@ namespace PushServer.Commands
                         OnUIMessageEventHandle($"兴业积分APP导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
                         continue;
                     }
-
-                   
-                    this.ResolveOrders(table,file.FullName, ordersList);
-                   
+                    
                 }
                 OnUIMessageEventHandle($"兴业积分APP导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
             }
@@ -113,20 +112,9 @@ namespace PushServer.Commands
             OrderDTO orderDTO = new OrderDTO();
             orderDTO.orderStatus = OrderStatus.Confirmed;
             orderDTO.fileName = file;
-            var sourceStatus = excelTable.Columns[0].ColumnName.Split(',').First().Split('：').Last();
-            switch (sourceStatus)
-            {
-                case "待发货":
-                    orderDTO.orderStatus = OrderStatus.Confirmed;
-                    break;
-                case "待收货":
-                    orderDTO.orderStatus = OrderStatus.Delivered;
-                    break;
-                case "待评价":
-                case "已评价":
-                    orderDTO.orderStatus = OrderStatus.Finished;
-                    break;
-            }
+            orderDTO.orderType = 0;
+            orderDTO.orderStatus = OrderStatus.Confirmed;
+           
 
             for (int i = 1; i < excelTable.Rows.Count; i++)
             {
@@ -140,48 +128,29 @@ namespace PushServer.Commands
 
                 orderDTO.sourceSN = Convert.ToString(row[1]); //订单号
                 if (string.IsNullOrEmpty(orderDTO.sourceSN))
-                    continue;
-
-                //Added By: BingYi 20180728
-                //CIBAPP目前包含两种支付方式: 本金支付/积分支付 
-                //如果为 本金支付,该订单 应该改属于 [兴业分期商城]
-                // var paymentType = Convert.ToString(row["支付方式"]).Trim();
-                //if (paymentType.Equals("本金支付") || paymentType.Equals("分期支付"))
-                //{
-                //    source = OrderSource.CIBSTM;
-                //    sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIBSTM);
-                //}
-
-                //订单SN=来源+原来的SN
-                orderDTO.orderSN = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
-                using (var db = new OMSContext())
                 {
-                    var foo = db.OrderSet.Find(orderDTO.orderSN);
-                    if (foo != null)
-                    {
-                        Util.Logs.Log.GetLog(nameof(CIBAPPExcelOrderOption)).Error($"订单{foo.OrderSn}已经存在");
-                        continue;
-
-                    }
+                    InputExceptionOrder(orderDTO, ExceptionType.SourceSnIsNull);
+                    continue;
                 }
+
+
+                orderDTO.productName = Convert.ToString(row[3]); //商品名称
+                orderDTO.productsku = Convert.ToString(row[2]); //商品编号
+                //订单SN=来源+原来的SN+日期
+                orderDTO.orderSN_old = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
+                orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN,DateTime.Now.ToString("yyyyMMdd"));
+                if (CheckOrderInDataBase(orderDTO))
+                    continue;
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    decimal unitPrice = 0M;
-                    orderDTO.productName = Convert.ToString(row[3]); //商品名称
-                    orderDTO.productsku = Convert.ToString(row[2]); //商品编号
-                    if (orderDTO.productName.Equals("水清清特供稻花香精装礼盒2.5KG"))
-                        unitPrice = 56.00M;
-                    else if (orderDTO.productName.Equals("水清清冠军优选四季经典4KG*1提"))
-                        unitPrice = 108.00M;
-
                     orderDTO.count = Convert.ToInt32(row[4]); //数量
                     var productProps = Convert.ToString(row[5]); //商品属性
 
 
                     orderDTO.consigneeName = Convert.ToString(row[6]); //收件人
                     orderDTO.consigneePhone = Convert.ToString(row[7]); //联系电话
-                    var consigneePhone2 = string.Empty;
+                    orderDTO.consigneePhone2 = string.Empty;
 
 
                     orderDTO.consigneeProvince = string.Empty;
@@ -202,7 +171,7 @@ namespace PushServer.Commands
                      //   consigneeAddress = addrInfo.Address;
                     }
 
-                    var totalAmount = 0;//?
+                   
                     var totalQuantity = orderDTO.count;
                    
 
@@ -213,125 +182,30 @@ namespace PushServer.Commands
                     if (invoiceFlag.Equals("否"))
                         invoiceType = invoiceName = string.Empty;
 
-                    var orderItem = new OrderEntity()
-                    {
-                        SourceSn = orderDTO.sourceSN,
-                        Source = orderDTO.source,
-                        SourceDesc = orderDTO.sourceDesc,
-                        CreatedDate = orderDTO.createdDate,
-                        OrderSn = orderDTO.orderSN,
-                        Consignee = new CustomerEntity()
-                        {
-                            Name = orderDTO.consigneeName,
-                            Phone = orderDTO.consigneePhone,
-                            Phone2 = consigneePhone2,
-                            CreateDate = orderDTO.createdDate
-                        },
-                        ConsigneeAddress = new AddressEntity()
-                        {
-                            Address = orderDTO.consigneeAddress,
-                            City = orderDTO.consigneeCity,
-                            County = orderDTO.consigneeCounty,
-                            Province = orderDTO.consigneeProvince,
-                            ZipCode = orderDTO.consigneeZipCode
-                        },
-                       
-                        OrderDateInfo = new OrderDateInfo()
-                        {
-                            CreateTime = orderDTO.createdDate,
-                            DayNum = orderDTO.createdDate.DayOfYear,
-                            MonthNum = orderDTO.createdDate.Month,
-                            WeekNum = Util.Helpers.Time.GetWeekNum(orderDTO.createdDate),
-                            SeasonNum = Util.Helpers.Time.GetSeasonNum(orderDTO.createdDate),
-                            Year = orderDTO.createdDate.Year,
-                            TimeStamp = Util.Helpers.Time.GetUnixTimestamp(orderDTO.createdDate)
-                        },
-                        OrderStatus = (int)orderDTO.orderStatus,
-                        OrderStatusDesc = Util.Helpers.Enum.GetDescription(typeof(OrderStatus), orderDTO.orderStatus),
-
-
-                        Remarks = string.Empty
-                    };
-                    if (orderItem.Products == null)
-                        orderItem.Products = new List<OrderProductInfo>();
+                    OrderEntity orderItem = OrderEntityService.CreateOrderEntity(orderDTO);
                     using (var db = new OMSContext())
                     {
                         //查找联系人
                         if (!string.IsNullOrEmpty(orderItem.Consignee.Phone))
                         {
-                            string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
-                            var s = db.CustomersSet.Include<CustomerEntity, ICollection<AddressEntity>>(c => c.Addresslist).FirstOrDefault(c => c.Name == orderItem.Consignee.Name && c.Phone == orderItem.Consignee.Phone);
-                            if (s != null)
-                            {
+                            OrderEntityService.InputConsigneeInfo(orderItem, db);
 
-                                orderItem.Consignee = s;
-                                
-                                DateTime startSeasonTime, endSeasonTime, startYearTime, endYearTime, startWeekTime, endWeekTime;
-                                Util.Helpers.Time.GetTimeBySeason(orderItem.CreatedDate.Year, Util.Helpers.Time.GetSeasonNum(orderItem.CreatedDate), out startSeasonTime, out endSeasonTime);
-                                Util.Helpers.Time.GetTimeByYear(orderItem.CreatedDate.Year, out startYearTime, out endYearTime);
-                                Util.Helpers.Time.GetTimeByWeek(orderItem.CreatedDate.Year, Util.Helpers.Time.GetWeekNum(orderItem.CreatedDate), out startWeekTime, out endWeekTime);
-
-                                orderItem.OrderRepurchase = new OrderRepurchase()
-                                {
-                                    DailyRepurchase = true,
-                                    MonthRepurchase = s.CreateDate.Value.Date < new DateTime(orderItem.CreatedDate.Year, orderItem.CreatedDate.Month, 1).Date ? true : false,
-                                    SeasonRepurchase = s.CreateDate.Value.Date < startSeasonTime.Date ? true : false,
-                                    WeekRepurchase = s.CreateDate.Value.Date < startWeekTime.Date ? true : false,
-                                    YearRepurchase = s.CreateDate.Value.Date < startYearTime.Date ? true : false,
-
-                                };
-                              
-                                //更新收件人与地址的关系
-
-                                if (s.Addresslist.Any(a => a.MD5 == md5))
-                                {
-                                    var addr = s.Addresslist.First(a => a.MD5 == md5);
-                                    orderItem.ConsigneeAddress = addr;//替换地址对象
-                                  
-                                }
-                                else
-                                {
-                                    orderItem.ConsigneeAddress.MD5 = md5;
-                                    s.Addresslist.Add(orderItem.ConsigneeAddress);
-                                }
-                            }
-                            else//没找到备案的收货人
-                            {
-                              
-                                orderItem.OrderRepurchase = new OrderRepurchase();
-                              
-                                orderItem.ConsigneeAddress.MD5 = md5;
-                                if (orderItem.Consignee.Addresslist == null)
-                                    orderItem.Consignee.Addresslist = new List<AddressEntity>();
-                                orderItem.Consignee.Addresslist.Add(orderItem.ConsigneeAddress);
-                            
-                                db.AddressSet.Add(orderItem.ConsigneeAddress);
-                                db.CustomersSet.Add(orderItem.Consignee);
-
-                            }
-                          
                         }
                         else //异常订单
                         {
-                            ExceptionOrder exceptionOrder = new ExceptionOrder()
-                            {
-                                OrderFileName = file,
-                                OrderInfo = Util.Helpers.Json.ToJson(orderItem),
-                                Source = this.Name
-                            };
-                            db.ExceptionOrders.Add(exceptionOrder);
-                            db.SaveChanges();
+                            InputExceptionOrder( orderDTO, ExceptionType.PhoneNumIsNull);
                             continue;
                         }
 
-                        InsertOrUpdateProductInfo(db, orderDTO, orderItem);
-                       
+                        if (!InputProductInfoWithoutSaveChange(db, orderDTO, orderItem))
+                        {
+                            continue;
+                        }
                         items.Add(orderItem);
                         if (orderItem.OrderRepurchase == null)
                             orderItem.OrderRepurchase = new OrderRepurchase();
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
-                      
                       
                         db.SaveChanges();
                     }
@@ -342,14 +216,11 @@ namespace PushServer.Commands
                     orderDTO.productName = Convert.ToString(row[3]); //商品名称
                     orderDTO.productsku = Convert.ToString(row[2]); //商品编号
 
-
                     orderDTO.count = Convert.ToInt32(row[4]); //数量
-
-                   
 
                     using (var db = new OMSContext())
                     {
-                        InsertOrUpdateProductInfo(db, orderDTO, item);
+                        InputProductInfoWithoutSaveChange(db, orderDTO, item);
                     }
 
                     

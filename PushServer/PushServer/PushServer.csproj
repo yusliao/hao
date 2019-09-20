@@ -141,8 +141,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z.EntityFramework.Extensions, Version=3.21.10.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Extensions.3.21.10\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
+    <Reference Include="Z.EntityFramework.Extensions, Version=3.22.4.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Extensions.3.22.4\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.9.4.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
       <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.9.4\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
@@ -170,12 +170,21 @@
     <Compile Include="Configuration\ClientElement.cs" />
     <Compile Include="Configuration\ClientListSection.cs" />
     <Compile Include="ImportExcelHelper.cs" />
-    <Compile Include="Migrations\201908060423518_20160201003.cs" />
-    <Compile Include="Migrations\201908060423518_20160201003.Designer.cs">
-      <DependentUpon>201908060423518_20160201003.cs</DependentUpon>
+    <Compile Include="Migrations\201909190716404_init.cs" />
+    <Compile Include="Migrations\201909190716404_init.Designer.cs">
+      <DependentUpon>201909190716404_init.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909190755277_modifyorderinfo.cs" />
+    <Compile Include="Migrations\201909190755277_modifyorderinfo.Designer.cs">
+      <DependentUpon>201909190755277_modifyorderinfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909190758376_modifyorderinfo1.cs" />
+    <Compile Include="Migrations\201909190758376_modifyorderinfo1.Designer.cs">
+      <DependentUpon>201909190758376_modifyorderinfo1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\OMSContext.cs" />
+    <Compile Include="ModelServer\OrderEntityService.cs" />
     <Compile Include="NPOIExcel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
@@ -193,28 +202,28 @@
       <DependentUpon>PushServer.cs</DependentUpon>
     </Compile>
     <Compile Include="SelfInstaller.cs" />
-    <Compile Include="Service\BLL\ALLStatisticServer.cs" />
-    <Compile Include="Service\BLL\CIBAPPStatisticServer.cs" />
-    <Compile Include="Service\BLL\CIBCQstatisticServer.cs" />
-    <Compile Include="Service\BLL\CIBJifenStatisticMonthPandianServer.cs" />
-    <Compile Include="Service\BLL\CIBVIPStatisticServer.cs" />
-    <Compile Include="Service\BLL\CIBPCStatisticServer.cs" />
-    <Compile Include="Service\BLL\CMBstatisticServer.cs" />
-    <Compile Include="Service\BLL\FriendstatisticServer.cs" />
-    <Compile Include="Service\BLL\JDstatisticServer.cs" />
-    <Compile Include="Service\BLL\RetailstatisticServer.cs" />
-    <Compile Include="Service\BLL\TMstatisticServer.cs" />
-    <Compile Include="Service\BLL\XunXiaostatisticServer.cs" />
-    <Compile Include="Service\BLL\YouZanstatisticServer.cs" />
-    <Compile Include="Service\Core\DistrictStatisticServerBase.cs" />
-    <Compile Include="Service\Core\IDistrictStatisticServer.cs" />
-    <Compile Include="Service\Core\IOrderStatisticServer.cs" />
-    <Compile Include="Service\Core\IPandianServer.cs" />
-    <Compile Include="Service\Core\IProductStatisticServer.cs" />
-    <Compile Include="Service\Core\OrderStatisticServerBase.cs" />
-    <Compile Include="Service\Core\ProductPandianStatisticServerBase.cs" />
-    <Compile Include="Service\Core\ProductStatisticServerBase.cs" />
-    <Compile Include="Service\BLL\StatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\ALLStatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\CIBAPPStatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\CIBCQstatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\CIBJifenStatisticMonthPandianServer.cs" />
+    <Compile Include="StatisticServer\BLL\CIBVIPStatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\CIBPCStatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\CMBstatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\FriendstatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\JDstatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\RetailstatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\TMstatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\XunXiaostatisticServer.cs" />
+    <Compile Include="StatisticServer\BLL\YouZanstatisticServer.cs" />
+    <Compile Include="StatisticServer\Core\DistrictStatisticServerBase.cs" />
+    <Compile Include="StatisticServer\Core\IDistrictStatisticServer.cs" />
+    <Compile Include="StatisticServer\Core\IOrderStatisticServer.cs" />
+    <Compile Include="StatisticServer\Core\IPandianServer.cs" />
+    <Compile Include="StatisticServer\Core\IProductStatisticServer.cs" />
+    <Compile Include="StatisticServer\Core\OrderStatisticServerBase.cs" />
+    <Compile Include="StatisticServer\Core\ProductPandianStatisticServerBase.cs" />
+    <Compile Include="StatisticServer\Core\ProductStatisticServerBase.cs" />
+    <Compile Include="StatisticServer\BLL\StatisticServer.cs" />
     <Compile Include="WxPushNews.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -229,8 +238,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201908060423518_20160201003.resx">
-      <DependentUpon>201908060423518_20160201003.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201909190716404_init.resx">
+      <DependentUpon>201909190716404_init.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909190755277_modifyorderinfo.resx">
+      <DependentUpon>201909190755277_modifyorderinfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909190758376_modifyorderinfo1.resx">
+      <DependentUpon>201909190758376_modifyorderinfo1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>

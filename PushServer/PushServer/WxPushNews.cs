@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using FusionStone.WeiXin;
 using OMS.Models;
 
-namespace M2.OrderManagement.Sync
+namespace PushServer
 {
     public class WxPushNews
     {
@@ -25,26 +25,28 @@ namespace M2.OrderManagement.Sync
             foreach (var targetName in wxTargets)
             {
                 var item = new WxMassApiWrapper(targetName);
-                if (targetName == "ALL")
-                    WxApiRetryBlock.Run(() => item.SendNews(wxArticles));
-                else if (serverName == OrderSource.CIB || serverName == OrderSource.CIBAPP || serverName == OrderSource.CIBVIP)
+                switch (serverName)
                 {
-                    WxApiRetryBlock.Run(() => item.SendNews(wxArticles));
+                    case OrderSource.CIB:
+                    case OrderSource.CIBAPP:
+                    case OrderSource.CIBVIP:
+                        if(targetName=="LJNY")
+                            WxApiRetryBlock.Run(() => item.SendNews(wxArticles));
+                        break;
+                    default:
+                        if(targetName=="ALL")
+                            WxApiRetryBlock.Run(() => item.SendNews(wxArticles));
+                        break;
                 }
-                else
-                    continue;
                 
             }
             
+        }
+        public static void SendErrorText(string msg)
+        {
+            var massApi = new WxMassApiWrapper("ERROR");
 
-            //foreach (var massApi in wxMassApiList)
-            //{
-            //    if(massApi.)
-            //    if(serverName== OrderSource.CIB||serverName==OrderSource.CIBAPP||serverName==OrderSource.CIBVIP)
-            //    { }
-            //    WxApiRetryBlock.Run(() => massApi.SendNews(wxArticles));
-              
-            //}
+            WxApiRetryBlock.Run(() => massApi.SendText($"您有新的错误订单需要处理!]\r\n{msg}"));
         }
     }
 }

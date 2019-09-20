@@ -24,7 +24,7 @@ namespace PushServer.Configuration
                 var folder = this["ExcelOrderFolder"] as string;
                 if(string.IsNullOrEmpty(folder))
                 {
-                    folder = $@"D:/LJNY/{Name}";
+                    folder = $@"D:/LJNY/Gaoxing/{Name}";
                 }
                 System.IO.Directory.CreateDirectory(folder);
                 return folder;

@@ -9,7 +9,7 @@ using System.Data;
 
 using System.IO;
 using FusionStone.WeiXin;
-using M2.OrderManagement.Sync;
+
 using PushServer.Service;
 using System.Data.Entity;
 using OMS.Models.DTO;
@@ -20,11 +20,14 @@ namespace PushServer.Commands
     {
         
         protected Util.Files.FileScanner FileScanner { get; set; } = new Util.Files.FileScanner();
+        protected List<ExceptionOrder> exceptionOrders = new List<ExceptionOrder>();
         public abstract string Name { get; }
         public bool IsImporting { get; set; } = false;
 
         public abstract IClientConfig clientConfig { get; }
+        public static event Action<ICollection<ExceptionOrder>> ExceptionMessageEventHandle;
         public static event Action<List<OrderEntity>,OptionType> OnPostCompletedEventHandle;
+    
         public static event Action<string> UIMessageEventHandle;
         protected abstract List<OrderEntity> FetchOrders();
         protected virtual void OnUIMessageEventHandle(string msg)
@@ -34,128 +37,369 @@ namespace PushServer.Commands
             if (handle != null)
                 handle(msg);
         }
+        protected virtual void OnExceptionMessageEventHandle(List<ExceptionOrder> msgs)
+        {
+            if (msgs.Any())
+            {
+                
+                ExceptionOrder[] exceptions = msgs.ToArray();
+                var handle = ExceptionMessageEventHandle;
+                if (handle != null)
+                    handle.BeginInvoke(exceptions, null, null);
+                msgs.Clear();
+            }
+        }
         /// <summary>
         /// 插入商品记录
         /// </summary>
         /// <param name="db"></param>
         /// <param name="orderDTO"></param>
         /// <param name="item"></param>
-        protected void InsertOrUpdateProductInfo(OMSContext db, OrderDTO orderDTO,OrderEntity item)
+        protected virtual bool InputProductInfoWithoutSaveChange(OMSContext db, OrderDTO orderDTO,OrderEntity item)
         {
-          
-            var bar = db.ProductDictionarySet.FirstOrDefault(p => (p.ProductNameInPlatform == orderDTO.productName.Trim()&&orderDTO.productName!=null || p.ProductId == orderDTO.productsku.Trim()&&orderDTO.productsku!=null) && p.ProductCode != null);
-            if (bar == null)
+            ProductDictionary pd = null;
+            switch (item.Source)
             {
-                if (string.IsNullOrEmpty(orderDTO.productsku))
-                {
-                    OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productName}）录入失败");
-                    if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == orderDTO.productName) == null)
+                case OrderSource.CIB:
+                case OrderSource.CIBAPP:
+                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null&& p.ProductCode != null);
+                    if (pd == null)
                     {
-                        ProductDictionary productDictionary = new ProductDictionary()
+                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+                        InputExceptionOrder(orderDTO,ExceptionType.ProductIdUnKnown);
+                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
                         {
-                            ProductId = orderDTO.productsku,
-                            ProductNameInPlatform = orderDTO.productName
-                        };
-                        db.ProductDictionarySet.Add(productDictionary);
-                        db.SaveChanges();
+                            ProductDictionary productDictionary = new ProductDictionary()
+                            {
+                                ProductId = orderDTO.productsku,
+                                ProductNameInPlatform = orderDTO.productName.Trim()
+                            };
+                            db.ProductDictionarySet.Add(productDictionary);
+                            db.SaveChanges();
+                        }
+                        return false;
                     }
-                }
-                else
-                {
-                    OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
-                    if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                    break;
+                case OrderSource.CIBVIP:
+                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null  && p.ProductCode != null);
+                    if (pd == null)
                     {
-                        ProductDictionary productDictionary = new ProductDictionary()
+                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productName}）录入失败");
+                        InputExceptionOrder(orderDTO,ExceptionType.ProductNameUnKnown);
+                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == orderDTO.productName) == null)
                         {
-                            ProductId = orderDTO.productsku,
-                            ProductNameInPlatform = orderDTO.productName
-                        };
-                        db.ProductDictionarySet.Add(productDictionary);
-                        db.SaveChanges();
+                            ProductDictionary productDictionary = new ProductDictionary()
+                            {
+                                ProductId = orderDTO.productsku,
+                                ProductNameInPlatform = orderDTO.productName.Trim()
+                            };
+                            db.ProductDictionarySet.Add(productDictionary);
+                            db.SaveChanges();
+                        }
+                        return false;
                     }
-                }
-
-
-
-                
-                if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
-                {
-                    ProductDictionary productDictionary = new ProductDictionary()
+                    break;
+    
+                default:
+                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
+                    if (pd == null)
                     {
-                        ProductId = orderDTO.productsku,
-                        ProductNameInPlatform = orderDTO.productName
-                    };
-                    db.ProductDictionarySet.Add(productDictionary);
-                    db.SaveChanges();
-                }
-                
-                return;
+                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+                        InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
+                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                        {
+                            ProductDictionary productDictionary = new ProductDictionary()
+                            {
+                                ProductId = orderDTO.productsku,
+                                ProductNameInPlatform = orderDTO.productName.Trim()
+                            };
+                            db.ProductDictionarySet.Add(productDictionary);
+                            db.SaveChanges();
+                        }
+                        return false;
+                    }
+                    break;
             }
-            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku == bar.ProductCode);
+
+
+            // var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == "S0010040003\t".Trim());
+            string temp = pd.ProductCode.Trim();//"S0010040003\t"
+            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == temp);
             if (foo == null)
             {
                 OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");
-               
-
-                return;
+                InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                return false;
             }
-
-            decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
-            OrderProductInfo orderProductInfo = new OrderProductInfo()
-            {
-                ProductPlatId = orderDTO.productsku,
-                ProductPlatName = orderDTO.productName,
-                //   Warehouse = item.OrderLogistics.Logistics,
-                MonthNum = orderDTO.createdDate.Month,
-                weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
-                weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
-                OrderSn = orderDTO.orderSN,
-              //  TotalAmount = totalAmount,
-                ProductCount = orderDTO.count,
-                ProductWeight = weight,
-                Source = orderDTO.source,
-                sku = foo.sku
-            };
             if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
             {
+                decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
+                OrderProductInfo orderProductInfo = new OrderProductInfo()
+                {
+                    ProductPlatId = orderDTO.productsku,
+                    ProductPlatName = orderDTO.productName.Trim(),
+                    //   Warehouse = item.OrderLogistics.Logistics,
+                    MonthNum = orderDTO.createdDate.Month,
+                    weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
+                    weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                    OrderSn = orderDTO.orderSN,
+                    //  TotalAmount = totalAmount,
+                    ProductCount = orderDTO.count,
+                    ProductWeight = weight,
+                    Source = orderDTO.source,
+                    sku = foo.sku
+                };
                 item.Products.Add(orderProductInfo);
-              
             }
+           
+           
+
             OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
+            return true;
         }
-       /// <summary>
-       /// 入库完毕
-       /// </summary>
-       /// <param name="postResult">入库结果</param>
-       /// <param name="lst">订单集合</param>
-       /// <param name="optionType" cref="OptionType">生成操作</param>
+        protected virtual bool InputProductInfoWithSaveChange(OMSContext db,OrderDTO orderDTO, OrderEntity item,string oldordersn=null)
+        {
+            ProductDictionary pd = null;
+            // 验证该商品是否在ERP系统中有存根。没有存根就停止录入
+            switch (item.Source)
+            {
+                case OrderSource.CIB:
+                case OrderSource.CIBAPP:
+                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
+                    if (pd == null)
+                    {
+                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+                        InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
+                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                        {
+                            ProductDictionary productDictionary = new ProductDictionary()
+                            {
+                                ProductId = orderDTO.productsku,
+                                ProductNameInPlatform = orderDTO.productName.Trim()
+                            };
+                            db.ProductDictionarySet.Add(productDictionary);
+                            db.SaveChanges();
+                        }
+                        return false;
+                    }
+                    break;
+                case OrderSource.CIBVIP: //根据商品名称查找对应关系
+                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null && p.ProductCode != null);
+                    if (pd == null)
+                    {
+                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productName}）录入失败");
+                        InputExceptionOrder(orderDTO, ExceptionType.ProductNameUnKnown);
+                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == orderDTO.productName) == null)
+                        {
+                            ProductDictionary productDictionary = new ProductDictionary()
+                            {
+                                ProductId = orderDTO.productsku,
+                                ProductNameInPlatform = orderDTO.productName.Trim()
+                            };
+                            db.ProductDictionarySet.Add(productDictionary);
+                            db.SaveChanges();
+                        }
+                        return false;
+                    }
+                    break;
+
+                default:
+                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
+                    if (pd == null)
+                    {
+                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+                        InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
+                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                        {
+                            ProductDictionary productDictionary = new ProductDictionary()
+                            {
+                                ProductId = orderDTO.productsku,
+                                ProductNameInPlatform = orderDTO.productName.Trim()
+                            };
+                            db.ProductDictionarySet.Add(productDictionary);
+                            db.SaveChanges();
+                        }
+                        return false;
+                    }
+                    break;
+            }
+
+
+            //判断该商品的ERP编号是否存在，不存在则停止录入
+            string temp = pd.ProductCode.Trim();//"S0010040003\t"
+            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == temp);
+            if (foo == null)
+            {
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");
+                InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                return false;
+            }
+            
+            if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
+            {
+                decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
+                OrderProductInfo orderProductInfo = new OrderProductInfo()
+                {
+                    ProductPlatId = orderDTO.productsku,
+                    ProductPlatName = orderDTO.productName,
+                    //   Warehouse = item.OrderLogistics.Logistics,
+                    MonthNum = orderDTO.createdDate.Month,
+                    weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
+                    weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                    OrderSn = oldordersn?? orderDTO.orderSN,
+                    //  TotalAmount = totalAmount,
+                    ProductCount = orderDTO.count,
+                    ProductWeight = weight,
+                    Source = orderDTO.source,
+                    sku = foo.sku
+                };
+                item.Products.Add(orderProductInfo);
+            }
+            db.SaveChanges();
+
+            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
+            return true;
+            
+           
+        }
+        protected virtual bool CheckOrderInDataBase(OrderDTO orderDTO)
+        {
+            /*检查订单是否已经存在在数据库中
+             * 如果订单不存在于数据库中，返回false,结束
+             * 如果订单存在于数据库中：
+             * 检查订单是否取消订单，如果是取消订单，则减去相应商品的数量和重量信息；
+             * 如果不是取消清单，则录入该订单商品
+             */ 
+            using (var db = new OMSContext())
+            {
+                var foo = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN_old);//订单在数据库中
+                if (foo != null)//系统中已经存在该订单
+                {
+                    //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
+                    if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
+                    {
+
+                        var bar = db.ProductDictionarySet.FirstOrDefault(x => x.ProductNameInPlatform.Trim() == orderDTO.productName.Trim());
+                        if (bar != null && !string.IsNullOrEmpty(bar.ProductCode))
+                        {
+                            var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
+                            if (p1 != null)
+                            {
+                                decimal weight = foo == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
+                                var p = foo.Products.FirstOrDefault(o => o.sku == p1.sku);
+                                if (p != null)
+                                {
+
+                                    p.ProductCount -= orderDTO.count;
+                                    p.ProductWeight -= weight;
+
+                                    db.SaveChanges();
+                                    return true;
+                                }
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        InputProductInfoWithSaveChange(db, orderDTO, foo,orderDTO.orderSN_old);
+                       
+                    }
+                    return true;
+                }
+                else
+                {
+                    var foo1 = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN);//订单在数据库中
+                    if (foo1 != null)//系统中已经存在该订单
+                    {
+                        //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
+                        if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
+                        {
+
+                            var bar = db.ProductDictionarySet.FirstOrDefault(x => x.ProductNameInPlatform.Trim() == orderDTO.productName.Trim());
+                            if (bar != null && !string.IsNullOrEmpty(bar.ProductCode))
+                            {
+                                var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
+                                if (p1 != null)
+                                {
+                                    decimal weight = foo == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
+                                    var p = foo.Products.FirstOrDefault(o => o.sku == p1.sku);
+                                    if (p != null)
+                                    {
+
+                                        p.ProductCount -= orderDTO.count;
+                                        p.ProductWeight -= weight;
+
+                                        db.SaveChanges();
+                                       
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            InputProductInfoWithSaveChange(db, orderDTO, foo1);
+                           
+                        }
+                        return true;
+
+                    }
+                    else
+                        return false;
+                }
+            }
+        }
+        protected void InputExceptionOrder(OrderDTO orderItem,ExceptionType exceptionType)
+        {
+            ExceptionOrder exceptionOrder = new ExceptionOrder()
+            {
+                OrderFileName = orderItem.fileName,
+                OrderInfo = Util.Helpers.Json.ToJson(orderItem),
+                Source = this.Name,
+                SourceSn = orderItem.sourceSN,
+                CreateTime = DateTime.Now,
+                ErrorCode = exceptionType,
+                ErrorMessage = Util.Helpers.Enum.GetDescription<ExceptionType>(exceptionType)
+
+            };
+            exceptionOrders.Add(exceptionOrder);
+        }
+        /// <summary>
+        /// 入库完毕
+        /// </summary>
+        /// <param name="postResult">入库结果</param>
+        /// <param name="lst">订单集合</param>
+        /// <param name="optionType" cref="OptionType">生成操作</param>
         protected virtual void OnPostCompleted(bool postResult,List<OrderEntity> lst,OptionType optionType= OptionType.ErpExcel)
         {
             if (postResult)
             {
-                try
-                {
+              
                     FileScanner.ScannedFiles.ForEach(f =>
                     {
-                        var temp = Path.GetExtension(f.Name);
-                        File.Move(f.FullName, Path.ChangeExtension(f.FullName, $"{temp}.bak"));
+                        try
+                        {
+                            var temp = Path.GetExtension(f.Name);
+                            File.Move(f.FullName, Path.ChangeExtension(f.FullName, $"{temp}.bak"));
+                        }
+                        catch (Exception ex)
+                        {
+                            Util.Logs.Log.GetLog(nameof(Name)).Error($"上传完毕，修改文件名后缀时出错,文件名：{f.Name}。/r/n{ex.Message}");
 
+                        }
                         // fileInfo.MoveTo($"{fileInfo.FullName}.bak");
                     });
                     FileScanner.ScannedFiles.Clear();
-                }
-                catch (Exception ex)
-                {
-                    Util.Logs.Log.GetLog(nameof(Name)).Error($"上传完毕，修改文件名后缀时出错。/r/n{ex.Message}");
-                    
-                }
+               
                 if(OnPostCompletedEventHandle!=null)
                 {
                     var handle = OnPostCompletedEventHandle;
                     handle.BeginInvoke(lst, optionType, null,null);
                     
                 }
-                
+               
+
+
             }
         }
        
@@ -184,6 +428,8 @@ namespace PushServer.Commands
                     result = InsertDB(lst);
                     OnPostCompleted(result, lst);
                 }
+                
+                OnExceptionMessageEventHandle(exceptionOrders);
                 return result;
             }
             finally
@@ -225,10 +471,14 @@ namespace PushServer.Commands
                 {
                    
                     stopwatch.Start();
+                   
                     db.BulkInsert<OrderEntity>(lst);
                     stopwatch.Stop();
                     OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单表】耗时ms:{stopwatch.ElapsedMilliseconds}");
-                  
+
+                    if(exceptionOrders.Any())
+                        db.BulkInsert<ExceptionOrder>(exceptionOrders);
+
                     stopwatch.Start();
                     db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
                     
@@ -286,6 +536,7 @@ namespace PushServer.Commands
     {
         None =0,
         ErpExcel,//ERP导出单
-        LogisticsExcel //银行回传单（物流单）
+        LogisticsExcel, //银行回传单（物流单）
+        ExceptionExcel   //异常订单
     }
 }

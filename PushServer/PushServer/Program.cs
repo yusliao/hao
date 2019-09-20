@@ -130,8 +130,6 @@ namespace PushServer
                             Console.WriteLine("报表推送失败");
                         }
                     }
-
-
                    
                     return true;
                 case ("p1"):

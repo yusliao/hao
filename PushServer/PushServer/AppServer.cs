@@ -51,11 +51,34 @@ namespace PushServer
             }
             OrderOptionBase.OnPostCompletedEventHandle += OrderOptionBase_OnPostCompletedEventHandle;
             OrderOptionBase.UIMessageEventHandle += OrderOptionBase_OnUIMessageEventHandle;
+            OrderOptionBase.ExceptionMessageEventHandle += OrderOptionBase_ExceptionMessageEventHandle1; ;
+
+            StatisticServer.Instance.ShowMessageEventHandle += OrderOptionBase_OnUIMessageEventHandle;
             
             #region MEF配置
             MyComposePart();
             #endregion
         }
+
+        private void OrderOptionBase_ExceptionMessageEventHandle1(ICollection<ExceptionOrder> obj)
+        {
+            if (obj != null && obj.Any())
+            {
+                ERP.ExportExcel<ExceptionOrder>(OptionType.ExceptionExcel, obj.ToList());
+                var glst = obj.GroupBy(e => e.ErrorCode);
+                foreach (var item in glst)
+                {
+                    WxPushNews.SendErrorText($"错误类型：{Util.Helpers.Enum.GetDescription<ExceptionType>(item.Key)},数量：{item.Count()}");
+                }
+              
+            }
+            else
+            {
+
+            }
+        }
+
+       
 
         private void OrderOptionBase_OnUIMessageEventHandle(string obj)
         {
@@ -73,7 +96,7 @@ namespace PushServer
         {
             if (obj != null&&obj.Any())
             {
-                ERP.ExportExcel(optionType, obj);
+                ERP.ExportExcel<OrderEntity>(optionType, obj);
             }
             else
             {
