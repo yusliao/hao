@@ -28,6 +28,7 @@ namespace OMS.Models
         /// 发货时间
         /// </summary>
         public DateTime? SendingTime { get; set; }
+        
         /// <summary>
         /// 配货时间
         /// </summary>
@@ -36,6 +37,10 @@ namespace OMS.Models
         /// 到货时间
         /// </summary>
         public DateTime? RecvTime { get; set; }
+        /// <summary>
+        /// 物流商品信息
+        /// </summary>
+        public ICollection<LogisticsProductInfo> LogisticsProducts { get; set; }
 
     }
 }

@@ -12,7 +12,7 @@ namespace OMS.Models
     /// </summary>
     public class OrderSource
     {
-        [Description("银行-兴业银行积分")]
+        [Description("银行-兴业银行积分PC")]
         public const string CIB = "CIB";
         [Description("银行-兴业银行积分")]
         public const string CIBAPP = "CIBAPP";
@@ -26,7 +26,7 @@ namespace OMS.Models
         public const string FRIEND = "FRIEND";
         [Description("其他-零售仓")]
         public const string RETAIL = "RETAIL";
-        [Description("广发银行商城")]
+        [Description("银行-广发银行商城")]
         public const string CGB = "CGB";
         [Description("民生银行")]
         public const string CMBC = "CMBC";

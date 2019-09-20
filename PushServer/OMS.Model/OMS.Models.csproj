@@ -49,6 +49,7 @@
     <Compile Include="Models\CustomStrategy.cs" />
     <Compile Include="Models\ExceptionOrder.cs" />
     <Compile Include="Models\OrderDateInfo.cs" />
+    <Compile Include="Models\OrderOptionRecord.cs" />
     <Compile Include="Models\OrderRepurchase.cs" />
     <Compile Include="Models\LogisticsInfo.cs" />
     <Compile Include="Models\OrderEntity.cs" />

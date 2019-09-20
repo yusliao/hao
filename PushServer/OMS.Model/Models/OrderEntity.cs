@@ -61,6 +61,10 @@ namespace OMS.Models
         /// </summary>
         public ICollection<OrderProductInfo> Products { get; set; }
         public ICollection<OrderLogisticsDetail> OrderLogistics { get; set; }
+        /// <summary>
+        /// 订单操作记录集
+        /// </summary>
+        public ICollection<OrderOptionRecord> OrderOptionRecords { get; set; }
 
         /// <summary>
         /// 备注
@@ -74,6 +78,10 @@ namespace OMS.Models
         /// 订单来源方式0：正常录入，1:月结补录,2:ERP导出单补录
         /// </summary>
         public int OrderComeFrom { get; set; }
+        /// <summary>
+        /// 订单类型0：销售订单，1:退换货订单,2:退货/退钱
+        /// </summary>
+        public int OrderType { get; set; }
 
     }
 }

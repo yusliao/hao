@@ -17,6 +17,11 @@ namespace OMS.Models.DTO
         public string source { get; set; }
         public string sourceDesc { get; set; }
         public string orderSN { get; set; }
+        /// <summary>
+        /// 订单来源方式0：销售订单，1:退换货订单,2:退货/退钱
+        /// </summary>
+        public int orderType { get; set; }
+        public string orderSN_old { get; set; }
         public DateTime createdDate { get; set; }
         public OrderStatus orderStatus { get; set; }
         public string consigneeName { get; set; }
@@ -27,7 +32,15 @@ namespace OMS.Models.DTO
         public string consigneeAddress { get; set; }
         public string consigneeZipCode { get; set; }
         public string consigneePhone2 { get; set; }
-        public string MyProperty { get; set; }
+        public int weightCode { get; set; }
+        public string weightCodeDesc { get; set; }
+        public string Warehouse { get; set; }
+        /// <summary>
+        /// 订单来源方式0：正常录入，1:月结补录,2:ERP导出单补录
+        /// </summary>
+        public int OrderComeFrom { get; set; }
+       
+     
 
     }
 }
