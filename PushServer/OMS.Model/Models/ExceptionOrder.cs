@@ -39,6 +39,8 @@ namespace OMS.Models
         OrderProductsNoExisted,
         [Description("通过售后单未找到销售订单")]
         OrderNoExistedFromSubOrder,
+        [Description("推送错误")]
+        PushException
 
 
 

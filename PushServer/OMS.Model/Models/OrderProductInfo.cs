@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 namespace OMS.Models
 {
     /// <summary>
-    /// 商品实体信息
+    /// 商品实体信息,SKU-weightModel 一一对应
     /// </summary>
     [Table("ProductInfos")]
     
@@ -103,8 +103,9 @@ namespace OMS.Models
 
         public string weightCodeDesc { get; set; }
         /// <summary>
-        /// 仓库
+        /// 仓库 ，仓库信息通过物流商品对象来提供
         /// </summary>
+       [Obsolete]
         public string Warehouse { get; set; } = "林江农业销售公司总仓";
     }
     /// <summary>
