@@ -258,6 +258,8 @@
     <Compile Include="Reflections\WebFinder.cs" />
     <Compile Include="Sessions\ISession.cs" />
     <Compile Include="Sessions\NullSession.cs" />
+    <Compile Include="Singleton\SingletonBase.cs" />
+    <Compile Include="Singleton\SingletonProvider.cs" />
     <Compile Include="Webs\Clients\HttpContentType.cs" />
     <Compile Include="Webs\Clients\HttpRequest.cs" />
     <Compile Include="Webs\Clients\HttpRequestBase.cs" />
