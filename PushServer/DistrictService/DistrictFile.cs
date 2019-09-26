@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 namespace DistrictService
 {
-    public static class DistrictFile
+    public  class DistrictFile
     {
         private class Item
         {
@@ -54,7 +54,7 @@ namespace DistrictService
             {
             }
         }
-        private static readonly List<DistrictInfo> _districtList;
+        private static readonly List<DistrictInfo> _districtList= new List<DistrictInfo>(DistrictFile.BuildDistrictInfoList());
         public static List<DistrictInfo> DistrictList
         {
             get
@@ -62,10 +62,7 @@ namespace DistrictService
                 return DistrictFile._districtList;
             }
         }
-        static DistrictFile()
-        {
-            DistrictFile._districtList = new List<DistrictInfo>(DistrictFile.BuildDistrictInfoList());
-        }
+       
         private static List<DistrictInfo> BuildDistrictInfoList()
         {
             List<DistrictInfo> list = new List<DistrictInfo>();

@@ -4,11 +4,8 @@ namespace DistrictService
 {
     public static class DistrictService
     {
-        private static readonly IDistrictService _internalService;
-        static DistrictService()
-        {
-            DistrictService._internalService = new MemoryDistrictService();
-        }
+        private static readonly IDistrictService _internalService = new MemoryDistrictService();
+     
         public static void Initialize()
         {
             Dictionary<string, string> provinceMap = DistrictMaps.ProvinceMap;
@@ -16,6 +13,8 @@ namespace DistrictService
         }
         public static AddressInfo ResolveAddress(string address)
         {
+            if (string.IsNullOrEmpty(address))
+                return new AddressInfo();
             return DistrictService._internalService.ResolveAddress(address);
         }
         public static string ReviseCityName(string cityName)

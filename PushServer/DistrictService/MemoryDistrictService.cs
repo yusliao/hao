@@ -35,7 +35,18 @@ namespace DistrictService
             string text3 = "";
             string address2 = address.RemoveInnerBlankSpace();
             this.ResolveProvinceName(ref address2, ref text, ref text2);
-            this.ResolveCityName(ref address2, ref text, ref text2);
+            switch (text)
+            {
+                case "北京":
+                case "上海":
+                case "天津":
+                case "重庆":
+                    text2 = $"{text}市";
+                    break;
+                default:
+                    this.ResolveCityName(ref address2, ref text, ref text2);
+                    break;
+            }
             this.ResolveCountyName(ref address2, ref text, ref text2, ref text3);
             bool flag = string.IsNullOrEmpty(text) && string.IsNullOrEmpty(text2) && string.IsNullOrEmpty(text3);
             if (flag)
@@ -356,7 +367,7 @@ namespace DistrictService
                         OMS.Models.ChinaAreaData countyinfo = null;
                         if (cityinfo != null)
                         {
-                            countyinfo = db.ChinaAreaDatas.Where(c => c.levelType == 3 && c.ParentId == cityinfo.ID).FirstOrDefault(c => address.IndexOf(c.ShortName) == 0);
+                            countyinfo = db.ChinaAreaDatas.Where(c => c.levelType == 3 && c.ParentId == cityinfo.ID).FirstOrDefault(c => address.Contains(c.ShortName) == true);
                         }
                         else //适用于地级市降级为区，县
                         {
