@@ -39,6 +39,9 @@
   <PropertyGroup>
     <ApplicationIcon>server_128px_1202172_easyicon.net.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CsvHelper, Version=12.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>..\packages\CsvHelper.12.1.2\lib\net45\CsvHelper.dll</HintPath>
@@ -51,6 +54,9 @@
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="FluentScheduler, Version=5.3.0.0, Culture=neutral, PublicKeyToken=b76503528a14ebd1, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentScheduler.5.3.0\lib\net40\FluentScheduler.dll</HintPath>
     </Reference>
     <Reference Include="FusionStone.WeiXin">
       <HintPath>..\packages\FusionStone.WeiXin.dll</HintPath>
@@ -170,6 +176,7 @@
     <Compile Include="Configuration\ClientElement.cs" />
     <Compile Include="Configuration\ClientListSection.cs" />
     <Compile Include="ImportExcelHelper.cs" />
+    <Compile Include="JobServer\PushJob.cs" />
     <Compile Include="Migrations\201909190716404_init.cs" />
     <Compile Include="Migrations\201909190716404_init.Designer.cs">
       <DependentUpon>201909190716404_init.cs</DependentUpon>
@@ -232,6 +239,7 @@
     <Content Include="NLog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="app.manifest" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>

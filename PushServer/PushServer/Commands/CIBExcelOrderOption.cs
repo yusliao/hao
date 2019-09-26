@@ -18,7 +18,7 @@ namespace PushServer.Commands
 {
     /// <summary>
     /// 兴业银行积分PC
-    /// 特点：通过兑换流水编号+付款时间+收货人手机号+商品编号 组成的MD5值 和商品编号编写逻辑
+    /// 特点：提供兑换流水编号+付款时间+收货人手机号+商品编号 组成的MD5值作为原始订单编号，提供商品编号
     /// </summary>
     [Export(typeof(IOrderOption))]
     class CIBExcelOrderOption : OrderOptionBase
@@ -169,7 +169,7 @@ namespace PushServer.Commands
                     customerPhone= orderDTO.consigneePhone = Convert.ToString(row["手机号码"]);
                 else
                     customerPhone = orderDTO.consigneePhone;//NOTE: no necessery!
-
+                //兑换流水+下单日期+手机号+商品编号
                 var sourceSN = $"{id.Trim()}_{orderDTO.createdDate.ToString("yyyyMMdd")}_{customerPhone}_{orderDTO.productsku}";
                 orderDTO.orderSN_old= string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
                 orderDTO.sourceSN = Util.Helpers.Encrypt.Md5By16(sourceSN);

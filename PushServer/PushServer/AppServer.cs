@@ -31,19 +31,20 @@ namespace PushServer
         /// 平台信息配置字典
         /// </summary>
         public readonly Dictionary<string, Configuration.IClientConfig> ConfigDictionary = new Dictionary<string, Configuration.IClientConfig>();
-     
-        private static readonly AppServer instance = new AppServer();
+
+        private static readonly Lazy<AppServer> instance = new Lazy<AppServer>(() => new AppServer());
         private ERPExcelOrderOption ERP { get; set; } = new ERPExcelOrderOption();
 
         public static AppServer Instance
         {
-            get { return instance; }
+            get { return instance.Value; }
         }
 
       
 
         private AppServer()
         {
+            DistrictService.DistrictService.Initialize();
             var section = System.Configuration.ConfigurationManager.GetSection("OrderSource") as Configuration.ClientListSection;
             foreach (var item in section.Clients)
             {
@@ -89,14 +90,25 @@ namespace PushServer
             }
         }
         /// <summary>
-        /// 生成ERP导出单
+        /// 导出报表
         /// </summary>
         /// <param name="obj"></param>
         private void OrderOptionBase_OnPostCompletedEventHandle(List<OMS.Models.OrderEntity> obj,OptionType optionType)
         {
-            if (obj != null&&obj.Any())
+           
+            if (obj != null && obj.Any())
             {
-                ERP.ExportExcel<OrderEntity>(optionType, obj);
+                try
+                {
+                    ERP.ExportExcel<OrderEntity>(optionType, obj);
+                }
+                catch (Exception ex)
+                {
+                    Util.Logs.Log.GetLog(nameof(AppServer)).Error($"{obj.First().SourceDesc}-{Util.Helpers.Enum.GetDescription<OptionType>(optionType)}生成失败.\r\n{ex.Message}\r\n{ex.StackTrace}");
+
+                }
+
+
             }
             else
             {
@@ -105,10 +117,12 @@ namespace PushServer
                 //    var commcolor = Console.ForegroundColor;
 
                 //    Console.ForegroundColor = ConsoleColor.Green;
-                //    Console.WriteLine($"没有检测到新订单数据。ERP-{obj[0].Source}导入订单生成失败");
+                 //   Console.WriteLine($"没有检测到新订单数据。ERP-{obj[0].Source}导入订单生成失败");
                 //    Console.ForegroundColor = commcolor;
                 //}
             }
+            
+         
 
         }
 
@@ -166,7 +180,7 @@ namespace PushServer
         public static bool ImportErpToOMS()
         {
 
-            return instance.ERP.ImportErpToOMS();
+            return Instance.ERP.ImportErpToOMS();
         }
         public  void ExportLogisticsInfo(List<OrderEntity> lst,string filepath)
         {
@@ -224,11 +238,33 @@ namespace PushServer
             
         }
 
-
+        /// <summary>
+        /// 日，周，月同时发，用于CMD模式
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
         public  static bool PushReport(DateTime dateTime)
         {
-            var serverNames = instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i=>i.Name).ToArray();
+            var serverNames = Instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i=>i.Name).ToArray();
             return StatisticServer.Instance.PushReport(serverNames, dateTime);
+
+        }
+        public static bool PushDailyReport(DateTime dateTime)
+        {
+            var serverNames = Instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i => i.Name).ToArray();
+            return StatisticServer.Instance.PushDailyReport(serverNames, dateTime);
+
+        }
+        public static bool PushWeeklyReport(DateTime dateTime)
+        {
+            var serverNames = Instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i => i.Name).ToArray();
+            return StatisticServer.Instance.PushWeeklyReport(serverNames, dateTime);
+
+        }
+        public static bool PushMonthlyReport(DateTime dateTime)
+        {
+            var serverNames = Instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i => i.Name).ToArray();
+            return StatisticServer.Instance.PushMonthlyReport(serverNames, dateTime);
 
         }
         /// <summary>
@@ -239,7 +275,7 @@ namespace PushServer
         /// <returns></returns>
         public  bool PushPandianReport(int monthNum)
         {
-            return StatisticServer.Instance.PushPandianReport(monthNum, instance.ERP.clientConfig.ExcelOrderFolder);
+            return StatisticServer.Instance.PushPandianReport(monthNum, Instance.ERP.clientConfig.ExcelOrderFolder);
          
            
             

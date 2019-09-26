@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Configuration;
 using PushServer.Service;
 using System.Globalization;
+using FluentScheduler;
+using PushServer.JobServer;
 
 namespace PushServer
 {
@@ -17,9 +19,8 @@ namespace PushServer
         /// </summary>
         static void Main()
         {
-            
 
-           
+
             if (Environment.UserInteractive)
             {
                
@@ -157,7 +158,7 @@ namespace PushServer
                     {
                         var createReportResult = PushReportHelper.CreateDayReport(cdateTime);
                         if (createReportResult)
-                            Console.WriteLine("报表生成成功！");
+                            Console.WriteLine("报表命令下达成功！");
                         else
                         {
                             Console.WriteLine("报表生成失败");
@@ -167,7 +168,7 @@ namespace PushServer
                     {
                         var createReportResult = PushReportHelper.CreateReport();
                         if (createReportResult)
-                            Console.WriteLine("报表生成成功！");
+                            Console.WriteLine("报表命令下达成功！");
                         else
                         {
                             Console.WriteLine("报表生成失败");

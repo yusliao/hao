@@ -18,7 +18,7 @@ namespace PushServer.Commands
 {
     /// <summary>
     /// 兴业银行积分
-    /// 特点：通过订单编号和订单商品编号编写逻辑
+    /// 特点：EXCEL中提供订单号和订单商品编号，商品名称
     /// </summary>
     [Export(typeof(IOrderOption))]
     class CIBAPPExcelOrderOption : OrderOptionBase
@@ -138,7 +138,9 @@ namespace PushServer.Commands
                 orderDTO.productsku = Convert.ToString(row[2]); //商品编号
                 //订单SN=来源+原来的SN+日期
                 orderDTO.orderSN_old = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
-                orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN,DateTime.Now.ToString("yyyyMMdd"));
+              
+         
+                orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
                 if (CheckOrderInDataBase(orderDTO))
                     continue;
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);

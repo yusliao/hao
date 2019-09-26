@@ -13,7 +13,7 @@ using FusionStone.WeiXin;
 using PushServer.Service;
 using System.Data.Entity;
 using OMS.Models.DTO;
-
+using System.ComponentModel;
 namespace PushServer.Commands
 {
     public abstract class OrderOptionBase : IOrderOption
@@ -535,8 +535,11 @@ namespace PushServer.Commands
     public enum OptionType
     {
         None =0,
-        ErpExcel,//ERP导出单
+        [Description("ERP导入单")]
+        ErpExcel,//ERP导入单
+        [Description("银行回传单")]
         LogisticsExcel, //银行回传单（物流单）
+        [Description("异常订单")]
         ExceptionExcel   //异常订单
     }
 }

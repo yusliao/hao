@@ -123,7 +123,8 @@ namespace PushServer.Commands
                         continue;
                     }
                     string ordertype = csv.GetField<string>("订单类型").Trim();
-                    orderDTO.OrderComeFrom = 2;
+                   
+                   
                     switch (ordertype)
                     {
                         case "销售订单":
@@ -153,23 +154,12 @@ namespace PushServer.Commands
                         decimal weight = csv.GetField<string>("总重量").ToInt();
                         int count = csv.GetField<string>("数量").ToInt();
                         order.OrderType = orderDTO.orderType;
-                        order.OrderComeFrom = orderDTO.OrderComeFrom;
-                        var p1 = order.Products.FirstOrDefault(p => p.sku == pcode);
-                        if (p1 != null)//修改已有商品汇总信息
-                        {
-                            p1.Warehouse = warehouse;
-                        }
-                        else//订单商品信息不吻合
-                        {
-                           
-                            InputExceptionOrder(orderDTO, ExceptionType.OrderProductsNoExisted);
-                            continue;
-                        }
-
+                        order.OrderStatus = (int)orderDTO.orderStatus;
+                        order.OrderStatusDesc= Util.Helpers.Enum.GetDescription<OrderStatus>(orderDTO.orderStatus); 
                         OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
                         orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                         orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
-                        orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                       // orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用")?.ToDecimalOrNull();
                         orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                         //发货时间为空时，从配货时间中取日期作为发货时间
 
@@ -328,7 +318,7 @@ namespace PushServer.Commands
                                 orderLogisticsDetail.OrderSn = targetorder.OrderSn;
                                 orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                                 orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
-                                orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                              //  orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
                                 orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                                 //发货时间为空时，从配货时间中取日期作为发货时间
                                 orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
@@ -393,7 +383,7 @@ namespace PushServer.Commands
                                     orderLogisticsDetail.OrderSn = targetorder.OrderSn;
                                     orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                                     orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
-                                    orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                                  //  orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
                                     orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                                     //发货时间为空时，从配货时间中取日期作为发货时间
                                     orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
@@ -485,7 +475,7 @@ namespace PushServer.Commands
                         orderLogisticsDetail.OrderSn = orderItem.OrderSn;
                         orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                         orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
-                        orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                      //  orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
                         orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                         //发货时间为空时，从配货时间中取日期作为发货时间
                         orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
@@ -537,7 +527,7 @@ namespace PushServer.Commands
                     orderLogisticsDetail.OrderSn = item.OrderSn;
                     orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
                     orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
-                    orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                   // orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
                     orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                     //发货时间为空时，从配货时间中取日期作为发货时间
                     orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
@@ -640,7 +630,7 @@ namespace PushServer.Commands
             orderLogisticsDetail.OrderSn = orderItem.OrderSn;
             orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
             orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
-            orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+           // orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
             orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
             //发货时间为空时，从配货时间中取日期作为发货时间
             orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
@@ -748,17 +738,21 @@ namespace PushServer.Commands
       
         public bool ExportExcel<T>(OptionType optionType, List<T> obj)
         {
+           
             switch (optionType)
             {
                 case OptionType.None:
                     break;
                 case OptionType.ErpExcel:
+                    OnUIMessageEventHandle("ERP导入单开始创建");
                     CreateErpExcel(obj as List<OrderEntity>);
                     break;
                 case OptionType.LogisticsExcel:
+                    OnUIMessageEventHandle("兴业银行回传单开始创建");
                     CreateLogisticsExcel(obj as List<OrderEntity>);
                     break;
                 case OptionType.ExceptionExcel:
+                    OnUIMessageEventHandle("错误信息单开始创建");
                     CreateExceptionExcel(obj as List<ExceptionOrder>);
                     break;
                 default:
