@@ -20,6 +20,16 @@ namespace PushServer
         static void Main()
         {
 
+            //var registry = new Registry();
+
+            //registry.Schedule(() =>
+            //{
+            //    Console.WriteLine("定时任务开始执行");
+
+            //    AppServer.ImportErpToOMS();
+            //}).ToRunOnceIn(5).Seconds();
+
+            //JobManager.Initialize(registry);
 
             if (Environment.UserInteractive)
             {

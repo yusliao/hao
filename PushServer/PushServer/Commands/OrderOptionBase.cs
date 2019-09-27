@@ -35,7 +35,7 @@ namespace PushServer.Commands
             Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Debug(msg);
             var handle = UIMessageEventHandle;
             if (handle != null)
-                handle(msg);
+                handle.BeginInvoke(msg,null,null);
         }
         protected virtual void OnExceptionMessageEventHandle(List<ExceptionOrder> msgs)
         {
@@ -254,10 +254,15 @@ namespace PushServer.Commands
                     sku = foo.sku
                 };
                 item.Products.Add(orderProductInfo);
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
+            }
+            else
+            {
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）重复录入");
             }
             db.SaveChanges();
 
-            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
+          
             return true;
             
            
