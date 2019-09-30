@@ -277,8 +277,85 @@ namespace PushServer.Commands
              */ 
             using (var db = new OMSContext())
             {
-                var foo = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN_old);//订单在数据库中
-                if (foo != null)//系统中已经存在该订单
+                #region 订单编号已经过渡完毕，该业务算法废弃
+                //var foo = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN_old);//订单在数据库中
+                //if (foo != null)//系统中已经存在该订单
+                //{
+                //    //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
+                //    if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
+                //    {
+
+                //        var bar = db.ProductDictionarySet.FirstOrDefault(x => x.ProductNameInPlatform.Trim() == orderDTO.productName.Trim());
+                //        if (bar != null && !string.IsNullOrEmpty(bar.ProductCode))
+                //        {
+                //            var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
+                //            if (p1 != null)
+                //            {
+                //                decimal weight = foo == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
+                //                var p = foo.Products.FirstOrDefault(o => o.sku == p1.sku);
+                //                if (p != null)
+                //                {
+
+                //                    p.ProductCount -= orderDTO.count;
+                //                    p.ProductWeight -= weight;
+
+                //                    db.SaveChanges();
+                //                    return true;
+                //                }
+                //            }
+                //        }
+
+                //    }
+                //    else
+                //    {
+                //        InputProductInfoWithSaveChange(db, orderDTO, foo, orderDTO.orderSN_old);
+
+                //    }
+                //    return true;
+                //}
+                //else
+                //{
+                //    var foo1 = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN);//订单在数据库中
+                //    if (foo1 != null)//系统中已经存在该订单
+                //    {
+                //        //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
+                //        if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
+                //        {
+
+                //            var bar = db.ProductDictionarySet.FirstOrDefault(x => x.ProductNameInPlatform.Trim() == orderDTO.productName.Trim());
+                //            if (bar != null && !string.IsNullOrEmpty(bar.ProductCode))
+                //            {
+                //                var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
+                //                if (p1 != null)
+                //                {
+                //                    decimal weight = foo1 == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
+                //                    var p = foo1.Products.FirstOrDefault(o => o.sku == p1.sku);
+                //                    if (p != null)
+                //                    {
+
+                //                        p.ProductCount -= orderDTO.count;
+                //                        p.ProductWeight -= weight;
+
+                //                        db.SaveChanges();
+
+                //                    }
+                //                }
+                //            }
+                //        }
+                //        else
+                //        {
+                //            InputProductInfoWithSaveChange(db, orderDTO, foo1);
+
+                //        }
+                //        return true;
+
+                //    }
+                //    else
+                //        return false;
+                //}
+                #endregion
+                var foo1 = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN);//订单在数据库中
+                if (foo1 != null)//系统中已经存在该订单
                 {
                     //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
                     if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
@@ -290,8 +367,8 @@ namespace PushServer.Commands
                             var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
                             if (p1 != null)
                             {
-                                decimal weight = foo == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
-                                var p = foo.Products.FirstOrDefault(o => o.sku == p1.sku);
+                                decimal weight = foo1 == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
+                                var p = foo1.Products.FirstOrDefault(o => o.sku == p1.sku);
                                 if (p != null)
                                 {
 
@@ -299,59 +376,21 @@ namespace PushServer.Commands
                                     p.ProductWeight -= weight;
 
                                     db.SaveChanges();
-                                    return true;
+
                                 }
                             }
                         }
-
                     }
                     else
                     {
-                        InputProductInfoWithSaveChange(db, orderDTO, foo,orderDTO.orderSN_old);
-                       
+                        InputProductInfoWithSaveChange(db, orderDTO, foo1);
+
                     }
                     return true;
+
                 }
                 else
-                {
-                    var foo1 = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN);//订单在数据库中
-                    if (foo1 != null)//系统中已经存在该订单
-                    {
-                        //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
-                        if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
-                        {
-
-                            var bar = db.ProductDictionarySet.FirstOrDefault(x => x.ProductNameInPlatform.Trim() == orderDTO.productName.Trim());
-                            if (bar != null && !string.IsNullOrEmpty(bar.ProductCode))
-                            {
-                                var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
-                                if (p1 != null)
-                                {
-                                    decimal weight = foo == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
-                                    var p = foo.Products.FirstOrDefault(o => o.sku == p1.sku);
-                                    if (p != null)
-                                    {
-
-                                        p.ProductCount -= orderDTO.count;
-                                        p.ProductWeight -= weight;
-
-                                        db.SaveChanges();
-                                       
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            InputProductInfoWithSaveChange(db, orderDTO, foo1);
-                           
-                        }
-                        return true;
-
-                    }
-                    else
-                        return false;
-                }
+                    return false;
             }
         }
         protected void InputExceptionOrder(OrderDTO orderItem,ExceptionType exceptionType)
@@ -454,18 +493,17 @@ namespace PushServer.Commands
                 stopwatch.Start();
                 foreach (var item in lst.AsParallel())
                 {
-                    item.OrderExtendInfo = new OrderExtendInfo()
-                    {
-                        DiscountFee = item.Products.Sum(p => p.DiscountFee),
-                        IsPromotional = item.Products.Any(p => p.DiscountFee > 0) ? true : false,
+                  
+                    item.OrderExtendInfo.DiscountFee = item.Products.Sum(p => p.DiscountFee);
+                    item.OrderExtendInfo.IsPromotional = item.Products.Any(p => p.DiscountFee > 0) ? true : false;
 
-                        OrderSn = item.OrderSn,
-                        TotalAmount = item.Products.Sum(p => p.TotalAmount),
-                        TotalProductCount = item.Products.Sum(p => p.ProductCount),
-                        CreatedDate = item.CreatedDate.Date,
-                       
-                        TotalWeight = item.Products.Sum(p => p.ProductWeight)
-                    };
+                    item.OrderExtendInfo.OrderSn = item.OrderSn;
+                    item.OrderExtendInfo.TotalAmount = item.Products.Sum(p => p.TotalAmount);
+                    item.OrderExtendInfo.TotalProductCount = item.Products.Sum(p => p.ProductCount);
+                    item.OrderExtendInfo.CreatedDate = item.CreatedDate.Date;
+
+                    item.OrderExtendInfo.TotalWeight = item.Products.Sum(p => p.ProductWeight);
+                    
                 }
                 
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));

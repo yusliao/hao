@@ -460,7 +460,7 @@ namespace PushServer.Commands
                         }
                         else //异常订单
                         {
-                            InputExceptionOrder(orderDTO, ExceptionType.PhoneNumIsNull);
+                            InputExceptionOrder(orderDTO, ExceptionType.PhoneNumOrPersonNameIsNull);
                             return null;
                         }
 
@@ -622,7 +622,7 @@ namespace PushServer.Commands
             }
             else //异常订单
             {
-                InputExceptionOrder(orderDTO, ExceptionType.PhoneNumIsNull);
+                InputExceptionOrder(orderDTO, ExceptionType.PhoneNumOrPersonNameIsNull);
                 return null;
             }
           

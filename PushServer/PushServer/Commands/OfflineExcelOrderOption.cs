@@ -21,9 +21,9 @@ namespace PushServer.Commands
     /// 特点：EXCEL中提供订单号和订单商品编号，商品名称
     /// </summary>
     [Export(typeof(IOrderOption))]
-    class CIBAPPExcelOrderOption : OrderOptionBase
+    class OfflineExcelOrderOption : OrderOptionBase
     {
-        public override string Name => OMS.Models.OrderSource.CIBAPP;
+        public override string Name => OMS.Models.OrderSource.OFFLINE;
 
         public override IClientConfig clientConfig => AppServer.Instance.ConfigDictionary[Name];
 
@@ -109,7 +109,7 @@ namespace PushServer.Commands
         protected  List<OrderEntity> ResolveOrders(DataTable excelTable,string file, List<OrderEntity> items)
         {
 
-            OrderDTO orderDTO = new OrderDTO();
+            BusinessOrderDTO orderDTO = new BusinessOrderDTO();
             orderDTO.orderStatus = OrderStatus.Confirmed;
             orderDTO.fileName = file;
             orderDTO.orderType = 0;
@@ -120,13 +120,13 @@ namespace PushServer.Commands
             {
                 var row = excelTable.Rows[i];
 
-                var orderDateStr = Convert.ToString(row[0]); //订单创建时间
+                var orderDateStr = Convert.ToString(row["订购日期"]); //订单创建时间
                 orderDTO.createdDate = DateTime.Parse(orderDateStr);
 
-                orderDTO.source = OrderSource.CIBAPP;
-                orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIBAPP);
+                orderDTO.source = Name;
+                orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(Name);
 
-                orderDTO.sourceSN = Convert.ToString(row[1]); //订单号
+                orderDTO.sourceSN = Convert.ToString(row["订购单号"]); //订单号
                 if (string.IsNullOrEmpty(orderDTO.sourceSN))
                 {
                     InputExceptionOrder(orderDTO, ExceptionType.SourceSnIsNull);
@@ -134,26 +134,26 @@ namespace PushServer.Commands
                 }
 
 
-                orderDTO.productName = Convert.ToString(row[3]); //商品名称
-                orderDTO.productsku = Convert.ToString(row[2]); //商品编号
-                //订单SN=来源+原来的SN+日期
-                orderDTO.orderSN_old = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
-              
-         
+                orderDTO.productName = Convert.ToString(row["商品名称"]); //商品名称
+                orderDTO.productsku = Convert.ToString(row["商品代码"]); //商品编号
+                orderDTO.productsku = Convert.ToString(row["单价"]); //商品编号
+                orderDTO.productsku = Convert.ToString(row["优惠金额"]); //商品编号
+                orderDTO.productsku = Convert.ToString(row["金额"]); //商品编号
+
                 orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
                 if (CheckOrderInDataBase(orderDTO))
                     continue;
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    orderDTO.count = Convert.ToInt32(row[4]); //数量
-                    var productProps = Convert.ToString(row[5]); //商品属性
+                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                   
 
 
-                    orderDTO.consigneeName = Convert.ToString(row[6]); //收件人
-                    orderDTO.consigneePhone = Convert.ToString(row[7]); //联系电话
+                    orderDTO.consigneeName = Convert.ToString(row["收货人"]); //收件人
+                    orderDTO.consigneePhone = Convert.ToString(row["电话"]); //联系电话
                     orderDTO.consigneePhone2 = string.Empty;
-
+                 
 
                     orderDTO.consigneeProvince = string.Empty;
                     orderDTO.consigneeCity = string.Empty;
@@ -178,19 +178,35 @@ namespace PushServer.Commands
                    
 
                     //是否需要发票
-                    var invoiceFlag = Convert.ToString(row["是否需要发票"]); //是否需要发票
-                    var invoiceType = string.Empty;
-                    var invoiceName = Convert.ToString(row["发票抬头"]); //发票抬头
-                    if (invoiceFlag.Equals("否"))
-                        invoiceType = invoiceName = string.Empty;
+                    orderDTO.Buyer.NeedInvoice  = Convert.ToString(row["是否开票"]); //是否需要发票
+                    orderDTO.Buyer.InvoiceType = Convert.ToString(row["发票类别"]);
+                    orderDTO.Buyer.InvoiceValue = Convert.ToSingle(row["税率"]);
+                    orderDTO.Buyer.Paymentmark = Convert.ToString(row["付款约定"]);
+                    orderDTO.Buyer.PaymentType = Convert.ToString(row["支付方式"]);
+                    orderDTO.Buyer.ProjectName = Convert.ToString(row["所属项目"]);
+                    orderDTO.Buyer.DeliverType = Convert.ToString(row["交货方式"]);
+                    orderDTO.Buyer.ContractCode = Convert.ToString(row["合同编号"]);
+                    orderDTO.Buyer.Name = Convert.ToString(row["采购方"]);
+                    if(string.IsNullOrEmpty(orderDTO.Buyer.Name))
+                    {
+                        InputExceptionOrder(orderDTO, ExceptionType.PhoneNumOrPersonNameIsNull);
 
+                        continue;
+                    }
+                    orderDTO.Buyer.InvoiceName = Convert.ToString(row["发票抬头"]); //发票抬头
+                    if (orderDTO.Buyer.NeedInvoice.Equals("否"))
+                        orderDTO.Buyer.InvoiceType = orderDTO.Buyer.InvoiceName = string.Empty;
+                    if (string.IsNullOrEmpty(orderDTO.consigneeName))
+                        orderDTO.consigneeName = orderDTO.Buyer.Name;
                     OrderEntity orderItem = OrderEntityService.CreateOrderEntity(orderDTO);
+                    orderItem.OrderExtendInfo.Buyer = orderDTO.Buyer;
+                    orderItem.OrderExtendInfo.Supplier = orderDTO.Supplier;
                     using (var db = new OMSContext())
                     {
                         //查找联系人
                         if (!string.IsNullOrEmpty(orderItem.Consignee.Phone))
                         {
-                            OrderEntityService.InputConsigneeInfo(orderItem, db);
+                            OrderEntityService.InputBusinessConsigneeInfo(orderItem, db);
 
                         }
                         else //异常订单
@@ -230,6 +246,105 @@ namespace PushServer.Commands
             }
 
             return items;
+        }
+        protected override  bool CheckOrderInDataBase(OrderDTO orderDTO)
+        {
+            /*检查订单是否已经存在在数据库中
+             * 如果订单不存在于数据库中，返回false,结束
+             * 如果订单存在于数据库中：
+             * 检查订单是否取消订单，如果是取消订单，则减去相应商品的数量和重量信息；
+             * 如果不是取消清单，则录入该订单商品
+             */
+
+            using (var db = new OMSContext())
+            {
+              
+                var foo1 = db.OrderSet.Include(o => o.Products).FirstOrDefault(o => o.OrderSn == orderDTO.orderSN);//订单在数据库中
+                if (foo1 != null)//系统中已经存在该订单
+                {
+                    //取消订单只存在于兴业积点渠道，这个渠道的商品没有商品编号
+                    if (orderDTO.orderStatus == OrderStatus.Cancelled)//是否取消订单
+                    {
+
+                        var bar = db.ProductDictionarySet.FirstOrDefault(x => x.ProductNameInPlatform.Trim() == orderDTO.productName.Trim());
+                        if (bar != null && !string.IsNullOrEmpty(bar.ProductCode))
+                        {
+                            var p1 = db.ProductsSet.Include(x => x.weightModel).FirstOrDefault(x => x.sku == bar.ProductCode);
+                            if (p1 != null)
+                            {
+                                decimal weight = foo1 == null ? 0 : p1.QuantityPerUnit * orderDTO.count;
+                                var p = foo1.Products.FirstOrDefault(o => o.sku == p1.sku);
+                                if (p != null)
+                                {
+
+                                    p.ProductCount -= orderDTO.count;
+                                    p.ProductWeight -= weight;
+
+                                    db.SaveChanges();
+
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        InputProductInfoWithSaveChange(db, orderDTO, foo1);
+
+                    }
+                    return true;
+
+                }
+                else
+                    return false;
+            }
+        }
+        protected  bool InputProductInfoWithSaveChange(OMSContext db, OrderDTO orderDTO, OrderEntity item)
+        {
+
+
+            //判断该商品的ERP编号是否存在，不存在则停止录入
+            string temp = orderDTO.productsku.Trim();
+            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == temp);
+            if (foo == null)
+            {
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");
+                InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                return false;
+            }
+
+            if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
+            {
+                decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
+                OrderProductInfo orderProductInfo = new OrderProductInfo()
+                {
+                    ProductPlatId = orderDTO.productsku,
+                    ProductPlatName = orderDTO.productName,
+                    //   Warehouse = item.OrderLogistics.Logistics,
+                    MonthNum = orderDTO.createdDate.Month,
+                    weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
+                    weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                    OrderSn = orderDTO.orderSN,
+                    TotalAmount = orderDTO.totalAmount,
+                    AmounPerUnit = orderDTO.pricePerUnit,
+                    DiscountFee = orderDTO.discountFee,
+                    ProductCount = orderDTO.count,
+                    ProductWeight = weight,
+                    Source = orderDTO.source,
+                    sku = foo.sku
+                };
+                item.Products.Add(orderProductInfo);
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
+            }
+            else
+            {
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）重复录入");
+            }
+            db.SaveChanges();
+
+
+            return true;
+
+
         }
     }
 }
