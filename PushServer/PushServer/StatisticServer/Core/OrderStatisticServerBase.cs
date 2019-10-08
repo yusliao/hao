@@ -16,8 +16,17 @@ namespace PushServer.Service
     public abstract class OrderStatisticServerBase : IOrderStatisticServer
     {
         public  abstract string ServerName { get; }
+        public static event Action<string> UIMessageEventHandle;
+        protected virtual void OnUIMessageEventHandle(string msg)
+        {
+            Util.Logs.Log.GetLog(nameof(ProductStatisticServerBase)).Debug(msg);
+            var handle = UIMessageEventHandle;
+            if (handle != null)
+                handle(msg);
+        }
         private bool CreateReport(StatisticType statisticType, int statisticValue, int year)
         {
+            OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-订单报表开始统计");
             try
             {
                 using (var db = new OMSContext())
@@ -83,10 +92,11 @@ namespace PushServer.Service
                             db.StatisticSet.Add(statistic);
                         }
                         db.SaveChanges();
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
                     }
                     else
                     {
-                        Util.Logs.Log.GetLog(nameof(StatisticServer)).Info("今日无统计结果");
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-订单方面无统计结果");
                         
                     }
                     return true;

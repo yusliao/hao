@@ -40,5 +40,8 @@ namespace OMS.Models
         public IDbSet<CustomStrategy> CustomStrategies { get; set; }
         public IDbSet<LogisticsProductInfo> LogisticsProductInfos { get; set; }
         public IDbSet<OrderOptionRecord> OrderOptionRecords { get; set; }
+        public IDbSet<BusinessBuyer> BusinessBuyers { get; set; }
+        public IDbSet<BusinessSupplier> BusinessSuppliers { get; set; }
+
     }
 }

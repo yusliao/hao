@@ -12,9 +12,18 @@ namespace PushServer.Service
     public abstract class DistrictStatisticServerBase : IDistrictStatisticServer
     {
         public abstract string ServerName { get; }
+        public static event Action<string> UIMessageEventHandle;
+        protected virtual void OnUIMessageEventHandle(string msg)
+        {
+            Util.Logs.Log.GetLog(nameof(ProductStatisticServerBase)).Debug(msg);
+            var handle = UIMessageEventHandle;
+            if (handle != null)
+                handle(msg);
+        }
 
         private bool CreateReport(StatisticType statisticType,int statisticValue,int year)
         {
+            OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-地域报表开始统计");
             try
             {
                 using (var db = new OMSContext())
@@ -126,9 +135,11 @@ namespace PushServer.Service
                         
                         db.StatisticDistricts.Add(statisticDistrict);
                         db.SaveChanges();
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
                     }
                     else
                     {
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-地域方面无统计结果");
                         return false;
                     }
                     return true;

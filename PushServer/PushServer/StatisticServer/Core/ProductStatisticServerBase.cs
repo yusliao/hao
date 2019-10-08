@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace PushServer.Service
 
         public virtual bool CreateDailyReport(DateTime value)
         {
+           
             return CreateReport(StatisticType.Day, value.DayOfYear, value.Year);
         }
 
@@ -32,6 +34,7 @@ namespace PushServer.Service
         }
         private bool CreateReport(StatisticType statisticType, int statisticValue,int year)
         {
+            OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-商品报表开始统计");
             try
             {
                 using (var db = new OMSContext())
@@ -80,7 +83,7 @@ namespace PushServer.Service
                                 SourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName),
                                 Year = year,
                                 ProductPlatName = db.ProductsSet.Find(item.Key.sku)?.ShortName??db.ProductsSet.Find(item.Key.sku)?.Name,
-
+                                SKU = item.Key.sku,
                                 ProductTotalAmount = item.Sum(o => o.TotalAmount),
                                 weightCode = item.Key.weightCode,
                                 weightCodeDesc = db.WeightCodeSet.Find(item.Key.weightCode)?.Value.ToString(),
@@ -115,14 +118,44 @@ namespace PushServer.Service
                         //}
                        
                         var removeobj = db.StatisticProductSet.Where(s => s.Year == year && s.Source == ServerName && s.StatisticType == (int)statisticType && s.StatisticValue==statisticValue);
-                        db.Set<StatisticProduct>().RemoveRange(removeobj);
-                        db.SaveChanges();
+                        
+                        if (removeobj.Any())
+                        {
+                            
+                            //bool saveFailed;
+                            //do
+                            //{
+                            //    saveFailed = false;
+                            //    try
+                            //    {
+                            //        db.SaveChanges();
+                            //    }
+                            //    catch (Db ex)
+                            //    {
+
+                            //        saveFailed = true;
+
+                            //        // Update original values from the database
+                            //        var entry = ex.Entries.Single();
+                            //        entry.OriginalValues.SetValues(entry.GetDatabaseValues());
+                            //    }
+
+                            //} while (saveFailed);
+
+
+                            db.Set<StatisticProduct>().RemoveRange(removeobj);
+                            db.SaveChanges();
+
+                        }
+                      
                         db.Set<StatisticProduct>().AddRange(smp);
                         db.SaveChanges();
-                        OnUIMessageEventHandle($"{ServerName}渠道-{statisticType}-{statisticValue}报表生成完毕");
+                        
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
                     }
                     else
                     {
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-产品方面无统计结果");
                         return false;
                     }
                     return true;

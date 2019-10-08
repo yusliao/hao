@@ -493,7 +493,8 @@ namespace PushServer.Commands
                 stopwatch.Start();
                 foreach (var item in lst.AsParallel())
                 {
-                  
+                    
+                    item.OrderExtendInfo = new OrderExtendInfo();
                     item.OrderExtendInfo.DiscountFee = item.Products.Sum(p => p.DiscountFee);
                     item.OrderExtendInfo.IsPromotional = item.Products.Any(p => p.DiscountFee > 0) ? true : false;
 
@@ -507,6 +508,7 @@ namespace PushServer.Commands
                 }
                 
                 db.BulkInsert<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
+              //  db.SaveChanges();
                 stopwatch.Stop();
                 OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单扩展表】耗时ms:{stopwatch.ElapsedMilliseconds}");
                 

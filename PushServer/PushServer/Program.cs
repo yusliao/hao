@@ -9,6 +9,7 @@ using PushServer.Service;
 using System.Globalization;
 using FluentScheduler;
 using PushServer.JobServer;
+using System.IO;
 
 namespace PushServer
 {
@@ -19,17 +20,6 @@ namespace PushServer
         /// </summary>
         static void Main()
         {
-
-            //var registry = new Registry();
-
-            //registry.Schedule(() =>
-            //{
-            //    Console.WriteLine("定时任务开始执行");
-
-            //    AppServer.ImportErpToOMS();
-            //}).ToRunOnceIn(5).Seconds();
-
-            //JobManager.Initialize(registry);
 
             if (Environment.UserInteractive)
             {

@@ -29,9 +29,12 @@ namespace PushServer.Service
         public  event Action<string> ShowMessageEventHandle;
         private StatisticServer()
         {
+            ProductStatisticServerBase.UIMessageEventHandle += ProductStatisticServerBase_UIMessageEventHandle;
+            OrderStatisticServerBase.UIMessageEventHandle += ProductStatisticServerBase_UIMessageEventHandle;
+            DistrictStatisticServerBase.UIMessageEventHandle += ProductStatisticServerBase_UIMessageEventHandle;
             #region MEF配置
             MyComposePart();
-            ProductStatisticServerBase.UIMessageEventHandle += ProductStatisticServerBase_UIMessageEventHandle;
+           
             #endregion
         }
 
@@ -58,51 +61,39 @@ namespace PushServer.Service
         {
             /*生成昨日报表
              */
-            ThreadPool.QueueUserWorkItem((o) =>
+            
+            foreach (var item in ProductStatisticServerOptSet)
             {
-                foreach (var item in ProductStatisticServerOptSet)
-                {
-                    var result = item.CreateDailyReport(dateTime);
-                }
-            });
-            ThreadPool.QueueUserWorkItem((o) =>
+                var result = item.CreateDailyReport(dateTime);
+            }
+            foreach (var item in OrderStatisticServerOptSet)
             {
-                foreach (var item in OrderStatisticServerOptSet)
-                {
-                    var result = item.CreateDailyReport(dateTime);
-                }
-            });
-            ThreadPool.QueueUserWorkItem((o) =>
+                var result = item.CreateDailyReport(dateTime);
+            }
+            foreach (var item in DistrictStatisticServerOptSet)
             {
-                foreach (var item in DistrictStatisticServerOptSet)
-                {
-                    var result = item.CreateDistrictDailyReport(dateTime);
-                }
-            });
+                var result = item.CreateDistrictDailyReport(dateTime);
+            }
+         
+           
         }
         public  void CreateWeekReport(int weeknum,int year)
         {
-            ThreadPool.QueueUserWorkItem((o) =>
+           
+            foreach (var item in ProductStatisticServerOptSet)
             {
-                foreach (var item in ProductStatisticServerOptSet)
-                {
-                    var result = item.CreateWeekReport(weeknum,year);
-                }
-            });
-            ThreadPool.QueueUserWorkItem((o) =>
+                var result = item.CreateWeekReport(weeknum,year);
+            }
+            foreach (var item in OrderStatisticServerOptSet)
             {
-                foreach (var item in OrderStatisticServerOptSet)
-                {
-                    var result = item.CreateWeekReport(weeknum, year);
-                }
-            });
-            ThreadPool.QueueUserWorkItem((o) =>
+                var result = item.CreateWeekReport(weeknum, year);
+            }
+            foreach (var item in DistrictStatisticServerOptSet)
             {
-                foreach (var item in DistrictStatisticServerOptSet)
-                {
-                    var result = item.CreateDistrictWeekReport(weeknum, year);
-                }
-            });
+                var result = item.CreateDistrictWeekReport(weeknum, year);
+            }
+          
+          
         }
         /// <summary>
         /// 创建月订单报表
@@ -110,27 +101,21 @@ namespace PushServer.Service
         /// <param name="monthnum"></param>
         public void CreateMonthReport(int monthnum,int year )
         {
-            ThreadPool.QueueUserWorkItem((o) =>
+          
+            foreach (var item in ProductStatisticServerOptSet)
             {
-                foreach (var item in ProductStatisticServerOptSet)
-                {
-                    var result = item.CreateMonthReport(monthnum, year);
-                }
-            });
-            ThreadPool.QueueUserWorkItem((o) =>
+                var result = item.CreateMonthReport(monthnum, year);
+            }
+            foreach (var item in OrderStatisticServerOptSet)
             {
-                foreach (var item in OrderStatisticServerOptSet)
-                {
-                    var result = item.CreateMonthReport(monthnum, year);
-                }
-            });
-            ThreadPool.QueueUserWorkItem((o) =>
+                var result = item.CreateMonthReport(monthnum, year);
+            }
+            foreach (var item in DistrictStatisticServerOptSet)
             {
-                foreach (var item in DistrictStatisticServerOptSet)
-                {
-                    var result = item.CreateDistrictMonthReport(monthnum, year);
-                }
-            });
+                var result = item.CreateDistrictMonthReport(monthnum, year);
+            }
+         
+          
 
 
         }
@@ -149,19 +134,21 @@ namespace PushServer.Service
              */ 
             try
             {
-                
-                CreateDailyReport(dt);
+                Task.Run(() =>
+                {
 
-                Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{dt.ToString("yyyyMMdd HH:mm:ss")}日报表创建完毕");
 
-                CreateWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
-                Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{Util.Helpers.Time.GetWeekNum(dt)}周报表创建完毕");
+                    CreateDailyReport(dt);
 
-              
-                CreateMonthReport(dt.Month, dt.Year);//生成当前月报表
-                Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{dt.Month}月报表创建完毕");
-                
-                
+                    Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{dt.ToString("yyyyMMdd HH:mm:ss")}日报表创建命令下达完毕");
+                    CreateWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
+                    Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{Util.Helpers.Time.GetWeekNum(dt)}周报表创建命令下达完毕");
+
+
+                    CreateMonthReport(dt.Month, dt.Year);//生成当前月报表
+                    Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{dt.Month}月报表创建命令下达完毕");
+                });
+
                 return true;
             }
             catch (Exception ex)

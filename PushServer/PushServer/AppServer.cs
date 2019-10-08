@@ -32,19 +32,19 @@ namespace PushServer
         /// </summary>
         public readonly Dictionary<string, Configuration.IClientConfig> ConfigDictionary = new Dictionary<string, Configuration.IClientConfig>();
 
-        private static readonly Lazy<AppServer> instance = new Lazy<AppServer>(() => new AppServer());
+        private static readonly AppServer instance =  new AppServer();
         private ERPExcelOrderOption ERP { get; set; } = new ERPExcelOrderOption();
 
         public static AppServer Instance
         {
-            get { return instance.Value; }
+            get { return instance; }
         }
 
       
 
         private AppServer()
         {
-            DistrictService.DistrictService.Initialize();
+           
             var section = System.Configuration.ConfigurationManager.GetSection("OrderSource") as Configuration.ClientListSection;
             foreach (var item in section.Clients)
             {

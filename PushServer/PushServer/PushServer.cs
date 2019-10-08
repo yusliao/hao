@@ -9,6 +9,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
@@ -38,6 +39,8 @@ namespace PushServer
         {
             // TODO: 在此处添加代码以启动服务。
             Util.Logs.Log.GetLog(nameof(PushServer)).Info("windows服务启动中");
+
+           
         }
 
         protected override void OnStop()
