@@ -52,6 +52,8 @@ namespace OMS.Models
         public const string ERP = "ERP";
         [Description("CIB积分盘点")]
         public const string CIBJifenPanDian = "CIBJifenPanDian";
+        [Description("线下订单")]
+        public const string OFFLINE = "OFFLINE";
         [Description("所有订单")]
         public const string ALL = "ALL";
 

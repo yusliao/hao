@@ -19,6 +19,8 @@ namespace OMS.Models
         public string Source { get; set; }
         public string SourceDesc { get; set; }
         public string ProductPlatName { get; set; }
+        
+        public string SKU { get; set; }
         public int weightCode { get; set; }
         public string weightCodeDesc { get; set; }
         public int ProductCount { get; set; }

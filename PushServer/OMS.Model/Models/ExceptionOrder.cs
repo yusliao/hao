@@ -23,8 +23,8 @@ namespace OMS.Models
     {
         [Description("未知错误")]
         None =0,
-        [Description("手机号为空")]
-        PhoneNumIsNull,
+        [Description("手机号或联系人为空")]
+        PhoneNumOrPersonNameIsNull,
         [Description("渠道商品编号未知")]
         ProductIdUnKnown,
         [Description("渠道商品名称未知")]

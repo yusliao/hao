@@ -83,6 +83,10 @@ namespace OMS.Models
         /// 商品总重量
         /// </summary>
         public decimal ProductWeight { get; set; }
+        /// <summary>
+        /// 单价
+        /// </summary>
+        public Decimal AmounPerUnit { get; set; }
 
         /// <summary>
         /// 实付金额

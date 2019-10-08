@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OMS.Models.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,9 @@ namespace OMS.Models.DTO
     {
         public string productName { get; set; }
         public string productsku { get; set; }
+        public Decimal pricePerUnit { get; set; }
+        public Decimal discountFee { get; set; }
+        public Decimal totalAmount { get; set; }
         public string fileName { get; set; }
         public string sourceSN { get; set; }
 
@@ -41,6 +45,15 @@ namespace OMS.Models.DTO
         public int OrderComeFrom { get; set; }
        
      
+
+    }
+    public class BusinessOrderDTO:OrderDTO
+    {
+
+        public BusinessBuyer Buyer { get; set; } = new BusinessBuyer();
+        public BusinessSupplier Supplier { get; set; } = new BusinessSupplier();
+     
+        
 
     }
 }
