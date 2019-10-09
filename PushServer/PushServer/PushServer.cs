@@ -32,8 +32,11 @@ namespace PushServer
                   Util.Logs.Log.GetLog(nameof(PushServer)).Error("An error just happened with a scheduled job: " + info.Exception);
                   WxPushNews.SendErrorText($"错误类型：{Util.Helpers.Enum.GetDescription<ExceptionType>(ExceptionType.PushException)},信息：{info.Exception}");
               };
+            JobManager.JobEnd += PushJob.OnJobEnd;
+            
         }
-        
+
+       
 
         protected override void OnStart(string[] args)
         {

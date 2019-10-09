@@ -163,10 +163,10 @@
     <Compile Include="Commands\CMBExcelOrderOption.cs" />
     <Compile Include="Commands\ERPExcelOrderOption.cs" />
     <Compile Include="Commands\FriendExcelOrderOption.cs" />
-    <Compile Include="Commands\IOrderOption.cs" />
+    <Compile Include="Commands\Core\IOrderOption.cs" />
     <Compile Include="Commands\JDExcelOrderOption.cs" />
     <Compile Include="Commands\OfflineExcelOrderOption.cs" />
-    <Compile Include="Commands\OrderOptionBase.cs" />
+    <Compile Include="Commands\Core\OrderOptionBase.cs" />
     <Compile Include="Commands\RetailExcelOrderOption.cs" />
     <Compile Include="Commands\TMExcelOrderOption.cs" />
     <Compile Include="Commands\XunXiaoExcelOrderOption.cs" />
