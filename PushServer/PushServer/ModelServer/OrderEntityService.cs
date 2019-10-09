@@ -153,7 +153,7 @@ namespace PushServer.ModelServer
                     Address = orderDTO.consigneeAddress,
                     City = orderDTO.consigneeCity,
                     Province = orderDTO.consigneeProvince,
-                    County = orderDTO.consigneeCounty,
+                    County = orderDTO.consigneeCounty??"其它区",
                     ZipCode = orderDTO.consigneeZipCode
 
                 },
