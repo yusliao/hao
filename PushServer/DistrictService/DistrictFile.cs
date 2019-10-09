@@ -90,12 +90,15 @@ namespace DistrictService
         }
         private static List<DistrictFile.Province> ParseDistrictFileContent()
         {
-            string districtFileName = Configuration.DistrictFileName;
+            string districtFileName = Path.Combine(AppContext.BaseDirectory,Configuration.DistrictFileName);
+           
             bool flag = !File.Exists(districtFileName);
             if (flag)
             {
+                Util.Logs.Log.GetLog(nameof(DistrictFile)).Error($"文件未找到：{districtFileName}");
                 throw new FileNotFoundException(districtFileName);
             }
+           
             List<DistrictFile.Province> list = new List<DistrictFile.Province>();
             using (StreamReader streamReader = new StreamReader(districtFileName))
             {

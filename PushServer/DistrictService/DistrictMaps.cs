@@ -40,10 +40,11 @@ namespace DistrictService
         }
         static DistrictMaps()
         {
-            string provinceMapFileName = Configuration.ProvinceMapFileName;
-            string cityMapFileName = Configuration.CityMapFileName;
-            string countyMapFileName = Configuration.CountyMapFileName;
-            string customMapFileName = Configuration.CustomMapFileName;
+            string provinceMapFileName = Path.Combine(AppContext.BaseDirectory, Configuration.ProvinceMapFileName);
+            string cityMapFileName = Path.Combine(AppContext.BaseDirectory, Configuration.CityMapFileName);
+            string countyMapFileName = Path.Combine(AppContext.BaseDirectory, Configuration.CountyMapFileName);
+            string customMapFileName = Path.Combine(AppContext.BaseDirectory, Configuration.CustomMapFileName);
+            
             bool flag = !File.Exists(provinceMapFileName);
             if (flag)
             {
