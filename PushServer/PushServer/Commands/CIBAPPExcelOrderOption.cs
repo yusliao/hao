@@ -141,7 +141,7 @@ namespace PushServer.Commands
               
          
                 orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
-                if (CheckOrderInDataBase(orderDTO))
+                if (CheckOrderInDataBase(orderDTO))//是否是重复订单
                     continue;
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)

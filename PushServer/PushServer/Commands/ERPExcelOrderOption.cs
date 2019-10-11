@@ -147,7 +147,7 @@ namespace PushServer.Commands
                     }
 
                     var order = db.OrderSet.Include(o => o.OrderLogistics).Include(o => o.Products).FirstOrDefault(o => o.SourceSn == orderDTO.sourceSN);
-                    if (order != null)//数据库中已经存在
+                    if (order != null)//找到该订单
                     {
                         string warehouse = csv.GetField<string>("仓库名称");
                         string pcode = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码

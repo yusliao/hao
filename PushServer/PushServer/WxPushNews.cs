@@ -46,7 +46,7 @@ namespace PushServer
         {
             var massApi = new WxMassApiWrapper("ERROR");
 
-            WxApiRetryBlock.Run(() => massApi.SendText($"您有新的错误订单需要处理!\r\n{msg}"));
+            WxApiRetryBlock.Run(() => massApi.SendText($"您有新的消息请查收!\r\n{msg}"));
         }
     }
 }

@@ -38,7 +38,14 @@ namespace PushServer.ModelServer
                 if (s.Addresslist.Any(a => a.MD5 == md5))
                 {
                     var addr = s.Addresslist.First(a => a.MD5 == md5);
+                    
+                    addr.City = orderItem.ConsigneeAddress.City;
+                    addr.County = orderItem.ConsigneeAddress.County;
+                    addr.Province = orderItem.ConsigneeAddress.Province;
+
                     orderItem.ConsigneeAddress = addr;//替换地址对象
+                    db.Entry<AddressEntity>(addr).State = EntityState.Modified;
+
                 }
                 else
                 {

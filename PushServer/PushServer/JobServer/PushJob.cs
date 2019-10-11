@@ -26,17 +26,17 @@ namespace PushServer.JobServer
             {
                 AppServer.PushWeeklyReport(DateTime.Now.AddDays(-1));
                 Util.Logs.Log.GetLog(nameof(PushJob)).Info("每周一15点定时周报表推送完毕");
-            }).WithName("PushWeeklyReport").ToRunEvery(0).Weeks().On(DayOfWeek.Monday).At(15,0);
+            }).WithName("PushWeeklyReport").ToRunEvery(1).Weeks().On(DayOfWeek.Monday).At(15,0);
             Schedule(() =>
             {
                 AppServer.PushMonthlyReport(DateTime.Now.AddDays(-1));
                 Util.Logs.Log.GetLog(nameof(PushJob)).Info("每月一号16点定时月报表推送完毕");
-            }).WithName("PushMonthlyReport").ToRunEvery(0).Months().On(1).At(16, 0);
+            }).WithName("PushMonthlyReport").ToRunEvery(1).Months().On(1).At(16, 0);
             Schedule(() =>
             {
                 Util.Logs.Log.GetLog(nameof(PushJob)).Info("每天23点定时报表统计业务正在生成统计报表...");
                 AppServer.CreateReport(DateTime.Now.AddDays(-1));
-            }).WithName("CreateReport2").ToRunEvery(0).Days().At(23, 0);
+            }).WithName("CreateReport2").ToRunEvery(1).Days().At(23, 0);
 
         }
         public static void OnJobEnd(JobEndInfo obj)

@@ -26,7 +26,7 @@ namespace PushServer
         public PushServer()
         {
             InitializeComponent();
-            JobManager.Initialize(new PushJob());
+            JobManager.InitializeWithoutStarting(new PushJob());
             JobManager.JobException += info =>
               {
                   Util.Logs.Log.GetLog(nameof(PushServer)).Error("An error just happened with a scheduled job: " + info.Exception);
@@ -42,7 +42,7 @@ namespace PushServer
         {
             // TODO: 在此处添加代码以启动服务。
             Util.Logs.Log.GetLog(nameof(PushServer)).Info("windows服务启动中");
-
+            JobManager.Start();
            
         }
 
