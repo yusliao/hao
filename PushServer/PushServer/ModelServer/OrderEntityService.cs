@@ -141,6 +141,8 @@ namespace PushServer.ModelServer
         }
         public static OrderEntity CreateOrderEntity(OrderDTO orderDTO)
         {
+            if (string.IsNullOrEmpty(orderDTO.consigneeCounty))
+                orderDTO.consigneeCounty = "其它区";
             var orderItem = new OrderEntity()
             {
                 SourceSn = orderDTO.sourceSN,
@@ -160,7 +162,7 @@ namespace PushServer.ModelServer
                     Address = orderDTO.consigneeAddress,
                     City = orderDTO.consigneeCity,
                     Province = orderDTO.consigneeProvince,
-                    County = orderDTO.consigneeCounty??"其它区",
+                    County = orderDTO.consigneeCounty,
                     ZipCode = orderDTO.consigneeZipCode
 
                 },
@@ -183,6 +185,7 @@ namespace PushServer.ModelServer
 
                 Remarks = string.Empty
             };
+           
             if (orderItem.Products == null)
                 orderItem.Products = new List<OrderProductInfo>();
             return orderItem;

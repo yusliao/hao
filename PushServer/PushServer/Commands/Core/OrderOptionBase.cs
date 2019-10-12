@@ -238,6 +238,7 @@ namespace PushServer.Commands
             if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
             {
                 decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
+                decimal totalAmount = pd.Price * orderDTO.count;
                 OrderProductInfo orderProductInfo = new OrderProductInfo()
                 {
                     ProductPlatId = orderDTO.productsku,
@@ -247,7 +248,7 @@ namespace PushServer.Commands
                     weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
                     weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
                     OrderSn = oldordersn?? orderDTO.orderSN,
-                    //  TotalAmount = totalAmount,
+                    TotalAmount = totalAmount,
                     ProductCount = orderDTO.count,
                     ProductWeight = weight,
                     Source = orderDTO.source,

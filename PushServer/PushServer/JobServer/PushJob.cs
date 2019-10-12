@@ -44,7 +44,7 @@ namespace PushServer.JobServer
             switch (obj.Name)
             {
                 case "CreateReport1":
-                    WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，13点定时任务--生成统计报表完毕...");
+                    WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，12点定时任务--生成统计报表完毕...");
                     break;
                 case "PushDailyReport":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天14点定时报表推送完毕...");

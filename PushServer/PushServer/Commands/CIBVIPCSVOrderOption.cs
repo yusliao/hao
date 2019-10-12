@@ -132,6 +132,7 @@ namespace PushServer.Commands
                     orderDTO.consigneeProvince = addrInfo.Province;
                     orderDTO.consigneeCity = addrInfo.City;
                     orderDTO.consigneeCounty = addrInfo.County;
+                  
                  
                 }
                 //数据库中查找订单，如果找到订单了就跳过
