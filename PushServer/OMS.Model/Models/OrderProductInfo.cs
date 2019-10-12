@@ -48,6 +48,10 @@ namespace OMS.Models
         /// 产地
         /// </summary>
         public AddressEntity Address { get; set; }
+        /// <summary>
+        /// ERP商品价格
+        /// </summary>
+        public decimal Price { get; set; }
 
     }
     /// <summary>
