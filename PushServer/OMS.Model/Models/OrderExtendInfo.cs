@@ -23,9 +23,17 @@ namespace OMS.Models
         /// </summary>
         public bool IsPromotional { get; set; }
         /// <summary>
-        /// 订单总金额
+        /// 订单总支付金额
         /// </summary>
         public decimal TotalAmount { get; set; }
+        /// <summary>
+        /// 总成本价
+        /// </summary>
+        public decimal TotalCostPrice { get; set; }
+        /// <summary>
+        /// 订单统一价下支付金额
+        /// </summary>
+        public decimal TotalFlatAmount { get; set; }
         /// <summary>
         /// 总商品数量
         /// </summary>

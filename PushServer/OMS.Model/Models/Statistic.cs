@@ -34,6 +34,14 @@ namespace OMS.Models
         /// </summary>
         public decimal TotalAmount { get; set; }
         /// <summary>
+        /// 总成本
+        /// </summary>
+        public decimal TotalCostAmount { get; set; }
+        /// <summary>
+        /// 统一价计算的总金额
+        /// </summary>
+        public decimal TotalFlatAmount { get; set; }
+        /// <summary>
         /// 总重量
         /// </summary>
         public decimal TotalWeight { get; set; }

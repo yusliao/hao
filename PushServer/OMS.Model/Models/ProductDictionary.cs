@@ -26,15 +26,20 @@ namespace OMS.Models
         /// 商品在平台上的名称
         /// </summary>
         public string ProductNameInPlatform { get; set; }
+        /// <summary>
+        /// 渠道
+        /// </summary>
         public string Source { get; set; }
         /// <summary>
-        /// 渠道价格
+        /// 支付价格
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal PayPrice { get; set; }
         /// <summary>
-        /// 状态：0已启用，1作废
+        /// 状态,[flag] 0：启用
         /// </summary>
         public int State { get; set; }
+
+        public DateTime CreateTime { get; set; }
 
     }
 }

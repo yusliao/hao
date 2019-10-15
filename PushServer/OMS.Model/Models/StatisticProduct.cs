@@ -24,7 +24,18 @@ namespace OMS.Models
         public int weightCode { get; set; }
         public string weightCodeDesc { get; set; }
         public int ProductCount { get; set; }
+        /// <summary>
+        /// 总支付金额
+        /// </summary>
         public decimal ProductTotalAmount { get; set; }
+        /// <summary>
+        /// 总成本金额
+        /// </summary>
+        public decimal ProductTotalCostAmount { get; set; }
+        /// <summary>
+        /// 总市场金额
+        /// </summary>
+        public decimal ProductTotalFlatAmount { get; set; }
         public decimal ProductTotalWeight { get; set; }
         
         /// <summary>
