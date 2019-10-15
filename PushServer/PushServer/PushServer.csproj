@@ -196,6 +196,22 @@
     <Compile Include="Migrations\201909301028096_buyer.Designer.cs">
       <DependentUpon>201909301028096_buyer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910150345393_price.cs" />
+    <Compile Include="Migrations\201910150345393_price.Designer.cs">
+      <DependentUpon>201910150345393_price.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910150637015_price1.cs" />
+    <Compile Include="Migrations\201910150637015_price1.Designer.cs">
+      <DependentUpon>201910150637015_price1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910150653214_price2.cs" />
+    <Compile Include="Migrations\201910150653214_price2.Designer.cs">
+      <DependentUpon>201910150653214_price2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910150917318_price3.cs" />
+    <Compile Include="Migrations\201910150917318_price3.Designer.cs">
+      <DependentUpon>201910150917318_price3.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\OMSContext.cs" />
     <Compile Include="ModelServer\OrderEntityService.cs" />
@@ -266,6 +282,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909301028096_buyer.resx">
       <DependentUpon>201909301028096_buyer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910150345393_price.resx">
+      <DependentUpon>201910150345393_price.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910150637015_price1.resx">
+      <DependentUpon>201910150637015_price1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910150653214_price2.resx">
+      <DependentUpon>201910150653214_price2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910150917318_price3.resx">
+      <DependentUpon>201910150917318_price3.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>

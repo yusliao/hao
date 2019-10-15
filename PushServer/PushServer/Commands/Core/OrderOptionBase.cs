@@ -72,6 +72,7 @@ namespace PushServer.Commands
                             ProductDictionary productDictionary = new ProductDictionary()
                             {
                                 ProductId = orderDTO.productsku,
+                                Source = orderDTO.source,
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
@@ -91,6 +92,7 @@ namespace PushServer.Commands
                             ProductDictionary productDictionary = new ProductDictionary()
                             {
                                 ProductId = orderDTO.productsku,
+                                Source = orderDTO.source,
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
@@ -111,6 +113,7 @@ namespace PushServer.Commands
                             ProductDictionary productDictionary = new ProductDictionary()
                             {
                                 ProductId = orderDTO.productsku,
+                                Source = orderDTO.source,
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
@@ -134,6 +137,9 @@ namespace PushServer.Commands
             if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
             {
                 decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
+                decimal totalAmount = pd.PayPrice * orderDTO.count;
+                decimal totalCostPrice = foo.CostPrice * orderDTO.count;
+                decimal totalFlatAmount = foo.FlatPrice * orderDTO.count;
                 OrderProductInfo orderProductInfo = new OrderProductInfo()
                 {
                     ProductPlatId = orderDTO.productsku,
@@ -143,7 +149,9 @@ namespace PushServer.Commands
                     weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
                     weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
                     OrderSn = orderDTO.orderSN,
-                    //  TotalAmount = totalAmount,
+                    TotalAmount = totalAmount,
+                    TotalCostPrice = totalCostPrice,
+                    TotalFlatAmount = totalFlatAmount,
                     ProductCount = orderDTO.count,
                     ProductWeight = weight,
                     Source = orderDTO.source,
@@ -175,6 +183,7 @@ namespace PushServer.Commands
                             ProductDictionary productDictionary = new ProductDictionary()
                             {
                                 ProductId = orderDTO.productsku,
+                                Source = orderDTO.source,
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
@@ -194,6 +203,7 @@ namespace PushServer.Commands
                             ProductDictionary productDictionary = new ProductDictionary()
                             {
                                 ProductId = orderDTO.productsku,
+                                Source = orderDTO.source,
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
@@ -214,6 +224,7 @@ namespace PushServer.Commands
                             ProductDictionary productDictionary = new ProductDictionary()
                             {
                                 ProductId = orderDTO.productsku,
+                                Source = orderDTO.source,
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
@@ -238,7 +249,9 @@ namespace PushServer.Commands
             if (item.Products.FirstOrDefault(p => p.sku == foo.sku) == null)
             {
                 decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
-                decimal totalAmount = pd.Price * orderDTO.count;
+                decimal totalAmount = pd.PayPrice * orderDTO.count;
+                decimal totalCostPrice = foo.CostPrice * orderDTO.count;
+                decimal totalFlatAmount = foo.FlatPrice * orderDTO.count;
                 OrderProductInfo orderProductInfo = new OrderProductInfo()
                 {
                     ProductPlatId = orderDTO.productsku,
@@ -249,6 +262,8 @@ namespace PushServer.Commands
                     weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
                     OrderSn = oldordersn?? orderDTO.orderSN,
                     TotalAmount = totalAmount,
+                    TotalCostPrice = totalCostPrice,
+                    TotalFlatAmount = totalFlatAmount,
                     ProductCount = orderDTO.count,
                     ProductWeight = weight,
                     Source = orderDTO.source,
@@ -498,6 +513,9 @@ namespace PushServer.Commands
                     item.OrderExtendInfo = new OrderExtendInfo();
                     item.OrderExtendInfo.DiscountFee = item.Products.Sum(p => p.DiscountFee);
                     item.OrderExtendInfo.IsPromotional = item.Products.Any(p => p.DiscountFee > 0) ? true : false;
+                    item.OrderExtendInfo.TotalAmount = item.Products.Sum(p => p.TotalAmount);
+                    item.OrderExtendInfo.TotalCostPrice = item.Products.Sum(p => p.TotalCostPrice);
+                    item.OrderExtendInfo.TotalFlatAmount = item.Products.Sum(p => p.TotalFlatAmount);
 
                     item.OrderExtendInfo.OrderSn = item.OrderSn;
                     item.OrderExtendInfo.TotalAmount = item.Products.Sum(p => p.TotalAmount);

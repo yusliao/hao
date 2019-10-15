@@ -85,6 +85,8 @@ namespace PushServer.Service
                                 ProductPlatName = db.ProductsSet.Find(item.Key.sku)?.ShortName??db.ProductsSet.Find(item.Key.sku)?.Name,
                                 SKU = item.Key.sku,
                                 ProductTotalAmount = item.Sum(o => o.TotalAmount),
+                                ProductTotalCostAmount = item.Sum(o=>o.TotalCostPrice),
+                                ProductTotalFlatAmount = item.Sum(o=>o.TotalFlatAmount),
                                 weightCode = item.Key.weightCode,
                                 weightCodeDesc = db.WeightCodeSet.Find(item.Key.weightCode)?.Value.ToString(),
                                 ProductTotalWeight = item.Sum(o => o.ProductWeight)/1000,
@@ -95,8 +97,12 @@ namespace PushServer.Service
                                 TotalCustomers = lst.GroupBy(o=>o.Consignee).Count(),//总计客户数量
                                 TotalOrders = lst.Count()
                             };
-                                    
-                                    
+                            if (StatisticType.Day == statisticType)
+                            {
+                                DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+                                statistic.CreateDate = start;
+                            }
+
                             statistic.TotalOrderRepurchase = lst.Where(o => o.OrderRepurchase.DailyRepurchase == true).Count();
                             statistic.TotalCustomerRepurchase = lst.Where(o => o.OrderRepurchase.DailyRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
                             var RepurchaseCount = lst.Where(o => o.OrderRepurchase.DailyRepurchase == true).Count();

@@ -304,8 +304,9 @@ namespace PushServer.Commands
                 {
                     using (var db = new OMSContext())
                     {
-                      string sn = orderItem.SourceSn.Substring(0, orderItem.SourceSn.Length - 2);//通过截断字符串匹配原始订单号
-                        var sourceorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == sn && o.OrderType == 0);
+                        string sn = orderItem.SourceSn.Substring(0, orderItem.SourceSn.Length - 2);//通过截断字符串匹配原始订单号
+
+                        var sourceorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == sn.Trim() && o.OrderType == 0);
                         if (sourceorder != null)
                         {
                             var targetorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == orderItem.SourceSn);//售后单是否已经入库
@@ -370,7 +371,19 @@ namespace PushServer.Commands
                         }
                         else//通过收货人找到最近的一个销售订单
                         {
-                            var lastorder = db.OrderSet.Include(o => o.Consignee).Where(o => o.Consignee.Name == orderDTO.consigneeName && o.Consignee.Phone == orderDTO.consigneePhone && o.OrderType == 0)?.LastOrDefault();
+                            InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
+                            return null;
+                            OrderEntity lastorder = null;
+                            try
+                            {
+                                lastorder = db.OrderSet.Include(o => o.Consignee).Where(o => o.Consignee.Name == orderDTO.consigneeName && o.Consignee.Phone == orderDTO.consigneePhone && o.OrderType == 0).FirstOrDefault();
+                            }
+                            catch (Exception)
+                            {
+                                InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
+                                return null;
+                            }
+                            
                             if (lastorder != null)
                             {
                                 var targetorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == orderItem.SourceSn);//售后单是否已经入库
@@ -434,12 +447,7 @@ namespace PushServer.Commands
                                 }
                                 return null;
                             }
-                            else
-                            {
-                                //TODO:
-                                InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
-                                return null;
-                            }
+                            
                         }
                     }
                     return null;

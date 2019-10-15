@@ -63,26 +63,38 @@ namespace PushServer.Service
                         List<StatisticDistrictItem> provinceitems = new List<StatisticDistrictItem>();
                         List<StatisticDistrictItem> cityitems = new List<StatisticDistrictItem>();
 
-                       
-                            var q1 = plst.GroupBy(p => new { p.ConsigneeAddress.Province });//按省份统计
-                            foreach (var item in q1)
-                            {
-                                var cad = db.ChinaAreaDatas.FirstOrDefault(a => a.Name.IndexOf(item.Key.Province) == 0);
-                                if (cad == null)
-                                    cad = db.ChinaAreaDatas.Find(100000);//中国
-                                StatisticDistrictItem statistic = new StatisticDistrictItem()
-                                {
-                                    CreateDate = DateTime.Now,
-                                    DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
-                                    TotalOrders = item.Count(),
-                                    TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
-                                    TotalProductCount = item.Sum(a => a.OrderExtendInfo.TotalProductCount),
-                                    TotalWeight = item.Sum(a => a.OrderExtendInfo.TotalWeight),
-                                    AddressID = cad
 
-                                };
-                                provinceitems.Add(statistic);
-                            }
+                        var q1 = plst.GroupBy(p => new { p.ConsigneeAddress.Province });//按省份统计
+                        DateTime createDate = DateTime.Now;
+                        if (StatisticType.Day == statisticType)
+                        {
+                            DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+                            createDate = start;
+                        }
+
+                        foreach (var item in q1)
+                        {
+                            var cad = db.ChinaAreaDatas.FirstOrDefault(a => a.Name.IndexOf(item.Key.Province) == 0);
+                            if (cad == null)
+                                cad = db.ChinaAreaDatas.Find(100000);//中国
+                            StatisticDistrictItem statistic = new StatisticDistrictItem()
+                            {
+                                CreateDate = createDate,
+                                DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
+                                TotalOrders = item.Count(),
+                                TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
+                                TotalCostAmount = item.Sum(o => o.OrderExtendInfo.TotalCostPrice),
+                                TotalFlatAmount = item.Sum(o => o.OrderExtendInfo.TotalFlatAmount),
+                                TotalProductCount = item.Sum(a => a.OrderExtendInfo.TotalProductCount),
+                                TotalWeight = item.Sum(a => a.OrderExtendInfo.TotalWeight),
+                                AddressID = cad
+
+                            };
+                            DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+                            statistic.CreateDate = start;
+                           
+                            provinceitems.Add(statistic);
+                        }
                      
                         
                             var q2 = plst.GroupBy(p => new { p.ConsigneeAddress.Province, p.ConsigneeAddress.City });//按省份，地级市统计
@@ -93,7 +105,7 @@ namespace PushServer.Service
                                     cad = db.ChinaAreaDatas.Find(100000);//中国
                                 StatisticDistrictItem statistic = new StatisticDistrictItem()
                                 {
-                                    CreateDate = DateTime.Now,
+                                    CreateDate = createDate,
                                     DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
                                     TotalOrders = item.Count(),
                                     TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
@@ -118,6 +130,11 @@ namespace PushServer.Service
                             Year = year
                             
                         };
+                        if (StatisticType.Day == statisticType)
+                        {
+                            DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
+                            statisticDistrict.CreateDate = start;
+                        }
 
                         var removeobj = db.StatisticDistricts.Include(s=>s.StatisticDistrictriProvinceItems).Include(s=>s.StatisticDistrictriCityItems).FirstOrDefault(s => s.Year == year && s.Source == ServerName && s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue);
                         if (removeobj != null)
