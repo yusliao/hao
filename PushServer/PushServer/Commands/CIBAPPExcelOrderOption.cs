@@ -116,7 +116,7 @@ namespace PushServer.Commands
             orderDTO.orderStatus = OrderStatus.Confirmed;
            
 
-            for (int i = 1; i < excelTable.Rows.Count; i++)
+            for (int i = 0; i < excelTable.Rows.Count; i++)
             {
                 var row = excelTable.Rows[i];
 
