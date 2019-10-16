@@ -39,7 +39,7 @@ namespace OMS.Models
         /// </summary>
         public int State { get; set; }
 
-        public DateTime CreateTime { get; set; }
+        public DateTime CreateTime { get; set; } = DateTime.Now;
 
     }
 }
