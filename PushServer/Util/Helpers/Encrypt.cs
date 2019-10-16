@@ -188,7 +188,7 @@ namespace Util.Helpers {
         /// <summary>
         /// DES密钥,24位字符串
         /// </summary>
-        public static string DesKey = "#s^un2ye21fcv%|f0XpR,+vh";
+        public static string DesKey = "#s^wxk2ye21fcv%|f0XpR,+v";
 
         /// <summary>
         /// DES加密
@@ -304,8 +304,12 @@ namespace Util.Helpers {
                 if ( _iv == null ) {
                     var size = 16;
                     _iv = new byte[size];
-                    for ( int i = 0; i < size; i++ )
+                    for (int i = 0; i < size; i++)
                         _iv[i] = 0;
+
+                    var bs=  Encoding.UTF8.GetBytes(Aesiv);
+                    Buffer.BlockCopy(bs, 0, _iv, 0, 16);
+                    
                 }
                 return _iv;
             }
@@ -314,7 +318,9 @@ namespace Util.Helpers {
         /// <summary>
         /// AES密钥
         /// </summary>
-        public static string AesKey = "QaP1AF8utIarcBqdhYTZpVGbiNQ9M6IL";
+        public static string AesKey = "MidnightBellsYnUyZaiDengdaiAC178";
+       // public static string AesKey = "QaP1AF8utIarcBqdhYTZpVGbiNQ9M6IL";
+        private static string Aesiv = "$ljny@Gaoxing123!~";
 
         /// <summary>
         /// AES加密
