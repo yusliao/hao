@@ -50,7 +50,7 @@ namespace PushServer.Commands
                                 dr["订单号"] = item.SourceSn;
                                 dr["物流单号"] = logisticsDetail.LogisticsNo;
 
-                                dr["物流编号"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == logisticsDetail.Logistics).BankLogisticsCode;
+                                dr["物流编号"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == logisticsDetail.Logistics)?.BankLogisticsCode;
 
                                 dt.Rows.Add(dr);
                             }
@@ -136,10 +136,9 @@ namespace PushServer.Commands
 
                 orderDTO.productName = Convert.ToString(row[3]); //商品名称
                 orderDTO.productsku = Convert.ToString(row[2]); //商品编号
-                //订单SN=来源+原来的SN+日期
-                orderDTO.orderSN_old = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
               
-         
+
+
                 orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
                 if (CheckOrderInDataBase(orderDTO))//是否是重复订单
                     continue;

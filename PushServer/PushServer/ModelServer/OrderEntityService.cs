@@ -9,10 +9,14 @@ using System.Threading.Tasks;
 
 namespace PushServer.ModelServer
 {
+    /// <summary>
+    /// 提供模型业务处理服务
+    /// </summary>
      public class OrderEntityService
     {
         public static void InputConsigneeInfo(OrderEntity orderItem, OMSContext db)
         {
+
             var s = db.CustomersSet.Include<CustomerEntity, ICollection<AddressEntity>>(c => c.Addresslist).FirstOrDefault(c => c.Name == orderItem.Consignee.Name && c.Phone == orderItem.Consignee.Phone);
             if (s != null)//通过姓名和手机号匹配是否是老用户
             {
@@ -26,7 +30,7 @@ namespace PushServer.ModelServer
                 //复购
                 orderItem.OrderRepurchase = new OrderRepurchase()
                 {
-                    DailyRepurchase = true,
+                    DailyRepurchase = s.CreateDate.Value.Date < orderItem.CreatedDate.Date ? true : false,
                     MonthRepurchase = s.CreateDate.Value.Date < new DateTime(orderItem.CreatedDate.Year, orderItem.CreatedDate.Month, 1).Date ? true : false,
                     SeasonRepurchase = s.CreateDate.Value.Date < startSeasonTime.Date ? true : false,
                     WeekRepurchase = s.CreateDate.Value.Date < startWeekTime.Date ? true : false,
@@ -34,7 +38,8 @@ namespace PushServer.ModelServer
 
                 };
                 //收获地址取MD5值进行比对，不同则新增到收货人地址列表中
-                string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
+                string addressstr = Util.Helpers.Encrypt.AesDecrypt(orderItem.ConsigneeAddress.Address);
+                string md5 = Util.Helpers.Encrypt.Md5By32(addressstr);
                 if (s.Addresslist.Any(a => a.MD5 == md5))
                 {
                     var addr = s.Addresslist.First(a => a.MD5 == md5);
@@ -56,12 +61,15 @@ namespace PushServer.ModelServer
             else//新用户
             {
                 orderItem.OrderRepurchase = new OrderRepurchase();
+                string addressstr = Util.Helpers.Encrypt.AesDecrypt(orderItem.ConsigneeAddress.Address);
 
-           
-                string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
+                string md5 = Util.Helpers.Encrypt.Md5By32(addressstr);
                 orderItem.ConsigneeAddress.MD5 = md5;
                 if (orderItem.Consignee.Addresslist == null)
                     orderItem.Consignee.Addresslist = new List<AddressEntity>();
+
+                
+              
                 orderItem.Consignee.Addresslist.Add(orderItem.ConsigneeAddress);
                 db.AddressSet.Add(orderItem.ConsigneeAddress);
                 db.CustomersSet.Add(orderItem.Consignee);
@@ -74,7 +82,9 @@ namespace PushServer.ModelServer
             if(s!=null)
             {
                 orderItem.Consignee = s;
-                string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
+                string addressstr = Util.Helpers.Encrypt.AesDecrypt(orderItem.ConsigneeAddress.Address);
+                string md5 = Util.Helpers.Encrypt.Md5By32(addressstr);
+               
                 if (s.Addresslist.Any(a => a.MD5 == md5))
                 {
                     var addr = s.Addresslist.First(a => a.MD5 == md5);
@@ -88,7 +98,8 @@ namespace PushServer.ModelServer
             }
             else
             {
-                string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
+                string addressstr = Util.Helpers.Encrypt.AesDecrypt(orderItem.ConsigneeAddress.Address);
+                string md5 = Util.Helpers.Encrypt.Md5By32(addressstr);
                 orderItem.ConsigneeAddress.MD5 = md5;
                 if (orderItem.Consignee.Addresslist == null)
                     orderItem.Consignee.Addresslist = new List<AddressEntity>();
@@ -115,7 +126,9 @@ namespace PushServer.ModelServer
 
                 };
                 //收获地址取MD5值进行比对，不同则新增到收货人地址列表中
-                string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
+              
+                string addressstr = Util.Helpers.Encrypt.AesDecrypt(orderItem.ConsigneeAddress.Address);
+                string md5 = Util.Helpers.Encrypt.Md5By32(addressstr);
                 if (b.Buyer.Addresslist.Any(a => a.MD5 == md5))
                 {
                     var addr = b.Buyer.Addresslist.First(a => a.MD5 == md5);
@@ -130,13 +143,18 @@ namespace PushServer.ModelServer
             else//新用户
             {
                 orderItem.OrderRepurchase = new OrderRepurchase();
+                string addressstr = Util.Helpers.Encrypt.AesDecrypt(orderItem.ConsigneeAddress.Address);
 
-            
-                string md5 = Util.Helpers.Encrypt.Md5By32(orderItem.ConsigneeAddress.Address.Trim().Replace(" ", ""));
+                string md5 = Util.Helpers.Encrypt.Md5By32(addressstr);
                 orderItem.ConsigneeAddress.MD5 = md5;
+             
+
                 orderItem.OrderExtendInfo.Buyer.Addresslist.Add(orderItem.ConsigneeAddress);
                 db.AddressSet.Add(orderItem.ConsigneeAddress);
                 db.CustomersSet.Add(orderItem.Consignee);
+
+                
+               
             }
         }
         public static OrderEntity CreateOrderEntity(OrderDTO orderDTO)
@@ -152,14 +170,14 @@ namespace PushServer.ModelServer
                 CreatedDate = orderDTO.createdDate,
                 Consignee = new CustomerEntity()
                 {
-                    Name = orderDTO.consigneeName,
-                    Phone = orderDTO.consigneePhone,
-                    Phone2 = orderDTO.consigneePhone2,
+                    Name = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneeName),
+                    Phone = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneePhone),
+                    Phone2 = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneePhone2),
                     CreateDate = orderDTO.createdDate
                 },
                 ConsigneeAddress = new AddressEntity()
                 {
-                    Address = orderDTO.consigneeAddress,
+                    Address = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneeAddress.Trim().Replace(" ", "")),//加密
                     City = orderDTO.consigneeCity,
                     Province = orderDTO.consigneeProvince,
                     County = orderDTO.consigneeCounty,

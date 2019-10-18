@@ -167,19 +167,19 @@ namespace PushServer.Service
              */
             try
             {
-                //int end = new DateTime(year, month+1, 1).AddDays(-1).Day;
-                //for (int i = 0; i < end; i++)
-                //{
-                //    var foo = new DateTime(year, month, i + 1);
-                //    CreateDailyReport(foo);
-                //    if (foo.DayOfWeek == DayOfWeek.Sunday)
-                //    {
-                //        CreateWeekReport(Util.Helpers.Time.GetWeekNum(foo), foo.Year);
-                //        Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{year}-{Util.Helpers.Time.GetWeekNum(foo)}周报表创建完毕");
-                //    }
+                int end = new DateTime(year, month + 1, 1).AddDays(-1).Day;
+                for (int i = 0; i < end; i++)
+                {
+                    var foo = new DateTime(year, month, i + 1);
+                    CreateDailyReport(foo);
+                    if (foo.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        CreateWeekReport(Util.Helpers.Time.GetWeekNum(foo), foo.Year);
+                        Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{year}-{Util.Helpers.Time.GetWeekNum(foo)}周报表创建完毕");
+                    }
 
-                //}
-               
+                }
+
                 CreateMonthReport(month, year);//生成当前月报表
                 Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{year}-{month}创建月报表任务已提交");
                 

@@ -49,7 +49,7 @@ namespace PushServer.Commands
                                 dr["订单号"] = item.SourceSn;
                                 dr["物流单号"] = logisticsDetail.LogisticsNo;
 
-                                dr["物流编号"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == logisticsDetail.Logistics).BankLogisticsCode;
+                                dr["物流编号"] = db.logisticsInfoSet.FirstOrDefault(l => l.FullName == logisticsDetail.Logistics)?.BankLogisticsCode;
 
                                 dt.Rows.Add(dr);
                             }

@@ -28,7 +28,11 @@ namespace PushServer.Commands
         public override string Name => OMS.Models.OrderSource.CIBVIP;
 
         public override IClientConfig clientConfig => AppServer.Instance.ConfigDictionary[Name];
-
+        /// <summary>
+        /// 积点，不需要告知客户物流信息，不需要反馈给银行
+        /// </summary>
+        /// <param name="orders"></param>
+        /// <returns></returns>
         public override DataTable ExportExcel(List<OrderEntity> orders)
         {
             return null;
