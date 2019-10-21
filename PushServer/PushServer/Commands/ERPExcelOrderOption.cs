@@ -834,7 +834,7 @@ namespace PushServer.Commands
                         var dr = dt.NewRow();
                         dr["店铺"] = item.SourceDesc;
                         dr["订单编号"] = item.SourceSn;
-                        dr["买家会员"] = item.Customer == null ? item.Consignee.Name : item.Customer.Name;
+                        dr["买家会员"] = item.Customer == null ? Util.Helpers.Encrypt.AesDecrypt(item.Consignee.Name) : Util.Helpers.Encrypt.AesDecrypt(item.Customer.Name);
                         dr["商品名称"] = productInfo.ProductPlatName;
                         dr["商品代码"] = productInfo.sku;
                         dr["规格代码"] = productInfo.weightCode == 0 ? string.Empty : productInfo.weightCode.ToString();
@@ -842,9 +842,9 @@ namespace PushServer.Commands
                         dr["价格"] = productInfo.TotalAmount.ToString();
                         dr["商品备注"] = item.Remarks;
                         dr["订单付款时间"] = item.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss");
-                        dr["收货人"] = item.Consignee.Name;
-                        dr["联系手机"] = item.Consignee.Phone ?? item.Consignee.Phone2;
-                        dr["收货地址"] = item.ConsigneeAddress.Address;
+                        dr["收货人"] = Util.Helpers.Encrypt.AesDecrypt(item.Consignee.Name);
+                        dr["联系手机"] = Util.Helpers.Encrypt.AesDecrypt(item.Consignee.Phone) ?? Util.Helpers.Encrypt.AesDecrypt(item.Consignee.Phone2);
+                        dr["收货地址"] = Util.Helpers.Encrypt.AesDecrypt(item.ConsigneeAddress.Address);
                         dr["省"] = item.ConsigneeAddress.Province;
                         dr["市"] = item.ConsigneeAddress.City;
                         dr["区"] = item.ConsigneeAddress.County;
