@@ -73,9 +73,8 @@ using System.Data.Common;
         /// <param name="conn"></param>
         public static void CloseConnection(DbConnection conn)
         {
-            if (conn.State == ConnectionState.Open)
-                conn.Close();
-            conn.Dispose();
+            if (conn.State != ConnectionState.Closed)
+                conn.Dispose();
         }
         /// <summary>
         /// 创建连接
