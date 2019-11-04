@@ -159,6 +159,7 @@ namespace PushServer
                     }
                     catch (Exception ex)
                     {
+                        item.Dispose();
                         if (Environment.UserInteractive)
                         {
                             var commcolor = Console.ForegroundColor;
@@ -243,10 +244,10 @@ namespace PushServer
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
-        public  static bool PushReport(DateTime dateTime)
+        public  static bool PushReport(DateTime dateTime,int reportType)
         {
             var serverNames = Instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i=>i.Name).ToArray();
-            return StatisticServer.Instance.PushReport(serverNames, dateTime);
+            return StatisticServer.Instance.PushReport(serverNames, dateTime,Util.Helpers.Enum.Parse<StatisticType>(reportType));
 
         }
         public static bool PushDailyReport(DateTime dateTime)
