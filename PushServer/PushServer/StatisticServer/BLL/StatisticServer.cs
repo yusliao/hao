@@ -276,13 +276,8 @@ namespace PushServer.Service
                 if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
                     continue;
                 var dt = dateTime;
-                if (DateTime.Now.DayOfWeek == DayOfWeek.Monday)
-                {
                    
-                      OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
-                  
-
-                }
+                OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
 
             }
             return true;
@@ -300,30 +295,33 @@ namespace PushServer.Service
                 if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
                     continue;
                 var dt = dateTime;
-               
-               
-                if (DateTime.Now.Day == 1)
-                {
                     
-                     OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushMonthReport(dt.Month, dt.Year);
-                 
-
-                }
+                OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushMonthReport(dt.Month, dt.Year);
 
             }
             return true;
         }
-        public bool PushReport(string[] serverNames, DateTime dateTime)
+        public bool PushReport(string[] serverNames, DateTime dateTime,StatisticType statisticType)
         {
-            /*推送报表规则
-             * 推送OrderSource对象指定的条目的推送报表
-             * 推送昨天的日报表
-             * 如果今天是周一，推送上周的周报表
-             * 如果今天是月初，推送上月月报表
-             */
-            PushDailyReport(serverNames, dateTime);
-            PushWeeklyReport(serverNames, dateTime);
-            PushMonthlyReport(serverNames, dateTime);
+            switch (statisticType)
+            {
+                case StatisticType.Day:
+                    PushDailyReport(serverNames, dateTime);
+                    break;
+                case StatisticType.Week:
+                    PushWeeklyReport(serverNames, dateTime);
+                    break;
+                case StatisticType.Month:
+                    PushMonthlyReport(serverNames, dateTime);
+                    break;
+                case StatisticType.Quarter:
+                    break;
+                case StatisticType.Year:
+                    break;
+                default:
+                    break;
+            }
+           
             return true;
         }
 

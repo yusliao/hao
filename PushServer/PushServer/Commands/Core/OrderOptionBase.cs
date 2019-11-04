@@ -577,7 +577,10 @@ namespace PushServer.Commands
                
             }
         }
-
+        public void Dispose()
+        {
+            FileScanner.ScannedFiles.Clear();
+        }
         
 
       

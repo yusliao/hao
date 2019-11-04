@@ -25,20 +25,22 @@ namespace PushServer
             foreach (var targetName in wxTargets)
             {
                 var item = new WxMassApiWrapper(targetName);
+
+                
                 switch (serverName)
                 {
                     case OrderSource.CIB:
                     case OrderSource.CIBAPP:
                     case OrderSource.CIBVIP:
-                        if(targetName=="LJNY")
+                        if(targetName!="ERROR")
                             WxApiRetryBlock.Run(() => item.SendNews(wxArticles));
                         break;
                     default:
-                        if(targetName=="ALL")
+                        if (targetName == "ALL")
                             WxApiRetryBlock.Run(() => item.SendNews(wxArticles));
                         break;
                 }
-                
+
             }
             
         }

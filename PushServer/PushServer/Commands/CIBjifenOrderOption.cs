@@ -340,5 +340,10 @@ namespace PushServer.Commands
         {
             throw new NotImplementedException();
         }
+
+        public void Dispose()
+        {
+            FileScanner.ScannedFiles.Clear();
+        }
     }
 }

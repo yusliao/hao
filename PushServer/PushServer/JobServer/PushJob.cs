@@ -34,6 +34,12 @@ namespace PushServer.JobServer
             }).WithName("PushMonthlyReport").ToRunEvery(1).Months().On(1).At(16, 0);
             Schedule(() =>
             {
+                Util.Logs.Log.GetLog(nameof(PushJob)).Info("每天21点定时ERP订单导入正在解析...");
+                
+                AppServer.ImportErpToOMS();
+            }).WithName("ImportErpToOMS").ToRunEvery(1).Days().At(21, 0);
+            Schedule(() =>
+            {
                 Util.Logs.Log.GetLog(nameof(PushJob)).Info("每天23点定时报表统计业务正在生成统计报表...");
                 AppServer.CreateReport(DateTime.Now.AddDays(-1));
             }).WithName("CreateReport2").ToRunEvery(1).Days().At(23, 0);
@@ -54,6 +60,9 @@ namespace PushServer.JobServer
                     break;
                 case "PushMonthlyReport":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每月一号16点定时月报表推送完毕...");
+                    break;
+                case "ImportErpToOMS":
+                    WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天21点定时ERP订单导入解析完毕...");
                     break;
                 case "CreateReport2":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天23点定时任务--生成统计报表完毕...");

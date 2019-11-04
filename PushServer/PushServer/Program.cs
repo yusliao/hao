@@ -75,6 +75,7 @@ namespace PushServer
             string[] str = exeArg.Trim().Replace('-',' ').Split(' ');
             if (str.Length == 1)
                 str = new string[2] { str[0], "" };
+            
             switch (str[0].ToLower())
             {
                 #region 基础服务
@@ -151,6 +152,7 @@ namespace PushServer
                         Console.WriteLine($"输入的命令有误，请重新输入");
                     }
                     return true;
+               
                 case ("c"):
                     DateTime cdateTime;
                     

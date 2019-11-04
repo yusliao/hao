@@ -173,7 +173,7 @@ namespace PushServer.Service
             var WxNewsPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsPicUrl"]; 
             var WxNewssmallPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewssmallPicUrl"];
 
-            var redirectUri = string.Format("{0}?date={1}&mode=day&source={2}", WxNewsUrl, DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), ServerName);
+            var redirectUri = string.Format("{0}?date={1}&mode={3}&source={2}", WxNewsUrl, DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), ServerName,statisticType.ToString().ToLower());
 
             redirectUri = System.Web.HttpUtility.UrlEncode(redirectUri);
 

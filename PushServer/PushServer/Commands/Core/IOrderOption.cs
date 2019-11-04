@@ -21,6 +21,7 @@ namespace PushServer.Commands
         /// </summary>
         /// <returns></returns>
         DataTable ExportExcel(List<OrderEntity> orders);
+        void Dispose();
        
        
         
