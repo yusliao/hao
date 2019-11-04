@@ -8,12 +8,12 @@ namespace PushServer
 {
     class PushReportHelper
     {
-        public static bool PushReport(DateTime dateTime)
+        public static bool PushReport(DateTime dateTime,int reportType=1)
         {
-          
-             return AppServer.PushReport(dateTime);
+
+            return AppServer.PushReport(dateTime,reportType);
            
-            
+
         }
         public static bool PushPandianReport(int monthNum)
         {
