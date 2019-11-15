@@ -82,6 +82,10 @@ namespace OMS.Models
         /// 订单类型0：销售订单，1:退换货订单,2:退货/退钱
         /// </summary>
         public int OrderType { get; set; }
+        /// <summary>
+        /// 支付方式，1：积分，2：自付金，3：积分+自付金，4：分期
+        /// </summary>
+        public int PayType { get; set; }
 
     }
 }

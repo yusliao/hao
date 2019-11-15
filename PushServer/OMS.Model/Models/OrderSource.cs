@@ -14,6 +14,16 @@ namespace OMS.Models
     {
         [Description("银行-兴业银行积分PC")]
         public const string CIB = "CIB";
+        /// <summary>
+        /// 分期商城
+        /// </summary>
+        [Description("银行-兴业分期商城")]
+        public const string CIBSTM = "CIBSTM";
+        /// <summary>
+        /// 积分加自付金
+        /// </summary>
+        [Description("银行-兴业积分加自付金")]
+        public const string CIBEVT = "CIBEVT";
         [Description("银行-兴业银行积分")]
         public const string CIBAPP = "CIBAPP";
         [Description("银行-招商银行网上商城")]

@@ -43,8 +43,9 @@ namespace OMS.Models.DTO
         /// 订单来源方式0：正常录入，1:月结补录,2:ERP导出单补录
         /// </summary>
         public int OrderComeFrom { get; set; }
-       
-     
+        public PayType PayType { get; set; }
+
+
 
     }
     public class BusinessOrderDTO:OrderDTO

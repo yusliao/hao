@@ -66,6 +66,14 @@ namespace OMS.Models
         YuejieDuoyu = 0x02,
 
     }
+    public enum PayType
+    {
+        None=0,
+        Integral,//积分
+        Money,//自付
+        IntegralAndMoney,//积分+自付金
+        installments //分期付款
+    }
    
 
    
