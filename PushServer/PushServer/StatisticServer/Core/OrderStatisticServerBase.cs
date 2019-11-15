@@ -32,13 +32,13 @@ namespace PushServer.Service
                 using (var db = new OMSContext())
                 {
                     List<OrderEntity> orderEntities = new List<OrderEntity>();
-
+                    
                     switch (statisticType)
                     {
                         case StatisticType.Day:
-                            DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue-1);
+                            DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
                             DateTime end = start.AddDays(1);
-                            
+                          
                             orderEntities = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.OrderExtendInfo).Include(o => o.Consignee).Where(o =>o.OrderType==0&& o.OrderDateInfo.CreateTime>=start && o.OrderDateInfo.CreateTime <= end && o.CreatedDate.Year == year).ToList();
                             break;
                         case StatisticType.Week:

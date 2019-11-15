@@ -182,7 +182,29 @@ namespace PushServer.Commands
                     var invoiceName = Convert.ToString(row["发票抬头"]); //发票抬头
                     if (invoiceFlag.Equals("否"))
                         invoiceType = invoiceName = string.Empty;
+                    string paystr = Convert.ToString(row["支付方式"]);
+                    switch (paystr)
+                    {
+                        case "积分支付":
+                            orderDTO.PayType = PayType.Integral;
+                            
+                            break;
+                        case "积分+自付金支付":
+                            orderDTO.PayType = PayType.IntegralAndMoney;
+                            orderDTO.source = OrderSource.CIBEVT;
+                            orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIBEVT);
 
+                            break;
+                        case "分期支付":
+                            orderDTO.PayType = PayType.installments;
+                            orderDTO.source = OrderSource.CIBSTM;
+                            orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.CIBSTM);
+
+                            break;
+                        default:
+                            orderDTO.PayType = PayType.None;
+                            break;
+                    }
                     OrderEntity orderItem = OrderEntityService.CreateOrderEntity(orderDTO);
                     using (var db = new OMSContext())
                     {

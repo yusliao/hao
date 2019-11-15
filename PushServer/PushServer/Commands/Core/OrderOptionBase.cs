@@ -62,6 +62,8 @@ namespace PushServer.Commands
             {
                 case OrderSource.CIB:
                 case OrderSource.CIBAPP:
+                case OrderSource.CIBEVT:
+                case OrderSource.CIBSTM:
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null&& p.ProductCode != null);
                     if (pd == null)
                     {
@@ -117,7 +119,7 @@ namespace PushServer.Commands
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
-                            db.SaveChanges();
+                            int i = db.SaveChanges();
                         }
                         return false;
                     }

@@ -20,7 +20,9 @@ namespace PushServer
         /// </summary>
         static void Main()
         {
-
+            //ReportHelper reportHelper = new ReportHelper();
+            //reportHelper.CIBCustomerDistribution();
+            //return;
             if (Environment.UserInteractive)
             {
                

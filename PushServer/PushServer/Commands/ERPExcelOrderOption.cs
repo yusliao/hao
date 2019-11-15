@@ -882,7 +882,9 @@ namespace PushServer.Commands
                     System.Threading.ThreadPool.QueueUserWorkItem(o =>
                     {
                         var dt = option.ExportExcel(item.ToList());
-                        if (option.clientConfig.Name == OrderSource.CIB || option.clientConfig.Name == OrderSource.CIBAPP)
+                        if (option.clientConfig.Name == OrderSource.CIB || option.clientConfig.Name == OrderSource.CIBAPP 
+                        || option.clientConfig.Name == OrderSource.CIBEVT
+                        || option.clientConfig.Name == OrderSource.CIBSTM)
                         {
                             if (dt != null)
                             {

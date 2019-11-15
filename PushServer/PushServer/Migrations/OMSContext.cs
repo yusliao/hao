@@ -11,10 +11,10 @@ namespace OMS.Models
     {
         public OMSContext():base("name=papa")
         {
-             //Database.SetInitializer<OMSContext>(null);
+             Database.SetInitializer<OMSContext>(null);
             //  Database.SetInitializer<OMSContext>(new CreateDatabaseIfNotExists<OMSContext>());
            //   Database.SetInitializer<OMSContext>(new DropCreateDatabaseIfModelChanges<OMSContext>());
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<OMSContext, PushServer.Migrations.Configuration>());
+           // Database.SetInitializer(new MigrateDatabaseToLatestVersion<OMSContext, PushServer.Migrations.Configuration>());
         }
         public IDbSet<AddressEntity> AddressSet { get; set; }
         public IDbSet<ProductEntity> ProductsSet { get; set; }

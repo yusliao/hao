@@ -148,11 +148,14 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z.EntityFramework.Extensions, Version=4.0.9.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Extensions.4.0.9\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
+    <Reference Include="Z.EntityFramework.Extensions, Version=4.0.12.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Extensions.4.0.12\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.10.3.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.10.3\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+    <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.12.3.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.12.3\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
+    </Reference>
+    <Reference Include="Z.Expressions.Eval, Version=3.0.3.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.Expressions.Eval.3.0.3\lib\net45\Z.Expressions.Eval.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -179,42 +182,6 @@
     <Compile Include="Configuration\ClientListSection.cs" />
     <Compile Include="ImportExcelHelper.cs" />
     <Compile Include="JobServer\PushJob.cs" />
-    <Compile Include="Migrations\201909190716404_init.cs" />
-    <Compile Include="Migrations\201909190716404_init.Designer.cs">
-      <DependentUpon>201909190716404_init.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201909190755277_modifyorderinfo.cs" />
-    <Compile Include="Migrations\201909190755277_modifyorderinfo.Designer.cs">
-      <DependentUpon>201909190755277_modifyorderinfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201909190758376_modifyorderinfo1.cs" />
-    <Compile Include="Migrations\201909190758376_modifyorderinfo1.Designer.cs">
-      <DependentUpon>201909190758376_modifyorderinfo1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201909270648151_ModifyStatisticProduct.cs" />
-    <Compile Include="Migrations\201909270648151_ModifyStatisticProduct.Designer.cs">
-      <DependentUpon>201909270648151_ModifyStatisticProduct.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201909301028096_buyer.cs" />
-    <Compile Include="Migrations\201909301028096_buyer.Designer.cs">
-      <DependentUpon>201909301028096_buyer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201910150345393_price.cs" />
-    <Compile Include="Migrations\201910150345393_price.Designer.cs">
-      <DependentUpon>201910150345393_price.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201910150637015_price1.cs" />
-    <Compile Include="Migrations\201910150637015_price1.Designer.cs">
-      <DependentUpon>201910150637015_price1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201910150653214_price2.cs" />
-    <Compile Include="Migrations\201910150653214_price2.Designer.cs">
-      <DependentUpon>201910150653214_price2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201910150917318_price3.cs" />
-    <Compile Include="Migrations\201910150917318_price3.Designer.cs">
-      <DependentUpon>201910150917318_price3.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\OMSContext.cs" />
     <Compile Include="ModelServer\OrderEntityService.cs" />
@@ -234,6 +201,7 @@
     <Compile Include="PushServer.Designer.cs">
       <DependentUpon>PushServer.cs</DependentUpon>
     </Compile>
+    <Compile Include="ReportHelper.cs" />
     <Compile Include="SelfInstaller.cs" />
     <Compile Include="StatisticServer\BLL\ALLStatisticServer.cs" />
     <Compile Include="StatisticServer\BLL\CIBAPPStatisticServer.cs" />
@@ -271,33 +239,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201909190716404_init.resx">
-      <DependentUpon>201909190716404_init.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201909190755277_modifyorderinfo.resx">
-      <DependentUpon>201909190755277_modifyorderinfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201909190758376_modifyorderinfo1.resx">
-      <DependentUpon>201909190758376_modifyorderinfo1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201909270648151_ModifyStatisticProduct.resx">
-      <DependentUpon>201909270648151_ModifyStatisticProduct.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201909301028096_buyer.resx">
-      <DependentUpon>201909301028096_buyer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910150345393_price.resx">
-      <DependentUpon>201910150345393_price.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910150637015_price1.resx">
-      <DependentUpon>201910150637015_price1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910150653214_price2.resx">
-      <DependentUpon>201910150653214_price2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201910150917318_price3.resx">
-      <DependentUpon>201910150917318_price3.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>

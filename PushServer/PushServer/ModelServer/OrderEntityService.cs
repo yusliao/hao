@@ -194,12 +194,12 @@ namespace PushServer.ModelServer
                     Year = orderDTO.createdDate.Year,
                     TimeStamp = Util.Helpers.Time.GetUnixTimestamp(orderDTO.createdDate)
                 },
-               
+
                 OrderType = orderDTO.orderType,
                 OrderComeFrom = orderDTO.OrderComeFrom,
                 OrderStatus = (int)orderDTO.orderStatus,
                 OrderStatusDesc = Util.Helpers.Enum.GetDescription(typeof(OrderStatus), orderDTO.orderStatus),
-
+                PayType = (int)orderDTO.PayType,
 
                 Remarks = string.Empty
             };
