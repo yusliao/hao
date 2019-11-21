@@ -47,19 +47,19 @@ namespace PushServer.Service
                             DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
                             DateTime end = start.AddDays(1);
 
-                            orderEntities = db.OrderSet.Include(o=>o.Consignee).Include(o=>o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s=> s.OrderType==0 && s.OrderDateInfo.CreateTime >= start && s.OrderDateInfo.CreateTime < end && s.CreatedDate.Year == year ).ToList();
+                            orderEntities = db.OrderSet.Include(o=>o.Consignee).Include(o=>o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => (s.OrderType & 1) == 0 && (s.OrderType & 4) == 0 && s.OrderDateInfo.CreateTime >= start && s.OrderDateInfo.CreateTime < end && s.CreatedDate.Year == year ).ToList();
                             break;
                         case StatisticType.Week:
-                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => s.OrderType == 0 && s.OrderDateInfo.WeekNum == statisticValue && s.CreatedDate.Year == year ).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => (s.OrderType & 1) == 0 && (s.OrderType & 4) == 0 && s.OrderDateInfo.WeekNum == statisticValue && s.CreatedDate.Year == year ).ToList();
                             break;
                         case StatisticType.Month:
-                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => s.OrderType == 0 && s.OrderDateInfo.MonthNum == statisticValue && s.CreatedDate.Year == year ).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => (s.OrderType & 1) == 0 && (s.OrderType & 4) == 0 && s.OrderDateInfo.MonthNum == statisticValue && s.CreatedDate.Year == year ).ToList();
                             break;
                         case StatisticType.Quarter:
-                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => s.OrderType == 0  && s.OrderDateInfo.SeasonNum == statisticValue && s.CreatedDate.Year == year ).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => (s.OrderType & 1) == 0 && (s.OrderType & 4) == 0 && s.OrderDateInfo.SeasonNum == statisticValue && s.CreatedDate.Year == year ).ToList();
                             break;
                         case StatisticType.Year:
-                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => s.OrderType == 0  && s.OrderDateInfo.Year == statisticValue).ToList();
+                            orderEntities = db.OrderSet.Include(o => o.Consignee).Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.Products).Where(s => (s.OrderType & 1) == 0 && (s.OrderType & 4) == 0 && s.OrderDateInfo.Year == statisticValue).ToList();
                             break;
                         default:
                             break;

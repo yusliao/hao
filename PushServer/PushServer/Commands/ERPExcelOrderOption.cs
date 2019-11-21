@@ -267,7 +267,7 @@ namespace PushServer.Commands
             orderDTO.weightCode = csv.GetField<int>("规格代码");
             orderDTO.weightCodeDesc = csv.GetField<string>("规格名称");
 
-          
+            
             string ordertype = csv.GetField<string>("订单类型").Trim();
             orderDTO.OrderComeFrom = 2;
             switch (ordertype)
@@ -690,6 +690,7 @@ namespace PushServer.Commands
                     {
                         ProductCode = orderDTO.productsku,
                         ProductNameInPlatform = orderDTO.productName,
+                        Source = orderDTO.source
 
                     };
                     db.ProductDictionarySet.Add(productDictionary);
@@ -709,6 +710,8 @@ namespace PushServer.Commands
                 InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
                 return false;
             }
+            if (foo.sku == "S0010030002" || foo.sku == "S0010040002")//标识该订单是周期购订单
+                item.OrderType += 4;
             var bar = item.Products.FirstOrDefault(p => p.sku == foo.sku);
             decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
             if (bar == null)
@@ -903,6 +906,24 @@ namespace PushServer.Commands
                         }
                         taskcount--;
                     });
+                }
+                else
+                {
+                    if(item.Key== OrderSource.CIBEVT||item.Key==OrderSource.CIBSTM)
+                    {
+                        System.Threading.ThreadPool.QueueUserWorkItem(o =>
+                        {
+                            var opt = OrderOptSet.FirstOrDefault(i => i.clientConfig.Name == OrderSource.CIBAPP);
+                            var dt = opt.ExportExcel(item.ToList());
+                           
+                            if (dt != null)
+                            {
+                                cib_dt.Merge(dt);
+                            }
+                           
+                            taskcount--;
+                        });
+                    }
                 }
             }
             while (taskcount > 0)
