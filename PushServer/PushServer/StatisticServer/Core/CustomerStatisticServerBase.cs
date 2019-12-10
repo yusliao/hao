@@ -13,13 +13,13 @@ namespace PushServer.Service
     /// <summary>
     /// 订单统计报表
     /// </summary>
-    public abstract class OrderStatisticServerBase : IOrderStatisticServer
+    public abstract class CustomerStatisticServerBase : ICustomerStatisticServer
     {
         public  abstract string ServerName { get; }
         public static event Action<string> UIMessageEventHandle;
         protected virtual void OnUIMessageEventHandle(string msg)
         {
-            Util.Logs.Log.GetLog(nameof(OrderStatisticServerBase)).Debug(msg);
+            Util.Logs.Log.GetLog(nameof(CustomerStatisticServerBase)).Debug(msg);
             var handle = UIMessageEventHandle;
             if (handle != null)
                 handle(msg);
@@ -137,7 +137,7 @@ namespace PushServer.Service
             }
             catch (Exception ex)
             {
-                Util.Logs.Log.GetLog(nameof(OrderStatisticServerBase)).Error($":error:{ex.Message},statck:{ex.StackTrace}");
+                Util.Logs.Log.GetLog(nameof(DistrictStatisticServerBase)).Error($":error:{ex.Message},statck:{ex.StackTrace}");
                 return false;
             }
         }

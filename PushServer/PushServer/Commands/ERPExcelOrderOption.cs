@@ -296,10 +296,8 @@ namespace PushServer.Commands
             if (item == null)//集合中不存在该订单对象
             {
                 var orderItem = OrderEntityService.CreateOrderEntity(orderDTO);
-                /* ERP售后单解析
-                * 售后订单查找原始订单的策略为：1. 剔除最后两位字符后的字符串作为订单号在系统中查找，如果找到则该记录为原始订单；2.根据收货人，查找该收货人最近的销售订单作为原始订单
-                */
-
+                
+                //售后单与原始订单建立联系
                 if (orderItem.OrderType == 1)
                 {
                     using (var db = new OMSContext())
@@ -448,6 +446,160 @@ namespace PushServer.Commands
                                 return null;
                             }
                             
+                        }
+                    }
+                    return null;
+
+
+                }
+                if (orderItem.OrderType == 4)//将周期购订单与原始订单建立联系
+                {
+                    using (var db = new OMSContext())
+                    {
+                        string sn = orderItem.SourceSn.Substring(0, orderItem.SourceSn.Length - 2);//通过截断字符串匹配原始订单号
+
+                        var sourceorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == sn.Trim() && o.OrderType == 0);
+                        if (sourceorder != null)
+                        {
+                            var targetorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == orderItem.SourceSn);//周期购单是否已经入库
+                            if (targetorder == null)//入库周期购订单
+                                InputOrderSubRecordInfo(csv, orderDTO, quantity, weight, orderItem, db, sourceorder);
+                            else //更新物流信息
+                            {
+
+                                OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
+                                orderLogisticsDetail.OrderSn = targetorder.OrderSn;
+                                orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
+                                orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
+                                //  orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                                orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
+                                //发货时间为空时，从配货时间中取日期作为发货时间
+                                orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
+                                var templ = targetorder.OrderLogistics.FirstOrDefault(o => o.LogisticsNo == orderLogisticsDetail.LogisticsNo && !string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo));//是否已经存在该物流信息，防止重复添加
+                                if (templ == null)
+                                {
+                                    if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
+                                    {
+                                        //db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                                        targetorder.OrderLogistics.Add(orderLogisticsDetail);
+                                        if (orderLogisticsDetail.LogisticsProducts == null)
+                                            orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
+                                        LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
+                                        {
+                                            ProductCount = quantity,
+                                            ProductPlatId = orderDTO.productsku,
+                                            ProductPlatName = orderDTO.productName,
+                                            ProductWeight = weight,
+                                            sku = orderDTO.productsku,
+                                            Warehouse = orderDTO.Warehouse,
+                                            weightCode = orderDTO.weightCode,
+                                            weightCodeDesc = orderDTO.weightCodeDesc
+                                        };
+                                        orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
+                                        db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                    }
+
+                                }
+                                else
+                                {
+                                    LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
+                                    {
+                                        ProductCount = quantity,
+                                        ProductPlatId = orderDTO.productsku,
+                                        ProductPlatName = orderDTO.productName,
+                                        ProductWeight = weight,
+                                        sku = orderDTO.productsku,
+                                        Warehouse = orderDTO.Warehouse,
+                                        weightCode = orderDTO.weightCode,
+                                        weightCodeDesc = orderDTO.weightCodeDesc
+                                    };
+                                    templ.LogisticsProducts.Add(logisticsProductInfo);
+                                    db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                }
+
+                                db.SaveChanges();
+
+                            }
+                        }
+                        else//通过收货人找到最近的一个销售订单
+                        {
+                            InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
+                            return null;
+                            OrderEntity lastorder = null;
+                            try
+                            {
+                                lastorder = db.OrderSet.Include(o => o.Consignee).Where(o => o.Consignee.Name == orderDTO.consigneeName && o.Consignee.Phone == orderDTO.consigneePhone && o.OrderType == 0).FirstOrDefault();
+                            }
+                            catch (Exception)
+                            {
+                                InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
+                                return null;
+                            }
+
+                            if (lastorder != null)
+                            {
+                                var targetorder = db.OrderSet.FirstOrDefault(o => o.SourceSn == orderItem.SourceSn);//售后单是否已经入库
+                                if (targetorder == null)
+                                    return InputOrderSubRecordInfo(csv, orderDTO, quantity, weight, orderItem, db, sourceorder);
+                                else
+                                {
+
+                                    OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
+                                    orderLogisticsDetail.OrderSn = targetorder.OrderSn;
+                                    orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
+                                    orderLogisticsDetail.LogisticsNo = csv.GetField<string>("物流单号").Trim();
+                                    //  orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用").ToDecimalOrNull();
+                                    orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
+                                    //发货时间为空时，从配货时间中取日期作为发货时间
+                                    orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
+                                    var templ = targetorder.OrderLogistics.FirstOrDefault(o => o.LogisticsNo == orderLogisticsDetail.LogisticsNo);//是否已经存在该物流信息，防止重复添加
+                                    if (templ == null)
+                                    {
+                                        if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
+                                        {
+                                            //db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                                            targetorder.OrderLogistics.Add(orderLogisticsDetail);
+                                            if (orderLogisticsDetail.LogisticsProducts == null)
+                                                orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
+                                            LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
+                                            {
+                                                ProductCount = quantity,
+                                                ProductPlatId = orderDTO.productsku,
+                                                ProductPlatName = orderDTO.productName,
+                                                ProductWeight = weight,
+                                                sku = orderDTO.productsku,
+                                                Warehouse = orderDTO.Warehouse,
+                                                weightCode = orderDTO.weightCode,
+                                                weightCodeDesc = orderDTO.weightCodeDesc
+                                            };
+                                            orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
+                                            db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
+                                        {
+                                            ProductCount = quantity,
+                                            ProductPlatId = orderDTO.productsku,
+                                            ProductPlatName = orderDTO.productName,
+                                            ProductWeight = weight,
+                                            sku = orderDTO.productsku,
+                                            Warehouse = orderDTO.Warehouse,
+                                            weightCode = orderDTO.weightCode,
+                                            weightCodeDesc = orderDTO.weightCodeDesc
+                                        };
+                                        templ.LogisticsProducts.Add(logisticsProductInfo);
+                                        db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                    }
+
+                                    db.SaveChanges();
+
+                                }
+                                return null;
+                            }
+
                         }
                     }
                     return null;
@@ -710,6 +862,12 @@ namespace PushServer.Commands
                 InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
                 return false;
             }
+            /*
+             * 订单来源是ERP，同时商品SKU是周期购商品的SKU，判定为周期购日常发货订单
+             * 周期购日常发货订单不纳入日常统计中，为了和客户下的周期购订单区分开
+             * 统计报表中只统计销售订单
+             * 
+             */
             if (foo.sku == "S0010030002" || foo.sku == "S0010040002")//标识该订单是周期购订单
                 item.OrderType += 4;
             var bar = item.Products.FirstOrDefault(p => p.sku == foo.sku);

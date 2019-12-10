@@ -30,7 +30,7 @@ namespace PushServer.Commands
         {
             var excelFileList = new List<DataFileInfo>();
 
-           
+
             //FileScanner.ScanAllFiles(new DirectoryInfo(clientConfig.ExcelOrderFolder), "*.xlsx");
             //if (FileScanner.ScannedFiles.Any())
             //{
@@ -47,7 +47,7 @@ namespace PushServer.Commands
             //}
 
             //excelFileList = excelFileList.OrderBy(f => f.FileDate).ToList();
-           
+
             return excelFileList;
         }
        

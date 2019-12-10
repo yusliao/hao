@@ -29,7 +29,7 @@ namespace PushServer
         }
         public static bool CreateHistoryReport(int month)
         {
-            return AppServer.CreateHistoryReport(month, DateTime.Now.Year);
+            return AppServer.CreateHistoryReport(month, 2018);
         }
         public static bool CreatePandianReport(int monthNum)
         {

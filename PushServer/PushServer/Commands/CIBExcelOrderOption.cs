@@ -64,7 +64,7 @@ namespace PushServer.Commands
         protected override List<OrderEntity> FetchOrders()
         {
             var ordersList = new List<OrderEntity>();
-
+            string sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(Name);
             foreach (var file in this.GetExcelFiles())
             {
                 using (var excel = new NPOIExcel(file.FullName))
@@ -74,11 +74,11 @@ namespace PushServer.Commands
                         this.ResolveOrders(table, file.FullName, ordersList);
                     else
                     {
-                        OnUIMessageEventHandle($"兴业积分PC导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
+                        OnUIMessageEventHandle($"{sourceDesc}导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
                         continue;
                     }
                 }
-                OnUIMessageEventHandle($"兴业积分PC导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
+                OnUIMessageEventHandle($"{sourceDesc}导入文件：{file.FileName}解析完毕,当前订单数{ordersList.Count}");
             }
             return ordersList;
         }

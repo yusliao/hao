@@ -78,12 +78,15 @@ namespace PushServer.Commands
                                 ProductNameInPlatform = orderDTO.productName.Trim()
                             };
                             db.ProductDictionarySet.Add(productDictionary);
+                            
                             db.SaveChanges();
                         }
                         return false;
                     }
                     break;
+                case OrderSource.CMBC:
                 case OrderSource.CIBVIP:
+                case OrderSource.ICIB:
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null  && p.ProductCode != null);
                     if (pd == null)
                     {
@@ -175,6 +178,8 @@ namespace PushServer.Commands
             {
                 case OrderSource.CIB:
                 case OrderSource.CIBAPP:
+                case OrderSource.CIBEVT:
+                case OrderSource.CIBSTM:
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
                     if (pd == null)
                     {
@@ -194,6 +199,8 @@ namespace PushServer.Commands
                         return false;
                     }
                     break;
+                case OrderSource.CMBC:
+                
                 case OrderSource.CIBVIP: //根据商品名称查找对应关系
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null && p.ProductCode != null);
                     if (pd == null)
