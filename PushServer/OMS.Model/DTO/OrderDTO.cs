@@ -22,7 +22,7 @@ namespace OMS.Models.DTO
         public string sourceDesc { get; set; }
         public string orderSN { get; set; }
         /// <summary>
-        /// 订单来源方式0：销售订单，1:退换货订单,2:退货/退钱
+        /// 订单来源方式0：销售订单，1:退换货订单,2:退货/退钱,4:周期购订单
         /// </summary>
         public int orderType { get; set; }
         public string orderSN_old { get; set; }

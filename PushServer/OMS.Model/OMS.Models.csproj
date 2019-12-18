@@ -64,6 +64,7 @@
     <Compile Include="Models\ProductCategory.cs" />
     <Compile Include="Models\ProductDictionary.cs" />
     <Compile Include="Models\Statistic.cs" />
+    <Compile Include="Models\StatisticCustomer.cs" />
     <Compile Include="Models\StatisticDistrict.cs" />
     <Compile Include="Models\StatisticProduct.cs" />
     <Compile Include="Models\WeightCode.cs" />
