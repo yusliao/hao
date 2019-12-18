@@ -38,8 +38,10 @@ namespace OMS.Models
         public const string RETAIL = "RETAIL";
         [Description("银行-广发银行商城")]
         public const string CGB = "CGB";
-        [Description("民生银行")]
+        [Description("银行-民生银行商城")]
         public const string CMBC = "CMBC";
+        [Description("电商-到家网")]
+        public const string CMPMC = "CMPMC";
         [Description("电商-京东水清清食品旗舰店")]
         public const string JINGDONG = "JINGDONG";
         [Description("水清清官方优品农铺")]

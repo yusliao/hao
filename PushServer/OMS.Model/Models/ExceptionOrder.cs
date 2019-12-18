@@ -35,6 +35,10 @@ namespace OMS.Models
         SourceSnIsNull,
         [Description("商品数量为空")]
         ProductCountIsNull,
+        [Description("商品数量不正确")]
+        ProductCountError,
+        [Description("物流单号未知")]
+        LogisticsNumUnKnown,
         [Description("订单中不存在该商品")]
         OrderProductsNoExisted,
         [Description("通过售后单未找到销售订单")]
