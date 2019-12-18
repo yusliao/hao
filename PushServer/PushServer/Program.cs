@@ -137,22 +137,22 @@ namespace PushServer
                    
                     return true;
                 case ("p1"):
-                    int month = DateTime.Now.Month;
-                    if (int.TryParse(str[1], out month))
-                    {
+                    //int month = DateTime.Now.Month;
+                    //if (int.TryParse(str[1], out month))
+                    //{
                         
-                        var pushpdReportResult = PushReportHelper.PushPandianReport(month);
-                        if (pushpdReportResult)
-                            Console.WriteLine("报表推送成功！");
-                        else
-                        {
-                            Console.WriteLine("报表推送失败");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"输入的命令有误，请重新输入");
-                    }
+                    //    var pushpdReportResult = PushReportHelper.PushPandianReport(month);
+                    //    if (pushpdReportResult)
+                    //        Console.WriteLine("报表推送成功！");
+                    //    else
+                    //    {
+                    //        Console.WriteLine("报表推送失败");
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine($"输入的命令有误，请重新输入");
+                    //}
                     return true;
                
                 case ("c"):

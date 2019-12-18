@@ -3,6 +3,7 @@
 using OMS.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
@@ -58,69 +59,38 @@ namespace PushServer.Service
                     }
                     if (ServerName != OrderSource.ALL)
                         orderEntities = orderEntities.Where(o => o.Source == ServerName).ToList();
-
-                    if (orderEntities != null && orderEntities.Any())
+                    var glst = orderEntities.GroupBy(o => o.Consignee).OrderByDescending(g=>g.Count()).Take(20);
+                    if (glst != null && glst.Any())
                     {
-                        Statistic statistic = new Statistic()
+                        List<StatisticCustomer> lst = new List<StatisticCustomer>();
+                        foreach (var item in glst)
                         {
-                            CreateDate = DateTime.Now,
-                            Year = year,
-                            PromotionalOrderCount = orderEntities.Where(o => o.OrderExtendInfo.IsPromotional == true).Count(),//总计优惠订单数
-                            Source = ServerName,
-                            SourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName),
-                            StatisticType = (int)statisticType,
-                            StatisticValue = statisticValue,
-                            TotalAmount = orderEntities.Sum(o => o.OrderExtendInfo.TotalAmount),//总计金额
-                            TotalCustomer = orderEntities.GroupBy(o => o.Consignee).ToList().Count(),//总计客户数量
-                            TotalOrderCount = orderEntities.Count,//总计订单数量
-                            TotalProductCount = orderEntities.Sum(o => o.OrderExtendInfo.TotalProductCount),//总计盒数
-                            TotalCostAmount = orderEntities.Sum(o=>o.OrderExtendInfo.TotalCostPrice),//总成本
-                            TotalFlatAmount = orderEntities.Sum(o=>o.OrderExtendInfo.TotalFlatAmount),//统一价下面的总金额
-                            TotalWeight = orderEntities.Sum(o => o.OrderExtendInfo.TotalWeight),
-                            
+                            StatisticCustomer statistic = new StatisticCustomer()
+                            {
+                                CreateDate = DateTime.Now,
+                                Year = year,
 
-                        };
-                        
-                        switch (statisticType)
-                        {
-                            case StatisticType.Day:
-                                DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
-                                statistic.CreateDate = start;
-                                statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Count();
-                                statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
-                                statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.DailyRepurchase == true).Sum(o => o.OrderExtendInfo.TotalProductCount);
-                                break;
-                            case StatisticType.Week:
-                                statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.WeekRepurchase == true).Count();
-                                statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.WeekRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
-                                statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.WeekRepurchase == true).Sum(o => o.OrderExtendInfo.TotalProductCount);
-                                break;
-                            case StatisticType.Month:
-                                statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.MonthRepurchase == true).Count();
-                                statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.MonthRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
-                                statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.MonthRepurchase == true).Sum(o => o.OrderExtendInfo.TotalProductCount);
-                                break;
-                            case StatisticType.Quarter:
-                                statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.SeasonRepurchase == true).Count();
-                                statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.SeasonRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
-                                statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.SeasonRepurchase == true).Sum(o => o.OrderExtendInfo.TotalProductCount);
-                                break;
-                            case StatisticType.Year:
-                                statistic.TotalOrderRepurchase = orderEntities.Where(o => o.OrderRepurchase.YearRepurchase == true).Count();
-                                statistic.TotalCustomerRepurchase = orderEntities.Where(o => o.OrderRepurchase.YearRepurchase == true).GroupBy(o => o.Consignee).ToList().Count();
-                                statistic.TotalProductRepurchase = orderEntities.Where(o => o.OrderRepurchase.YearRepurchase == true).Sum(o => o.OrderExtendInfo.TotalProductCount);
-                                break;
-                            default:
-                                break;
+                                Source = ServerName,
+                                SourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName),
+                                StatisticType = (int)statisticType,
+                                StatisticValue = statisticValue,
+                                OrderCount = item.Count(),
+                                ProductCount = item.Sum(o=>o.OrderExtendInfo.TotalProductCount),
+                                Customer = item.Key,
+                                Name = item.Key.Name,
+                                Phone = item.Key.Phone
+
+                            };
+                            lst.Add(statistic);
                         }
 
-                        var foo = db.StatisticSet.FirstOrDefault(s => s.Source == statistic.Source && s.StatisticType == statistic.StatisticType && s.StatisticValue == statistic.StatisticValue&&s.Year==year);
+                        var foo = db.StatisticCustomers.Where(s => s.Source == ServerName && s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue&&s.Year==year);
                         if (foo == null)
-                            db.StatisticSet.Add(statistic);
+                            db.Set<StatisticCustomer>().AddRange(lst);
                         else
                         {
-                            db.StatisticSet.Remove(foo);
-                            db.StatisticSet.Add(statistic);
+                            db.Set<StatisticCustomer>().RemoveRange(foo);
+                            db.Set<StatisticCustomer>().AddRange(lst);
                         }
                         db.SaveChanges();
                         OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
@@ -166,229 +136,70 @@ namespace PushServer.Service
         {
             return CreateReport(StatisticType.Year, year, year);
         }
-        private  void PushReport(StatisticType statisticType, int statisticValue,int year)
+
+        private DataTable PushReport(StatisticType statisticType, int statisticValue, int year)
         {
-         
-            var WxNewsUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsUrl"];
-            var WxNewsPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewsPicUrl"]; 
-            var WxNewssmallPicUrl = System.Configuration.ConfigurationManager.AppSettings["WxNewssmallPicUrl"];
-
-            var redirectUri = string.Format("{0}?date={1}&mode={3}&source={2}", WxNewsUrl, DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"), ServerName,statisticType.ToString().ToLower());
-
-            redirectUri = System.Web.HttpUtility.UrlEncode(redirectUri);
-
-            var url = WxPushNews.CreateWxNewsOAuthUrl(redirectUri);
-            var picUrl = WxNewsPicUrl;
-            var smallpicUrl = WxNewssmallPicUrl;
+            DataTable dt = new DataTable();
             using (var db = new OMSContext())
             {
-                Statistic foo = new Statistic();
-                string title = string.Empty;
-                
-                List<Statistic> lst = new List<Statistic>();
-                var nameDesc =  Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName);
-                switch (statisticType)
+
+                var lst = db.StatisticCustomers.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == ServerName);
+                if (lst != null && lst.Any())
                 {
-                    case StatisticType.Day:
-                        
-                        DateTime dateTime = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
-                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
-                        
-                        foreach (var s in lst)
-                        {
-                            foo.TotalAmount += s.TotalAmount;
-                            foo.TotalCustomer += s.TotalCustomer;
-                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
-                            foo.TotalOrderCount += s.TotalOrderCount;
-                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
-                            foo.TotalProductCount += s.TotalProductCount;
-                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
-                            foo.TotalWeight += s.TotalWeight;
-                        }
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(今日无单）", dateTime.ToString("yyyy年MM月dd日"), nameDesc, Environment.NewLine);
-                        else
-                            title = string.Format("{0} #{1}#", dateTime.ToString("yyyy年MM月dd日"), nameDesc);
-                        break;
-                    case StatisticType.Week:
-                       
-                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Week && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
-                        foreach (var s in lst)
-                        {
-                            foo.TotalAmount += s.TotalAmount;
-                            foo.TotalCustomer += s.TotalCustomer;
-                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
-                            foo.TotalOrderCount += s.TotalOrderCount;
-                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
-                            foo.TotalProductCount += s.TotalProductCount;
-                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
-                            foo.TotalWeight += s.TotalWeight;
-                        }
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(本周无单）", $"{year}年{statisticValue}周", nameDesc, Environment.NewLine);
-                        else
-                            title = $"{year}年#{statisticValue}周#{nameDesc}";
-                        break;
-                    case StatisticType.Month:
 
-                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
-                        foreach (var s in lst)
-                        {
-                            foo.TotalAmount += s.TotalAmount;
-                            foo.TotalCustomer += s.TotalCustomer;
-                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
-                            foo.TotalOrderCount += s.TotalOrderCount;
-                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
-                            foo.TotalProductCount += s.TotalProductCount;
-                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
-                            foo.TotalWeight += s.TotalWeight;
-                        }
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(本月无单）", $"{year}年{statisticValue}月", nameDesc, Environment.NewLine);
-                        else
-                            title = $"{year}年#{statisticValue}月份#{nameDesc}";
-                        break;
-                    case StatisticType.Quarter:
-
-                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Quarter && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
-                        foreach (var s in lst)
-                        {
-                            foo.TotalAmount += s.TotalAmount;
-                            foo.TotalCustomer += s.TotalCustomer;
-                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
-                            foo.TotalOrderCount += s.TotalOrderCount;
-                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
-                            foo.TotalProductCount += s.TotalProductCount;
-                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
-                            foo.TotalWeight += s.TotalWeight;
-                        }
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(本季无单）", $"{year}年{statisticValue}季", nameDesc, Environment.NewLine);
-                        else
-                            title = $"{year}年#{statisticValue}季度#{nameDesc}";
-                        break;
-                    case StatisticType.Year:
-
-                        lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Year && s.StatisticValue == year&& s.SourceDesc == nameDesc).ToList();
-                        foreach (var s in lst)
-                        {
-                            foo.TotalAmount += s.TotalAmount;
-                            foo.TotalCustomer += s.TotalCustomer;
-                            foo.TotalCustomerRepurchase += s.TotalCustomerRepurchase;
-                            foo.TotalOrderCount += s.TotalOrderCount;
-                            foo.TotalOrderRepurchase += s.TotalOrderRepurchase;
-                            foo.TotalProductCount += s.TotalProductCount;
-                            foo.TotalProductRepurchase += s.TotalProductRepurchase;
-                            foo.TotalWeight += s.TotalWeight;
-                        }
-                        if (foo == null || foo.TotalOrderCount <= 0)
-                            title = string.Format("{0} #{1}#{2}(本年无单）", $"{year}年", nameDesc, Environment.NewLine);
-                        else
-                            title = $"{year}年#{nameDesc}";
-                        break;
-                    default:
-                        break;
-                }
+                    #region create columns
 
 
-                var wxArticles = new List<WxArticle>()
-                {
-                    new WxArticle( title,url,picUrl,string.Empty)
-                };
-                int rangvalue = 7;
-                switch (statisticType)
-                {
-                   
-                    case StatisticType.Week:
-                        rangvalue = 7;
-                        break;
-                    case StatisticType.Month:
-                        rangvalue = DateTime.DaysInMonth(year, statisticValue);
-                        break;
-                    case StatisticType.Quarter:
-                        rangvalue = Util.Helpers.Time.GetDaysInSeason(year, statisticValue);
-                        break;
-                    case StatisticType.Year:
-                        rangvalue = Util.Helpers.Time.GetDaysInYear(year);
-                        break;
-                    default:
-                        break;
-                }
-                if (foo != null && foo.TotalOrderCount > 0 && statisticType != StatisticType.Day)
-                {
-                    wxArticles.AddRange(new List<WxArticle>()
+                    dt.Columns.Add("店铺");
+                    dt.Columns.Add("姓名");
+                    dt.Columns.Add("手机号");
+                    dt.Columns.Add("单数");
+                    dt.Columns.Add("盒数");
+                    dt.Columns.Add("报表时间");
+                    #endregion
+                    foreach (var item in lst)
                     {
-                          new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,smallpicUrl,string.Empty),
-                        new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,smallpicUrl,string.Empty),
+                        var dr = dt.NewRow();
+                        dr["店铺"] = item.Source;
+                        dr["姓名"] = item.Name;
+
+                        dr["手机号"] = item.Phone;
+                        dr["单数"] = item.OrderCount;
+                        dr["盒数"] = item.ProductCount;
+                        dr["报表时间"] = item.CreateDate;
                        
+                        dt.Rows.Add(dr);
 
-                        new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,smallpicUrl,string.Empty),
-                         new WxArticle(string.Format("日均单数：{0}", Math.Round((double)foo.TotalOrderCount/rangvalue,2)),url,smallpicUrl,string.Empty),
-                        new WxArticle(string.Format("日均盒数：{0}",Math.Round((double)foo.TotalProductCount/rangvalue,2)),url,smallpicUrl,string.Empty),
-                       // new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,smallpicUrl,string.Empty),
-                       // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
-                      //  new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,smallpicUrl,string.Empty),
-
-                        new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,smallpicUrl,string.Empty),
-                        new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,smallpicUrl,string.Empty),
-
-                    });
-                }
-                else if (foo != null && foo.TotalOrderCount > 0 && statisticType == StatisticType.Day)
-                {
-                    wxArticles.AddRange(new List<WxArticle>()
-                    {
-
-                        new WxArticle(string.Format("总计人数：{0}", foo.TotalCustomer),url,smallpicUrl,string.Empty),
-                          new WxArticle(string.Format("总计单数：{0}", foo.TotalOrderCount),url,smallpicUrl,string.Empty),
-                        new WxArticle(string.Format("总计盒数：{0}", foo.TotalProductCount),url,smallpicUrl,string.Empty),
-                        new WxArticle(string.Format("总计重量(kg)：{0}", foo.TotalWeight/1000),url,smallpicUrl,string.Empty),
-                       // new WxArticle(string.Format("总计促销单数：{0}", foo.PromotionalOrderCount),url,string.Empty,string.Empty),
-                        new WxArticle(string.Format("总计复购人数：{0}", foo.TotalCustomerRepurchase),url,smallpicUrl,string.Empty),
-
-                        new WxArticle(string.Format("总计人数复购率：{0}%", Math.Round((double)foo.TotalCustomerRepurchase*100/foo.TotalCustomer,2)),url,smallpicUrl,string.Empty),
-                        new WxArticle(string.Format("总计单数复购率：{0}%",Math.Round((double)foo.TotalOrderRepurchase*100/foo.TotalOrderCount,2)),url,smallpicUrl,string.Empty),
-
-                    });
-                }
-                try
-                {
-                    WxPushNews.OrderStatistic(wxArticles,ServerName);
-                    Util.Logs.Log.GetLog(nameof(WxPushNews)).Info($"消息推送成功：{wxArticles[0].Title}");
-                }
-                catch (Exception ex)
-                {
-                    Util.Logs.Log.GetLog(nameof(WxPushNews)).Error($"消息推送失败：{wxArticles[0].Title}，error:{ex.Message},stackTrace：{ex.StackTrace}");
+                    }
 
                 }
-
             }
+            return dt;
         }
-        public virtual void PushDailyReport(DateTime value)
+        public virtual DataTable PushDailyReport(DateTime value)
         {
-            PushReport(StatisticType.Day, value.DayOfYear, value.Year);
-        }
-
-        public virtual void PushMonthReport(int monthnum, int year)
-        {
-            PushReport(StatisticType.Month, monthnum, year);
+            return PushReport(StatisticType.Day, value.DayOfYear, value.Year);
         }
 
-        public virtual void PushSeasonReport(int seasonnum, int year)
-        {
 
-            PushReport(StatisticType.Quarter, seasonnum, year);
+        public virtual DataTable PushMonthReport(int monthNum, int year)
+        {
+            return PushReport(StatisticType.Month, monthNum, year);
         }
 
-        public virtual void PushWeekReport(int weeknum, int year)
+        public virtual DataTable PushSeasonReport(int seasonNum, int year)
         {
-
-            PushReport(StatisticType.Week,weeknum, year);
+            return PushReport(StatisticType.Quarter, seasonNum, year);
         }
 
-        public virtual void PushYearReport(int year)
+        public virtual DataTable PushWeekReport(int weekNum, int year)
         {
-            PushReport(StatisticType.Year, year, year);
+            return PushReport(StatisticType.Week, weekNum, year);
+        }
+
+        public virtual DataTable PushYearReport(int year)
+        {
+            return PushReport(StatisticType.Year, year, year);
         }
     }
 }

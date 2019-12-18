@@ -97,13 +97,13 @@ namespace PushServer.Commands
         /// <param name="items">已解析订单集合</param>
         protected void ResolveOrders(CsvReader csv, string file, ref List<OrderEntity> items)
         {
+            System.Collections.Concurrent.ConcurrentDictionary<long, int> orderProductCountDic = new System.Collections.Concurrent.ConcurrentDictionary<long, int>();
             csv.Read();
             csv.ReadHeader();
             List<OrderEntity> newOrderlst = new List<OrderEntity>();
             OrderDTO orderDTO = new OrderDTO();
             orderDTO.fileName = file;
-            orderDTO.source = Name;
-            orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(Name);
+            
             while (csv.Read())
             {
                 /*处理逻辑：
@@ -114,9 +114,22 @@ namespace PushServer.Commands
 
                 using (var db = new OMSContext())
                 {
-                    
+                    var desc = csv.GetField<string>("店铺名称").Trim();
+                    var opt = AppServer.Instance.ConfigDictionary.FirstOrDefault(o => o.Value.Tag == desc);
+                    if (opt.Key == null)
+                    {
+                        OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
+
+                        continue;
+                    }
+                  
+                   
+                    orderDTO.source = opt.Value.Name;
+                    orderDTO.sourceDesc = desc;
                     orderDTO.sourceSN = csv.GetField<string>("平台单号").Trim();
-                    if(string.IsNullOrEmpty(orderDTO.sourceSN))
+                    
+                  
+                    if (string.IsNullOrEmpty(orderDTO.sourceSN))
                     {
                         //TODO:
                         InputExceptionOrder(orderDTO, ExceptionType.SourceSnIsNull);
@@ -146,13 +159,60 @@ namespace PushServer.Commands
                             break;
                     }
 
-                    var order = db.OrderSet.Include(o => o.OrderLogistics).Include(o => o.Products).FirstOrDefault(o => o.SourceSn == orderDTO.sourceSN);
+                    var order = db.OrderSet.Include(o => o.OrderLogistics.Select(l=>l.LogisticsProducts)).Include(o => o.Products).FirstOrDefault(o => o.SourceSn == orderDTO.sourceSN);
                     if (order != null)//找到该订单
                     {
-                        string warehouse = csv.GetField<string>("仓库名称");
-                        string pcode = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码
+                        string warehouse = orderDTO.Warehouse = csv.GetField<string>("仓库名称");
+                        string pcode =orderDTO.productsku = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码
                         decimal weight = csv.GetField<string>("总重量").ToInt();
-                        int count = csv.GetField<string>("数量").ToInt();
+                        int count =orderDTO.count = csv.GetField<string>("数量").ToInt();
+                        /*根据数量来判定是否数量上漏发了商品
+                         */
+                        #region 漏发商品处理
+                        if (orderDTO.orderType == 0)
+                        {
+
+
+                            System.Threading.ThreadPool.QueueUserWorkItem(o =>
+                            {
+                                var curproduct = order.Products.FirstOrDefault(p => p.sku == pcode);
+                                if (curproduct != null)
+                                {
+                                    if (orderProductCountDic.ContainsKey(curproduct.Id))
+                                    {
+                                        if (orderProductCountDic[curproduct.Id] >= count)
+                                        {
+                                            int c = orderProductCountDic[curproduct.Id] - count;
+                                            orderProductCountDic.AddOrUpdate(curproduct.Id, l => c, (l, i) => i - count);
+                                            
+                                        }
+                                        else if (orderProductCountDic[curproduct.Id] < count)
+                                        {
+                                            InputExceptionOrder(orderDTO, ExceptionType.ProductCountError);
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        if (curproduct.ProductCount != count)
+                                        {
+                                            if (curproduct.ProductCount > count)
+                                            {
+                                                int c = curproduct.ProductCount - count;
+                                                orderProductCountDic.AddOrUpdate(curproduct.Id, c, (l, i) => i - count);
+                                               
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                   // InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                                }
+                            });
+                        }
+                        #endregion
                         order.OrderType = orderDTO.orderType;
                         order.OrderStatus = (int)orderDTO.orderStatus;
                         order.OrderStatusDesc= Util.Helpers.Enum.GetDescription<OrderStatus>(orderDTO.orderStatus); 
@@ -162,12 +222,13 @@ namespace PushServer.Commands
                        // orderLogisticsDetail.LogisticsPrice = csv.GetField<string>("物流费用")?.ToDecimalOrNull();
                         orderLogisticsDetail.PickingTime = DateTime.Parse(csv.GetField<string>("配货时间"));
                         //发货时间为空时，从配货时间中取日期作为发货时间
-
+                        
                         orderLogisticsDetail.SendingTime = csv.GetField<string>("发货时间") == "" ? orderLogisticsDetail.PickingTime.Value.Date : DateTime.Parse(csv.GetField<string>("发货时间"));
-                        var templ = order.OrderLogistics.FirstOrDefault(o => o.LogisticsNo == orderLogisticsDetail.LogisticsNo);//是否已经存在该物流信息，防止重复添加
-                        if (templ == null)
+                       
+                        if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
                         {
-                            if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
+                            var templ = order.OrderLogistics.FirstOrDefault(o => o.LogisticsNo == orderLogisticsDetail.LogisticsNo);//是否已经存在该物流信息，防止重复添加
+                            if (templ == null|| templ.LogisticsProducts.FirstOrDefault(l=>l.ProductPlatId==pcode)==null)
                             {
                                 db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
                                 order.OrderLogistics.Add(orderLogisticsDetail);
@@ -188,8 +249,15 @@ namespace PushServer.Commands
                                 orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
                                 db.LogisticsProductInfos.Add(logisticsProductInfo);
                             }
-
+                            
+                                
                         }
+                        else
+                        {
+                            InputExceptionOrder(orderDTO, ExceptionType.LogisticsNumUnKnown);
+                        }
+
+                        
                         db.SaveChanges();
                         items.Add(order);
 
@@ -371,6 +439,10 @@ namespace PushServer.Commands
                         {
                             InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
                             return null;
+
+                            #region 业务上暂不执行
+
+                            
                             OrderEntity lastorder = null;
                             try
                             {
@@ -445,7 +517,7 @@ namespace PushServer.Commands
                                 }
                                 return null;
                             }
-                            
+                            #endregion
                         }
                     }
                     return null;
@@ -525,6 +597,9 @@ namespace PushServer.Commands
                         {
                             InputExceptionOrder(orderDTO, ExceptionType.OrderNoExistedFromSubOrder);
                             return null;
+                            #region 业务上暂不执行
+
+                            
                             OrderEntity lastorder = null;
                             try
                             {
@@ -599,7 +674,7 @@ namespace PushServer.Commands
                                 }
                                 return null;
                             }
-
+                            #endregion
                         }
                     }
                     return null;
@@ -996,7 +1071,7 @@ namespace PushServer.Commands
                         dr["店铺"] = item.SourceDesc;
                         dr["订单编号"] = item.SourceSn;
                         dr["买家会员"] = item.Customer == null ? Util.Helpers.Encrypt.AesDecrypt(item.Consignee.Name) : Util.Helpers.Encrypt.AesDecrypt(item.Customer.Name);
-                        dr["商品名称"] = productInfo.ProductPlatName;
+                        dr["商品名称"] = db.ProductsSet.FirstOrDefault(p=>p.sku==productInfo.sku).ShortName;
                         dr["商品代码"] = productInfo.sku;
                         dr["规格代码"] = productInfo.weightCode == 0 ? string.Empty : productInfo.weightCode.ToString();
                         dr["数量"] = productInfo.ProductCount.ToString();

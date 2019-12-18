@@ -24,7 +24,7 @@ namespace PushServer.Commands
 
         public override DataTable ExportExcel(List<OrderEntity> orders)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         protected override List<OrderEntity> FetchOrders()
