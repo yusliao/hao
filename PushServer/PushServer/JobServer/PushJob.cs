@@ -13,7 +13,7 @@ namespace PushServer.JobServer
         {
             Schedule(() =>
             {
-                Util.Logs.Log.GetLog(nameof(PushJob)).Info("每天13点定时报表统计业务正在生成统计报表...");
+                Util.Logs.Log.GetLog(nameof(PushJob)).Info("每天12点定时报表统计业务正在生成统计报表...");
               
                 AppServer.CreateReport(DateTime.Now.AddDays(-1));
             }).WithName("CreateReport1").ToRunEvery(1).Days().At(12, 0);

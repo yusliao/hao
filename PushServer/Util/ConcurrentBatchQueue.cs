@@ -21,7 +21,7 @@ namespace Util
         class Entity
         {
             public T[] Array { get; set; }
-
+            
             public int Count;
         }
 

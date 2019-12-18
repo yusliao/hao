@@ -103,19 +103,19 @@ namespace PushServer.Service
         /// <param name="monthnum"></param>
         public void CreateMonthReport(int monthnum,int year )
         {
-          
-            //foreach (var item in ProductStatisticServerOptSet)
-            //{
-            //    var result = item.CreateMonthReport(monthnum, year);
-            //}
-            //foreach (var item in OrderStatisticServerOptSet)
-            //{
-            //    var result = item.CreateMonthReport(monthnum, year);
-            //}
-            //foreach (var item in DistrictStatisticServerOptSet)
-            //{
-            //    var result = item.CreateDistrictMonthReport(monthnum, year);
-            //}
+
+            foreach (var item in ProductStatisticServerOptSet)
+            {
+                var result = item.CreateMonthReport(monthnum, year);
+            }
+            foreach (var item in OrderStatisticServerOptSet)
+            {
+                var result = item.CreateMonthReport(monthnum, year);
+            }
+            foreach (var item in DistrictStatisticServerOptSet)
+            {
+                var result = item.CreateDistrictMonthReport(monthnum, year);
+            }
             foreach (var item in CustomerStatisticServerOptSet)
             {
                 var result = item.CreateMonthReport(monthnum, year);
@@ -144,10 +144,10 @@ namespace PushServer.Service
                 {
 
 
-                 //   CreateDailyReport(dt);
+                    CreateDailyReport(dt);
 
                     Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{dt.ToString("yyyyMMdd HH:mm:ss")}日报表创建命令下达完毕");
-                //    CreateWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
+                    CreateWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
                     Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{Util.Helpers.Time.GetWeekNum(dt)}周报表创建命令下达完毕");
 
 

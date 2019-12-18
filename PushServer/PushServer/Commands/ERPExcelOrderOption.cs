@@ -114,18 +114,7 @@ namespace PushServer.Commands
 
                 using (var db = new OMSContext())
                 {
-                    var desc = csv.GetField<string>("店铺名称").Trim();
-                    var opt = AppServer.Instance.ConfigDictionary.FirstOrDefault(o => o.Value.Tag == desc);
-                    if (opt.Key == null)
-                    {
-                        OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
-
-                        continue;
-                    }
-                  
                    
-                    orderDTO.source = opt.Value.Name;
-                    orderDTO.sourceDesc = desc;
                     orderDTO.sourceSN = csv.GetField<string>("平台单号").Trim();
                     
                   
@@ -162,6 +151,12 @@ namespace PushServer.Commands
                     var order = db.OrderSet.Include(o => o.OrderLogistics.Select(l=>l.LogisticsProducts)).Include(o => o.Products).FirstOrDefault(o => o.SourceSn == orderDTO.sourceSN);
                     if (order != null)//找到该订单
                     {
+                       
+
+                        orderDTO.source = order.Source;
+                        orderDTO.sourceDesc = order.SourceDesc;
+
+
                         string warehouse = orderDTO.Warehouse = csv.GetField<string>("仓库名称");
                         string pcode =orderDTO.productsku = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码
                         decimal weight = csv.GetField<string>("总重量").ToInt();
