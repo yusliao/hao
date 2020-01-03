@@ -42,19 +42,23 @@ namespace DistrictServiceConsole
             //            break;
             //    }
             //}
-            Program.Encrypt();
+           // Program.Encrypt();
             //DateTime dt = new DateTime(2019, 9, 11);
             //int i = dt.DayOfYear;
             //dt = new DateTime(2019, 9, 27);
             //i = dt.DayOfYear;
-          
+
             //    string str = "山东济宁太白湖区许庄街道豪庭御都小区";
 
 
             //    var d = DistrictService.DistrictService.ResolveAddress(str.Trim());
             //    Console.WriteLine(d.ToString());
-
-       
+            int i = Util.Helpers.Time.GetWeekNum(new DateTime(2019,1,1));
+            int i1 = Util.Helpers.Time.GetWeekNum(new DateTime(2019, 1, 7));
+            int j = Util.Helpers.Time.GetWeekNum(new DateTime(2019, 12, 31));
+            int m = Util.Helpers.Time.GetWeekNum(new DateTime(2019, 12, 25));
+            int k = Util.Helpers.Time.GetWeekNum(new DateTime(2020, 1, 1));
+            int k1 = Util.Helpers.Time.GetWeekNum(new DateTime(2020, 1, 6));
             Console.ReadLine();
 
 
