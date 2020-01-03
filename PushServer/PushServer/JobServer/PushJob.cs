@@ -57,27 +57,35 @@ namespace PushServer.JobServer
             {
                 case "CreateReport1":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，12点定时任务--生成统计报表完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，12点定时任务--生成统计报表完毕...");
                     break;
                 case "PushDailyReport":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天14点定时报表推送完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，每天14点定时报表推送完毕...");
                     break;
                 case "PushWeeklyReport":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每周一15点定时周报表推送完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，每周一15点定时周报表推送完毕...");
                     break;
                 case "PushMonthlyReport":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每月一号16点定时月报表推送完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，每月一号16点定时月报表推送完毕...");
                     break;
                 case "CreateRepeatReport":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天19点定时历史报表生成完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，每天19点定时历史报表生成完毕...");
                     break;
                 case "ImportErpToOMS":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天21点定时ERP订单导入解析完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，每天21点定时ERP订单导入解析完毕...");
                     break;
                 case "CreateReport2":
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，每天23点定时任务--生成统计报表完毕...");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，每天23点定时任务...");
                     break;
                 default:
                     WxPushNews.SendErrorText($"当前时间：{DateTime.Now}，任务名称{obj.Name}执行完毕");
+                    Util.Logs.Log.GetLog(nameof(PushJob)).Info($"当前时间：{DateTime.Now}，任务名称{obj.Name}执行完毕");
                     break;
             }
         }
