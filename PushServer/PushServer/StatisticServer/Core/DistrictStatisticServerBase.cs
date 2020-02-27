@@ -152,7 +152,7 @@ namespace PushServer.Service
                         
                         db.StatisticDistricts.Add(statisticDistrict);
                         db.SaveChanges();
-                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-地域统计完毕");
                     }
                     else
                     {
@@ -223,5 +223,17 @@ namespace PushServer.Service
         {
             throw new NotImplementedException();
         }
+    }
+    public class DistrictStatisticServerCommon : DistrictStatisticServerBase
+    {
+
+
+        public override string ServerName => Name;
+        private String Name { get; set; }
+        public DistrictStatisticServerCommon(string name)
+        {
+            Name = name;
+        }
+
     }
 }

@@ -123,7 +123,7 @@ namespace PushServer.Service
                             db.StatisticSet.Add(statistic);
                         }
                         db.SaveChanges();
-                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-订单统计完毕");
                     }
                     else
                     {
@@ -390,5 +390,17 @@ namespace PushServer.Service
         {
             PushReport(StatisticType.Year, year, year);
         }
+    }
+    public class OrderStatisticServerCommon : OrderStatisticServerBase
+    {
+
+
+        public override string ServerName => Name;
+        private String Name { get; set; }
+        public OrderStatisticServerCommon(string name)
+        {
+            Name = name;
+        }
+
     }
 }

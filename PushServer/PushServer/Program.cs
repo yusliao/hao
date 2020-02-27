@@ -56,16 +56,16 @@ namespace PushServer
             Console.WriteLine("欢迎进入推送服务，本服务的目的是将商铺的订单信息推送到OMS中!");
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Please press a key to continue...");
-            Console.WriteLine("-[start]: 开启服务;");
-            Console.WriteLine("-[stop]: 停止服务;");
             Console.WriteLine("-[i]: 安装服务;");
             Console.WriteLine("-[u]: 卸载服务;");
+            Console.WriteLine("-[start]: 开启服务;");
+            Console.WriteLine("-[stop]: 停止服务;");
             Console.WriteLine("-[p]: 推送报表;");
-            Console.WriteLine("-[p1]: 推送盘点报表;后跟具体的月份值  exp: p1 6");
+           // Console.WriteLine("-[p1]: 推送盘点报表;后跟具体的月份值  exp: p1 6");
             Console.WriteLine("-[c]: 生成报表; exp: c ");
             Console.WriteLine("-[c2]: 生成回传订单; exp: c2 ");
             Console.WriteLine("-[c3]: 生成历史报表; exp: c3 1 ");
-            Console.WriteLine("-[c1]: 生成盘点报表; 后跟具体的月份值 exp: c1 6");
+           // Console.WriteLine("-[c1]: 生成盘点报表; 后跟具体的月份值 exp: c1 6");
             Console.WriteLine("-[in]: 导入订单");
          
             //Console.WriteLine("-[out]: 导出订单;");
@@ -234,8 +234,23 @@ namespace PushServer
                         Console.WriteLine("导入订单失败");
                     }
                     return true;
-               
-             
+                case ("y"):
+                    int year = 2020;
+                    if (int.TryParse(str[1], out year))
+                    {
+                        var createyearReportResult = PushReportHelper.CreateYearReport(year);
+                        if (createyearReportResult)
+                            Console.WriteLine("报表生成成功！");
+                        else
+                        {
+                            Console.WriteLine("报表生成失败");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"输入的命令有误，请重新输入");
+                    }
+                    return true;
                 default:
                     Console.WriteLine("Invalid argument!");
                     return false;

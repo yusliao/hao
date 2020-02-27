@@ -15,6 +15,8 @@ namespace PushServer.Service
     public class ALLProductStatisticServer : ProductStatisticServerBase
     {
         public override string ServerName => OrderSource.ALL;
+
+        
     }
     [Export(typeof(IDistrictStatisticServer))]
     public class ALLDistrictStatisticServer : DistrictStatisticServerBase

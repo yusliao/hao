@@ -60,7 +60,6 @@
     <Compile Include="Models\OrderProductInfo.cs" />
     <Compile Include="Models\OrderSource.cs" />
     <Compile Include="Models\OrderStatus.cs" />
-    <Compile Include="Models\PeriodBuyOrder.cs" />
     <Compile Include="Models\ProductCategory.cs" />
     <Compile Include="Models\ProductDictionary.cs" />
     <Compile Include="Models\Statistic.cs" />

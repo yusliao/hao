@@ -103,7 +103,8 @@ namespace PushServer.Commands
             List<OrderEntity> newOrderlst = new List<OrderEntity>();
             OrderDTO orderDTO = new OrderDTO();
             orderDTO.fileName = file;
-            
+            List<string> badRecord = new List<string>();
+            csv.Configuration.BadDataFound = context => badRecord.Add(context.RawRecord);
             while (csv.Read())
             {
                 /*处理逻辑：
@@ -275,6 +276,15 @@ namespace PushServer.Commands
             if(newOrderlst.Any())
                 InsertDB(newOrderlst);
 
+            if (badRecord.Count>0)
+            {
+                foreach (var item in badRecord)
+                {
+                    Util.Logs.Log.GetLog(nameof(ERPExcelOrderOption)).Debug(item);
+                }
+               
+            }
+
 
         }
         /// <summary>
@@ -287,8 +297,9 @@ namespace PushServer.Commands
         private OrderEntity ResolveOrdersFromERPExcel(CsvReader csv, string file, List<OrderEntity> items)
         {
             var desc = csv.GetField<string>("店铺名称").Trim();
-            var opt = this.OrderOptSet.FirstOrDefault(o => Util.Helpers.Reflection.GetDescription<OrderSource>(o.clientConfig.Name.ToUpper()) == desc);
-            if (opt == null)
+           // var opt = this.OrderOptSet.FirstOrDefault(o => Util.Helpers.Reflection.GetDescription<OrderSource>(o.clientConfig.Name.ToUpper()) == desc);
+            var config = AppServer.Instance.ConfigDictionary.Values.FirstOrDefault(c => c.Tag.Contains(desc));
+            if (config == null)
             {
                 OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
                 
@@ -296,7 +307,7 @@ namespace PushServer.Commands
             }
             OrderDTO orderDTO = new OrderDTO();
             orderDTO.fileName = file;
-            orderDTO.source = opt.clientConfig.Name;
+            orderDTO.source = config.Name;
             orderDTO.sourceDesc = desc;
             orderDTO.sourceSN = csv.GetField<string>("平台单号").Trim();
             if (string.IsNullOrEmpty(orderDTO.sourceSN))

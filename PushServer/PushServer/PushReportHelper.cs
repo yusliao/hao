@@ -27,6 +27,10 @@ namespace PushServer
         {
             return AppServer.CreateReport(dateTime);
         }
+        public static bool CreateYearReport(int year)
+        {
+            return AppServer.CreateYearReport(year);
+        }
         public static bool CreateHistoryReport(int month)
         {
             return AppServer.CreateHistoryReport(month, DateTime.Now.Year);

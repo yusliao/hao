@@ -63,39 +63,105 @@ namespace PushServer.Service
         {
             /*生成昨日报表
              */
-            
-            foreach (var item in ProductStatisticServerOptSet)
-            {
-                var result = item.CreateDailyReport(dateTime);
-            }
-            foreach (var item in OrderStatisticServerOptSet)
-            {
-                var result = item.CreateDailyReport(dateTime);
-            }
-            foreach (var item in DistrictStatisticServerOptSet)
-            {
-                var result = item.CreateDistrictDailyReport(dateTime);
-            }
-         
+            #region 静态实现
+
            
+            //foreach (var item in ProductStatisticServerOptSet)
+            //{
+            //    var result = item.CreateDailyReport(dateTime);
+            //}
+            //foreach (var item in OrderStatisticServerOptSet)
+            //{
+            //    var result = item.CreateDailyReport(dateTime);
+            //}
+            //foreach (var item in DistrictStatisticServerOptSet)
+            //{
+            //    var result = item.CreateDistrictDailyReport(dateTime);
+            //}
+            #endregion
+            #region 动态方式加载
+
+            foreach (var item in AppServer.Instance.ConfigDictionary.Values)
+            {
+                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                pcomm.CreateDailyReport(dateTime);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                ocomm.CreateDailyReport(dateTime);
+                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                dcomm.CreateDistrictDailyReport(dateTime);
+                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                ccomm.CreateDailyReport(dateTime);
+
+            }
+            #endregion
+
+
         }
         public  void CreateWeekReport(int weeknum,int year)
         {
            
-            foreach (var item in ProductStatisticServerOptSet)
+            //foreach (var item in ProductStatisticServerOptSet)
+            //{
+            //    var result = item.CreateWeekReport(weeknum,year);
+            //}
+            //foreach (var item in OrderStatisticServerOptSet)
+            //{
+            //    var result = item.CreateWeekReport(weeknum, year);
+            //}
+            //foreach (var item in DistrictStatisticServerOptSet)
+            //{
+            //    var result = item.CreateDistrictWeekReport(weeknum, year);
+            //}
+            #region 动态方式加载
+
+            foreach (var item in AppServer.Instance.ConfigDictionary.Values)
             {
-                var result = item.CreateWeekReport(weeknum,year);
+                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                pcomm.CreateWeekReport(weeknum, year);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                ocomm.CreateWeekReport(weeknum, year);
+                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                dcomm.CreateDistrictWeekReport(weeknum, year);
+                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                ccomm.CreateWeekReport(weeknum, year);
+
             }
-            foreach (var item in OrderStatisticServerOptSet)
+            #endregion
+
+
+        }
+        public bool CreateYearReport(int year)
+        {
+
+
+            #region 动态方式加载
+
+            try
             {
-                var result = item.CreateWeekReport(weeknum, year);
+                foreach (var item in AppServer.Instance.ConfigDictionary.Values)
+                {
+                    ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                    pcomm.CreateYearReport(year);
+                    //OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                    //ocomm.CreateYearReport(year);
+                    //DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                    //dcomm.CreateDistrictYearReport(year);
+                    //CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                    //ccomm.CreateYearReport(year);
+                }
+                Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{year}创建年报表任务已提交");
+                return true;
             }
-            foreach (var item in DistrictStatisticServerOptSet)
+            catch (Exception ex)
             {
-                var result = item.CreateDistrictWeekReport(weeknum, year);
+                Util.Logs.Log.GetLog(nameof(Statistic)).Error($"历史报表{year}年生成失败。/r/n{ex.Message}");
+                return false;
             }
-          
-          
+
+            
+            #endregion
+
+
         }
         /// <summary>
         /// 创建月订单报表
@@ -104,22 +170,37 @@ namespace PushServer.Service
         public void CreateMonthReport(int monthnum,int year )
         {
 
-            foreach (var item in ProductStatisticServerOptSet)
+            //foreach (var item in ProductStatisticServerOptSet)
+            //{
+            //    var result = item.CreateMonthReport(monthnum, year);
+            //}
+            //foreach (var item in OrderStatisticServerOptSet)
+            //{
+            //    var result = item.CreateMonthReport(monthnum, year);
+            //}
+            //foreach (var item in DistrictStatisticServerOptSet)
+            //{
+            //    var result = item.CreateDistrictMonthReport(monthnum, year);
+            //}
+            //foreach (var item in CustomerStatisticServerOptSet)
+            //{
+            //    var result = item.CreateMonthReport(monthnum, year);
+            //}
+            #region 动态方式加载
+
+            foreach (var item in AppServer.Instance.ConfigDictionary.Values)
             {
-                var result = item.CreateMonthReport(monthnum, year);
+                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                pcomm.CreateMonthReport(monthnum, year);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                ocomm.CreateMonthReport(monthnum, year);
+                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                dcomm.CreateDistrictMonthReport(monthnum, year);
+                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                ccomm.CreateMonthReport(monthnum, year);
+
             }
-            foreach (var item in OrderStatisticServerOptSet)
-            {
-                var result = item.CreateMonthReport(monthnum, year);
-            }
-            foreach (var item in DistrictStatisticServerOptSet)
-            {
-                var result = item.CreateDistrictMonthReport(monthnum, year);
-            }
-            foreach (var item in CustomerStatisticServerOptSet)
-            {
-                var result = item.CreateMonthReport(monthnum, year);
-            }
+            #endregion
 
 
 
@@ -153,6 +234,7 @@ namespace PushServer.Service
 
                     CreateMonthReport(dt.Month, dt.Year);//生成当前月报表
                     Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{dt.Month}月报表创建命令下达完毕");
+                    
                 });
 
                 return true;
@@ -199,6 +281,7 @@ namespace PushServer.Service
             }
 
         }
+       
 
         public  bool PushPandianReport(int monthNum,string pandianFolder)
         {

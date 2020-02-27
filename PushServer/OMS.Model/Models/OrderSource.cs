@@ -34,6 +34,8 @@ namespace OMS.Models
         public const string CIBVIP_CQ = "CIBVIP_CQ";
         [Description("客情-周期配送")]
         public const string FRIEND = "FRIEND";
+        [Description("客情-非周期配送")]
+        public const string FRIEND_Un = "FRIEND_Un";
         [Description("其他-零售仓")]
         public const string RETAIL = "RETAIL";
         [Description("银行-广发银行商城")]
@@ -66,8 +68,26 @@ namespace OMS.Models
         public const string CIBJifenPanDian = "CIBJifenPanDian";
         [Description("线下订单")]
         public const string OFFLINE = "OFFLINE";
+        [Description("电商-邮乐农品平台林江米业旗舰店")]
+        public const string ULE = "ULE";
         [Description("所有订单")]
         public const string ALL = "ALL";
+        [Description("渠道-欧阳总")]
+        public const string OUYANG = "OUYANG";
+        [Description("渠道-张鹏")]
+        public const string ZHANGPENG = "ZHANGPENG";
+        [Description("长春-品味鲜米")]
+        public const string SELF_CC = "SELF_CC";
+        [Description("深圳-品味鲜米")]
+        public const string SELF_SZ = "SELF_SZ";
+        [Description("渠道-代莲清")]
+        public const string DAILIANQING = "DAILIANQING";
+        [Description("其他-林江农业销售客户")]
+        public const string SELF_X = "SELF_X";
+        [Description("其他-大米网")]
+        public const string DAMI = "DAMI";
+        [Description("渠道-聂亚峰")]
+        public const string NIEYAFENG = "NIEYAFENG";
 
     }
 

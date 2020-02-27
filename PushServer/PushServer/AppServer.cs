@@ -32,6 +32,11 @@ namespace PushServer
         /// </summary>
         public readonly Dictionary<string, Configuration.IClientConfig> ConfigDictionary = new Dictionary<string, Configuration.IClientConfig>();
 
+        internal static bool CreateYearReport(int year)
+        {
+            return StatisticServer.Instance.CreateYearReport(year);
+        }
+
         private static readonly AppServer instance =  new AppServer();
         private ERPExcelOrderOption ERP { get; set; } = new ERPExcelOrderOption();
 
@@ -289,7 +294,6 @@ namespace PushServer
         public static bool CreateHistoryReport(int month,int year)
         {
             return StatisticServer.Instance.CreateHistoryReport(month, year);
-
         }
         public static bool CreatePandianReport(int monthNum)
         {

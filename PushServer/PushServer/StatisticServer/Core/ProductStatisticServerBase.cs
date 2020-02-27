@@ -13,6 +13,8 @@ namespace PushServer.Service
     public abstract class ProductStatisticServerBase : IProductStatisticServer
     {
         public abstract string ServerName { get; }
+        
+
         public static event Action<string> UIMessageEventHandle;
         protected virtual void OnUIMessageEventHandle(string msg)
         {
@@ -39,6 +41,7 @@ namespace PushServer.Service
             {
                 using (var db = new OMSContext())
                 {
+                    db.Database.CommandTimeout = 600000;
                     List<OrderEntity> orderEntities = new List<OrderEntity>();
 
                     switch (statisticType)
@@ -174,7 +177,7 @@ namespace PushServer.Service
                         db.Set<StatisticProduct>().AddRange(smp);
                         db.SaveChanges();
                         
-                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-商品统计完毕");
                     }
                     else
                     {
@@ -273,5 +276,17 @@ namespace PushServer.Service
         {
             return PushReport(StatisticType.Year, year, year);
         }
+    }
+    public class ProductStatisticServerCommon : ProductStatisticServerBase
+    {
+       
+
+        public override string ServerName => Name;
+        private String Name { get; set; }
+        public ProductStatisticServerCommon(string name)
+        {
+            Name = name;
+        }
+
     }
 }

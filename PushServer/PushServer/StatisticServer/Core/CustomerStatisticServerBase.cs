@@ -27,7 +27,7 @@ namespace PushServer.Service
         }
         private bool CreateReport(StatisticType statisticType, int statisticValue, int year)
         {
-            OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-订单报表开始统计");
+            OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-客户报表开始统计");
             try
             {
                 using (var db = new OMSContext())
@@ -93,11 +93,11 @@ namespace PushServer.Service
                             db.Set<StatisticCustomer>().AddRange(lst);
                         }
                         db.SaveChanges();
-                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-统计完毕");
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-客户统计完毕");
                     }
                     else
                     {
-                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-订单方面无统计结果");
+                        OnUIMessageEventHandle($"{ServerName}-{statisticType.ToString()}-{statisticValue}-客户方面无统计结果");
                         
                     }
                     return true;
@@ -201,5 +201,17 @@ namespace PushServer.Service
         {
             return PushReport(StatisticType.Year, year, year);
         }
+    }
+    public class CustomerStatisticServerCommon : CustomerStatisticServerBase
+    {
+
+
+        public override string ServerName => Name;
+        private String Name { get; set; }
+        public CustomerStatisticServerCommon(string name)
+        {
+            Name = name;
+        }
+
     }
 }
