@@ -142,12 +142,12 @@ namespace PushServer.Service
                 {
                     ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
                     pcomm.CreateYearReport(year);
-                    //OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
-                    //ocomm.CreateYearReport(year);
-                    //DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
-                    //dcomm.CreateDistrictYearReport(year);
-                    //CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
-                    //ccomm.CreateYearReport(year);
+                    OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                    ocomm.CreateYearReport(year);
+                    DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                    dcomm.CreateDistrictYearReport(year);
+                    CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                    ccomm.CreateYearReport(year);
                 }
                 Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{year}创建年报表任务已提交");
                 return true;
