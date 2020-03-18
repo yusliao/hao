@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Util;
 namespace PushServer
 {
+    /// <summary>
+    /// 报表帮助类
+    /// </summary>
     class PushReportHelper
     {
         public static bool PushReport(DateTime dateTime,int reportType=1)
