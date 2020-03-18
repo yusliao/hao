@@ -20,9 +20,7 @@ namespace PushServer
         /// </summary>
         static void Main()
         {
-            //ReportHelper reportHelper = new ReportHelper();
-            //reportHelper.CIBCustomerDistribution();
-            //return;
+            
             if (Environment.UserInteractive)
             {
                
@@ -111,10 +109,12 @@ namespace PushServer
                     }
                     return true;
                 #endregion
-                case ("p"):
+                #region 命令控制
+               
+                case ("p")://推送报表
 
                     DateTime dateTime;
-                    if (DateTime.TryParse(str[1], out dateTime))
+                    if (DateTime.TryParse(str[1], out dateTime))//推送指定日期的报表
                     {
                         var pushReportResult = PushReportHelper.PushReport(dateTime);
                         if (pushReportResult)
@@ -124,7 +124,7 @@ namespace PushServer
                             Console.WriteLine("报表推送失败");
                         }
                     }
-                    else
+                    else//推送昨天的报表
                     {
                         var pushReportResult = PushReportHelper.PushReport(DateTime.Now.AddDays(-1));
                         if (pushReportResult)
@@ -155,10 +155,10 @@ namespace PushServer
                     //}
                     return true;
                
-                case ("c"):
+                case ("c")://生成报表
                     DateTime cdateTime;
                     
-                    if (DateTime.TryParse(str[1], out cdateTime))
+                    if (DateTime.TryParse(str[1], out cdateTime))//生成指定日期的报表
                     {
                         var createReportResult = PushReportHelper.CreateDayReport(cdateTime);
                         if (createReportResult)
@@ -168,7 +168,7 @@ namespace PushServer
                             Console.WriteLine("报表生成失败");
                         }
                     }
-                    else
+                    else//生成昨日报表
                     {
                         var createReportResult = PushReportHelper.CreateReport();
                         if (createReportResult)
@@ -180,26 +180,26 @@ namespace PushServer
                     }
                     return true;
                 case ("c1"):
-                    int c1month = 6;
-                    if (int.TryParse(str[1], out c1month))
-                    {
-                        var createPandianReportResult = PushReportHelper.CreatePandianReport(c1month);
-                        if (createPandianReportResult)
-                            Console.WriteLine("报表生成成功！");
-                        else
-                        {
-                            Console.WriteLine("报表生成失败");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"输入的命令有误，请重新输入");
-                    }
+                    //int c1month = 6;
+                    //if (int.TryParse(str[1], out c1month))
+                    //{
+                    //    var createPandianReportResult = PushReportHelper.CreatePandianReport(c1month);
+                    //    if (createPandianReportResult)
+                    //        Console.WriteLine("报表生成成功！");
+                    //    else
+                    //    {
+                    //        Console.WriteLine("报表生成失败");
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine($"输入的命令有误，请重新输入");
+                    //}
                    
                     return true;
-                case ("c3"):
+                case ("c3")://按月重新生成历史报表
                     int c3month = DateTime.Now.Month;
-                    if (int.TryParse(str[1], out c3month))
+                    if (int.TryParse(str[1], out c3month))//生成今年指定月份的报表
                     {
                         var createPandianReportResult = PushReportHelper.CreateHistoryReport(c3month);
                         if (createPandianReportResult)
@@ -215,7 +215,7 @@ namespace PushServer
                     }
 
                     return true;
-                case ("c2"):
+                case ("c2")://生成回传订单
                     
                     var exportExcelResult = ExcelHelper.ExportExcel();
                     if (exportExcelResult)
@@ -225,7 +225,7 @@ namespace PushServer
                         Console.WriteLine("生成回传订单失败");
                     }
                     return true;
-                case ("in"):
+                case ("in")://导入订单
                     var importExcelResult = ExcelHelper.Dowork();
                     if (importExcelResult)
                         Console.WriteLine("导入订单成功！");
@@ -234,7 +234,7 @@ namespace PushServer
                         Console.WriteLine("导入订单失败");
                     }
                     return true;
-                case ("y"):
+                case ("y")://生成年度报表
                     int year = 2020;
                     if (int.TryParse(str[1], out year))
                     {
@@ -251,6 +251,7 @@ namespace PushServer
                         Console.WriteLine($"输入的命令有误，请重新输入");
                     }
                     return true;
+                #endregion
                 default:
                     Console.WriteLine("Invalid argument!");
                     return false;
