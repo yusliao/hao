@@ -1011,6 +1011,10 @@ namespace PushServer.Commands
            
             return true;
         }
+        /// <summary>
+        /// 创建ERP导入单
+        /// </summary>
+        /// <param name="obj"></param>
         protected void CreateErpExcel(List<OMS.Models.OrderEntity> obj)
         {
             DataTable dt = new DataTable();
@@ -1108,6 +1112,10 @@ namespace PushServer.Commands
            
             
         }
+        /// <summary>
+        /// 创建物流导出单
+        /// </summary>
+        /// <param name="lst"></param>
         protected void CreateLogisticsExcel(List<OMS.Models.OrderEntity> lst)
         {
             var glst = lst.GroupBy(o => o.Source).ToList();
@@ -1115,15 +1123,16 @@ namespace PushServer.Commands
             cib_dt.Columns.Add("订单号");
             cib_dt.Columns.Add("物流编号");
             cib_dt.Columns.Add("物流单号");
-            int taskcount = glst.Count;
+            int taskcount = glst.Count;//任务计数
             foreach (var item in glst)
             {
                 var option = OrderOptSet.FirstOrDefault(i => i.clientConfig.Name == item.Key);
-                if (option != null)
+                if (option != null)//过滤出需要生成物流导出单的渠道
                 {
                     System.Threading.ThreadPool.QueueUserWorkItem(o =>
                     {
                         var dt = option.ExportExcel(item.ToList());
+                        //合并兴业银行各个渠道的物流导出单
                         if (option.clientConfig.Name == OrderSource.CIB || option.clientConfig.Name == OrderSource.CIBAPP 
                         || option.clientConfig.Name == OrderSource.CIBEVT
                         || option.clientConfig.Name == OrderSource.CIBSTM)
@@ -1133,20 +1142,20 @@ namespace PushServer.Commands
                                 cib_dt.Merge(dt);
                             }
                         }
-                        else
-                        {
-                            if (dt != null&&dt.Rows.Count>0)
-                            {
-                                string filename = Path.Combine(clientConfig.ExcelOrderFolder, "logistics", $"ERP-{item.Key}回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
-                                NPOIExcel.Export(dt, filename);
-                                OnUIMessageEventHandle($"ERP-{item.Key}回传订单生成成功。文件名:{filename}");
+                        //else
+                        //{
+                        //    if (dt != null&&dt.Rows.Count>0)//生成物流导出单
+                        //    {
+                        //        string filename = Path.Combine(clientConfig.ExcelOrderFolder, "logistics", $"ERP-{item.Key}回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
+                        //        NPOIExcel.Export(dt, filename);
+                        //        OnUIMessageEventHandle($"ERP-{item.Key}回传订单生成成功。文件名:{filename}");
                                
-                            }
-                        }
+                        //    }
+                        //}
                         taskcount--;
                     });
                 }
-                else
+                else //
                 {
                     if(item.Key== OrderSource.CIBEVT||item.Key==OrderSource.CIBSTM)
                     {
@@ -1160,21 +1169,26 @@ namespace PushServer.Commands
                                 cib_dt.Merge(dt);
                             }
                            
-                            taskcount--;
+                            
                         });
                     }
+                    taskcount--;
                 }
             }
-            while (taskcount > 0)
+            while (taskcount > 0)//还有未完成的任务
             {
                 System.Threading.Thread.Sleep(1000);
             }
-            if (cib_dt.Rows.Count > 0)
+            if (cib_dt.Rows.Count > 0)//生成兴业银行物流导出单
             {
                 string filename = Path.Combine(clientConfig.ExcelOrderFolder, "logistics", $"ERP-兴业银行积分回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
                 NPOIExcel.Export(cib_dt, filename);
                 OnUIMessageEventHandle($"ERP-兴业银行积分回传订单生成成功。文件名:{filename}");
                
+            }
+            else
+            {
+                OnUIMessageEventHandle($"ERP-兴业银行积分回传订单生成失败，订单数量为0。");
             }
         }
         protected void CreateExceptionExcel(List<OMS.Models.ExceptionOrder> lst)
