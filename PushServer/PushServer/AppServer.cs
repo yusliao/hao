@@ -188,61 +188,6 @@ namespace PushServer
 
             return Instance.ERP.ImportErpToOMS();
         }
-        public  void ExportLogisticsInfo(List<OrderEntity> lst,string filepath)
-        {
-            var glst = lst.GroupBy(o => o.Source).ToList();
-            DataTable cib_dt = new DataTable();
-            cib_dt.Columns.Add("订单号");
-            cib_dt.Columns.Add("物流编号");
-            cib_dt.Columns.Add("物流单号");
-            int taskcount = glst.Count;
-            foreach (var item in glst)
-            {
-                var option = AppServer.Instance.OrderOptSet.FirstOrDefault(i => i.clientConfig.Name == item.Key);
-                if (option != null)
-                {
-                    System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                    {
-                        var dt = option.ExportExcel(item.ToList());
-                        if (option.clientConfig.Name == OrderSource.CIB || option.clientConfig.Name == OrderSource.CIBAPP)
-                        {
-                            if (dt != null)
-                            {
-                                cib_dt.Merge(dt);
-                            }
-                        }
-                        else
-                        {
-                            if (dt != null)
-                            {
-                                string filename = Path.Combine(filepath, $"ERP-{item.Key}回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
-                                NPOIExcel.Export(dt, filename);
-                                if (Environment.UserInteractive)
-                                {
-                                    Console.WriteLine($"ERP-{item.Key}回传订单生成成功。文件名:{filename}");
-                                }
-                            }
-                        }
-                        taskcount--;
-                    });
-                }
-            }
-            while (taskcount > 0)
-            {
-                System.Threading.Thread.Sleep(1000);
-            }
-            if (cib_dt.Rows.Count > 0)
-            {
-                string filename = Path.Combine(filepath, $"ERP-兴业银行积分回传订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
-                NPOIExcel.Export(cib_dt, filename);
-                if (Environment.UserInteractive)
-                {
-                    Console.WriteLine($"ERP-兴业银行积分回传订单生成成功。文件名:{filename}");
-                }
-            }
-
-            
-        }
 
         /// <summary>
         /// 日，周，月同时发，用于CMD模式
