@@ -26,7 +26,13 @@ namespace PushServer.Configuration
                 {
                     folder = $@"D:/LJNY/Gaoxing/{Name}";
                 }
-                System.IO.Directory.CreateDirectory(folder);
+                string[] dirs = folder.Split(',');
+                foreach (var item in dirs)
+                {
+                    if(!string.IsNullOrEmpty(item)&&!System.IO.Directory.Exists(item))
+                        System.IO.Directory.CreateDirectory(item);
+                }
+               
                 return folder;
             }
         }
