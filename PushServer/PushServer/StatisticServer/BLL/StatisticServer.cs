@@ -80,7 +80,7 @@ namespace PushServer.Service
             //}
             #endregion
             #region 动态方式加载
-
+            //加载所有渠道
             foreach (var item in AppServer.Instance.ConfigDictionary.Values)
             {
                 ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
@@ -94,7 +94,7 @@ namespace PushServer.Service
 
             }
             #endregion
-
+            
 
         }
         public  void CreateWeekReport(int weeknum,int year)
