@@ -34,13 +34,14 @@ namespace Util.Files
             // list the files
             try
             {
+                
                 foreach (FileInfo f in dir.GetFiles(searchPattern))
                 {
                     //Console.WriteLine("File {0}", f.FullName);
                     _scannedFiles.Add(f);
                 }
             }
-            catch
+            catch(Exception ex)
             {
                 Console.WriteLine("Directory {0}  \n could not be accessed!!!!", dir.FullName);
                 return;  // We alredy got an error trying to access dir so dont try to access it again
@@ -56,7 +57,35 @@ namespace Util.Files
             }
 
         }
-        
+        public void ScanAllExcelFiles(DirectoryInfo dir)
+        {
+
+            // list the files
+            try
+            {
+                foreach (FileInfo f in dir.GetFiles().Where(f=>f.Extension.EndsWith(".xlsx")||f.Extension.EndsWith(".xls")))
+                {
+                    //Console.WriteLine("File {0}", f.FullName);
+                    _scannedFiles.Add(f);
+                }
+            }
+            catch
+            {
+                Console.WriteLine("Directory {0}  \n could not be accessed!!!!", dir.FullName);
+                return;  // We alredy got an error trying to access dir so dont try to access it again
+            }
+            foreach (DirectoryInfo d in dir.GetDirectories())
+            {
+                _scannedFolders.Add(d);
+                ScanAllExcelFiles(d);
+            }
+
+
+
+
+        }
+
+
 
 
     }
