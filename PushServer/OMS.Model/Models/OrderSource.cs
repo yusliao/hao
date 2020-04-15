@@ -46,6 +46,10 @@ namespace OMS.Models
         public const string CMPMC = "CMPMC";
         [Description("电商-京东水清清食品旗舰店")]
         public const string JINGDONG = "JINGDONG";
+        [Description("银行-金文科技代发")]
+        public const string BANK_JINWEN = "BANK_JINWEN";
+        [Description("银行-金文（工行代发）")]
+        public const string ICBC_JINWEN = "ICBC_JINWEN";
         [Description("水清清官方优品农铺")]
         public const string TAOBAO = "TAOBAO";
         [Description("电商-天猫商城旗舰店")]
