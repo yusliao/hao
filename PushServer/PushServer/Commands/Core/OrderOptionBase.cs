@@ -86,6 +86,8 @@ namespace PushServer.Commands
                     break;
                 case OrderSource.CMBC:
                 case OrderSource.CIBVIP:
+                case OrderSource.ICBC_JINWEN:
+                case OrderSource.BANK_JINWEN:
                 case OrderSource.ICIB:
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null  && p.ProductCode != null);
                     if (pd == null)
@@ -200,7 +202,8 @@ namespace PushServer.Commands
                     }
                     break;
                 case OrderSource.CMBC:
-                
+                case OrderSource.ICBC_JINWEN:
+                case OrderSource.BANK_JINWEN:
                 case OrderSource.CIBVIP: //根据商品名称查找对应关系
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null && p.ProductCode != null);
                     if (pd == null)
@@ -292,6 +295,11 @@ namespace PushServer.Commands
             
            
         }
+        /// <summary>
+        /// 检查订单是否已经存在于数据库中，如果存在了就更新商品信息。
+        /// </summary>
+        /// <param name="orderDTO"></param>
+        /// <returns></returns>
         protected virtual bool CheckOrderInDataBase(OrderDTO orderDTO)
         {
             /*检查订单是否已经存在在数据库中
@@ -458,7 +466,8 @@ namespace PushServer.Commands
                         }
                         // fileInfo.MoveTo($"{fileInfo.FullName}.bak");
                     });
-                    FileScanner.ScannedFiles.Clear();
+                FileScanner.ScannedFiles.Clear();
+                FileScanner.ScannedFolders?.Clear();
                
                 if(OnPostCompletedEventHandle!=null)
                 {

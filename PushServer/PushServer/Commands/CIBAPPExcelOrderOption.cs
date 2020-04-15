@@ -146,7 +146,7 @@ namespace PushServer.Commands
                 if (item == null)
                 {
                     orderDTO.count = Convert.ToInt32(row[4]); //数量
-                    var productProps = Convert.ToString(row[5]); //商品属性
+                   // var productProps = Convert.ToString(row[5]); //商品属性
 
 
                     orderDTO.consigneeName = Convert.ToString(row[6]); //收件人
