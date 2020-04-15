@@ -324,10 +324,11 @@ namespace PushServer
             try
             {
                 fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                if (fileName.IndexOf(".xlsx") > 0) // 2007版本
-                    workbook = new XSSFWorkbook(fs);
-                else if (fileName.IndexOf(".xls") > 0) // 2003版本
-                    workbook = new HSSFWorkbook(fs);
+                workbook = WorkbookFactory.Create(fs); 
+                //if (fileName.IndexOf(".xlsx") > 0) // 2007版本
+                //    workbook = new XSSFWorkbook(fs);
+                //else if (fileName.IndexOf(".xls") > 0) // 2003版本
+                //    workbook = new HSSFWorkbook(fs);
 
                 if (sheetName != null)
                 {
@@ -357,11 +358,18 @@ namespace PushServer
 
                             if (cell != null)
                             {
-                                string cellValue = cell.StringCellValue;
-                                if (cellValue != null)
+                                if (cell.CellType == CellType.String)
                                 {
-                                    DataColumn column = new DataColumn(cellValue);
-                                    data.Columns.Add(column);
+                                    string cellValue = cell.StringCellValue;
+                                    if (cellValue != null)
+                                    {
+                                        DataColumn column = new DataColumn(cellValue);
+                                        data.Columns.Add(column);
+                                    }
+                                }
+                                else
+                                {
+                                    data.Columns.Add(new DataColumn(Guid.NewGuid().ToString()));
                                 }
                             }
                         }
@@ -394,7 +402,7 @@ namespace PushServer
             catch (Exception ex)
             {
                 Util.Logs.Log.GetLog(nameof(NPOIExcel)).Error($"method:{ex.TargetSite.Name},msg:{ex.Message},stack:{ex.StackTrace}");
-                return null;
+                return data;
             }
         }
 
