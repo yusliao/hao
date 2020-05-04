@@ -24,7 +24,10 @@ namespace PushServer.Configuration
                 var folder = this["ExcelOrderFolder"] as string;
                 if(string.IsNullOrEmpty(folder))
                 {
-                    folder = $@"D:/LJNY/Gaoxing/{Name}";
+                    var path = System.Configuration.ConfigurationManager.AppSettings["BasePath"];
+                    if (!System.IO.Directory.Exists(path))
+                        System.IO.Directory.CreateDirectory(path);
+                    folder = $"{path}/Gaoxing/{Name}";
                 }
                 string[] dirs = folder.Split(',');
                 foreach (var item in dirs)
