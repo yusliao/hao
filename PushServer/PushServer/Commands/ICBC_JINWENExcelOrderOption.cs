@@ -124,7 +124,16 @@ namespace PushServer.Commands
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                    try
+                    {
+                        orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.count = Convert.ToInt32(row["通知数量"]); //数量
+
+                    }
+                    
                    
 
 
@@ -186,7 +195,15 @@ namespace PushServer.Commands
                     orderDTO.consigneeName = Convert.ToString(row["收货人"]); //收件人
                     orderDTO.consigneePhone = Convert.ToString(row["手机"]); //联系电话
 
-                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                    try
+                    {
+                        orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.count = Convert.ToInt32(row["通知数量"]); //数量
+
+                    }
 
                     using (var db = new OMSContext())
                     {
