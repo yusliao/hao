@@ -88,6 +88,8 @@ namespace PushServer.Commands
                 case OrderSource.CIBVIP:
                 case OrderSource.ICBC_JINWEN:
                 case OrderSource.BANK_JINWEN:
+                case OrderSource.XUNXIAO:
+                case OrderSource.JINGDONG:
                 case OrderSource.ICIB:
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null  && p.ProductCode != null);
                     if (pd == null)
@@ -204,6 +206,8 @@ namespace PushServer.Commands
                 case OrderSource.CMBC:
                 case OrderSource.ICBC_JINWEN:
                 case OrderSource.BANK_JINWEN:
+                case OrderSource.XUNXIAO:
+                case OrderSource.JINGDONG:
                 case OrderSource.CIBVIP: //根据商品名称查找对应关系
                     pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null && p.ProductCode != null);
                     if (pd == null)
@@ -457,7 +461,7 @@ namespace PushServer.Commands
                         try
                         {
                             var temp = Path.GetExtension(f.Name);
-                            File.Move(f.FullName, Path.ChangeExtension(f.FullName, $"{temp}.bak"));
+                            File.Move(f.FullName, Path.ChangeExtension($"{f.FullName}_{DateTime.Now}", $"{temp}.bak"));
                         }
                         catch (Exception ex)
                         {
