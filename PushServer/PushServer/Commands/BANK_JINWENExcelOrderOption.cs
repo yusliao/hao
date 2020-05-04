@@ -305,9 +305,9 @@ namespace PushServer.Commands
             {
                 var row = excelTable.Rows[i];
 
-                var orderDateStr = Convert.ToString(row["支付时间"]); //订单创建时间 2020-04-08 23:18:19
-                orderDTO.createdDate = DateTime.Parse(orderDateStr);
-
+                //var orderDateStr = Convert.ToString(row["支付时间"]); //订单创建时间 2020-04-08 23:18:19
+                //orderDTO.createdDate = DateTime.Parse(orderDateStr);
+                orderDTO.createdDate = file.FileDate;
 
                 orderDTO.source = this.Name;
                 orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(this.Name);
@@ -319,8 +319,16 @@ namespace PushServer.Commands
                     continue;
                 }
 
-
-                orderDTO.productName = Convert.ToString(row["产品名称"]); //商品名称
+                try
+                {
+                    orderDTO.productName = Convert.ToString(row["产品名称"]); //商品名称
+                }
+                catch (Exception)
+                {
+                    orderDTO.productName = Convert.ToString(row["商品名称"]); //商品名称
+                   
+                }
+               
                                                                       // orderDTO.productsku = Convert.ToString(row[2]); //商品编号
 
 
@@ -331,20 +339,57 @@ namespace PushServer.Commands
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    orderDTO.count = Convert.ToInt32(row["产品数量"]); //数量
 
+                    try
+                    {
+                        orderDTO.count = Convert.ToInt32(row["产品数量"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.count = Convert.ToInt32(row["数量"]); //商品名称
 
+                    }
 
-                    orderDTO.consigneeName = Convert.ToString(row["收货人姓名"]); //收件人
-                    orderDTO.consigneePhone = Convert.ToString(row["收货人电话1"]); //联系电话
+                    //  orderDTO.count = Convert.ToInt32(row["产品数量"]); //数量
+
+                    try
+                    {
+                        orderDTO.consigneeName = Convert.ToString(row["收货人姓名"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.consigneeName = Convert.ToString(row["收货人"]); //商品名称
+
+                    }
+
+                   // orderDTO.consigneeName = Convert.ToString(row["收货人姓名"]); //收件人
+                    try
+                    {
+                        orderDTO.consigneePhone = Convert.ToString(row["收货人电话1"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.consigneePhone = Convert.ToString(row["手机"]); //商品名称
+
+                    }
+                   // orderDTO.consigneePhone = Convert.ToString(row["收货人电话1"]); //联系电话
                     orderDTO.consigneePhone2 = string.Empty;
 
 
                     orderDTO.consigneeProvince = string.Empty;
                     orderDTO.consigneeCity = string.Empty;
                     orderDTO.consigneeCounty = string.Empty;
-                    orderDTO.consigneeAddress = Convert.ToString(row["收货地址"]); //收货地区+详细地址
-                                                                                // orderDTO.consigneeZipCode = Convert.ToString(row[9]); //邮编
+                    try
+                    {
+                        orderDTO.consigneeAddress = Convert.ToString(row["收货地址"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.consigneeAddress = Convert.ToString(row["地址"]); //商品名称
+
+                    }
+                    // orderDTO.consigneeAddress = Convert.ToString(row["收货地址"]); //收货地区+详细地址
+                    // orderDTO.consigneeZipCode = Convert.ToString(row[9]); //邮编
 
                     //
                     if (string.IsNullOrEmpty(orderDTO.consigneeProvince)
@@ -390,10 +435,36 @@ namespace PushServer.Commands
                 }
                 else
                 {
-                    orderDTO.consigneeName = Convert.ToString(row["收货人姓名"]); //收件人
-                    orderDTO.consigneePhone = Convert.ToString(row["收货人电话1"]); //联系电话
+                    try
+                    {
+                        orderDTO.consigneeName = Convert.ToString(row["收货人姓名"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.consigneeName = Convert.ToString(row["收货人"]); //商品名称
 
-                    orderDTO.count = Convert.ToInt32(row["产品数量"]); //数量
+                    }
+
+                    // orderDTO.consigneeName = Convert.ToString(row["收货人姓名"]); //收件人
+                    try
+                    {
+                        orderDTO.consigneePhone = Convert.ToString(row["收货人电话1"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.consigneePhone = Convert.ToString(row["手机"]); //商品名称
+
+                    }
+
+                    try
+                    {
+                        orderDTO.count = Convert.ToInt32(row["产品数量"]); //商品名称
+                    }
+                    catch (Exception)
+                    {
+                        orderDTO.count = Convert.ToInt32(row["数量"]); //商品名称
+
+                    }
 
                     using (var db = new OMSContext())
                     {
