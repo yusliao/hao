@@ -460,8 +460,15 @@ namespace PushServer.Commands
                     {
                         try
                         {
+                            /*
                             var temp = Path.GetExtension(f.Name);
-                            File.Move(f.FullName, Path.ChangeExtension($"{f.FullName}_{DateTime.Now}", $"{temp}.bak"));
+                            File.Move(f.FullName, Path.ChangeExtension($"{f.FullName}", $"{temp}_{DateTime.Now.ToString("yyyyMMdd")}.bak"));
+                            */
+                            string newfilename = $"{f.FullName}.bak";
+                            Util.Files.Paths.IndexPathGenerator indexPathGenerator = new Util.Files.Paths.IndexPathGenerator(new FileInfo(f.FullName).DirectoryName);
+                            newfilename = indexPathGenerator.GetNewFileName(newfilename, 1);
+                            File.Move(f.FullName, newfilename);
+
                         }
                         catch (Exception ex)
                         {

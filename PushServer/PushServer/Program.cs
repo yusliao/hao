@@ -61,9 +61,10 @@ namespace PushServer
             Console.WriteLine("-[p]: 推送报表;");
            // Console.WriteLine("-[p1]: 推送盘点报表;后跟具体的月份值  exp: p1 6");
             Console.WriteLine("-[c]: 生成报表; exp: c ");
-            Console.WriteLine("-[c2]: 生成回传订单; exp: c2 ");
+            Console.WriteLine("-[c2]: 生成回传银行订单; exp: c2 ");
             Console.WriteLine("-[c3]: 生成历史报表; exp: c3 1 ");
-           // Console.WriteLine("-[c1]: 生成盘点报表; 后跟具体的月份值 exp: c1 6");
+            Console.WriteLine("-[c4]: 生成ERP导入单; exp: c4 ");
+            // Console.WriteLine("-[c1]: 生成盘点报表; 后跟具体的月份值 exp: c1 6");
             Console.WriteLine("-[in]: 导入订单");
          
             //Console.WriteLine("-[out]: 导出订单;");
@@ -219,6 +220,16 @@ namespace PushServer
                     
                     var exportExcelResult = ExcelHelper.ExportExcel();
                     if (exportExcelResult)
+                        Console.WriteLine("生成回传订单成功！");
+                    else
+                    {
+                        Console.WriteLine("生成回传订单失败");
+                    }
+                    return true;
+                case ("c4")://生成ERP导入单
+
+                    var ier = ExcelHelper.CreateImportERPExcel();
+                    if (ier)
                         Console.WriteLine("生成回传订单成功！");
                     else
                     {

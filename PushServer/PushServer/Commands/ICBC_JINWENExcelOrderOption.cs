@@ -113,7 +113,7 @@ namespace PushServer.Commands
                 }
 
 
-                orderDTO.productName = Convert.ToString(row["商品名称"]); //商品名称
+                orderDTO.productName = Convert.ToString(row[2]); //商品名称
                // orderDTO.productsku = Convert.ToString(row[2]); //商品编号
 
 

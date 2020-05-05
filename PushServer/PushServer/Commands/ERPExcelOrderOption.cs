@@ -60,7 +60,33 @@ namespace PushServer.Commands
             else
                 return false;
         }
-       
+        /// <summary>
+        /// 订单从OMS 导入ERP
+        /// </summary>
+        /// <returns></returns>
+        public bool ImportOMSToERP()
+        {
+            var lst = FetchOrdersFromDB();
+            if (lst != null && lst.Any())
+            {
+                var glst = lst.GroupBy(o => o.Source);
+                OnUIMessageEventHandle($"正在生成ERP导入单,订单数量：{lst.Count}");
+                foreach (var item in glst)
+                {
+                    var temp = item.ToList();
+                    OnUIMessageEventHandle($"正在生成{item.Key}-ERP导入单,订单数量：{temp.Count}");
+                    OnPostCompleted(true, temp, OptionType.ErpExcel);
+                    OnExceptionMessageEventHandle(exceptionOrders);
+                }
+               
+
+               
+                return true;
+            }
+            else
+                return false;
+        }
+
 
         protected override List<OrderEntity> FetchOrders()
         {
@@ -74,6 +100,20 @@ namespace PushServer.Commands
                 {
                     ResolveOrders(csv, file.FullName, ref ordersList);
                 }
+            }
+            return ordersList;
+        }
+        protected  List<OrderEntity> FetchOrdersFromDB()
+        {
+            var ordersList = new List<OrderEntity>();
+
+            using (OMSContext db = new OMSContext())
+            {
+                DateTime start = DateTime.Now.AddDays(-7);
+                DateTime end = DateTime.Now;
+
+                ordersList = db.OrderSet.Include(o => o.OrderDateInfo).Include(o => o.OrderRepurchase).Include(o => o.OrderExtendInfo).Include(o => o.Consignee).Include(o=>o.ConsigneeAddress).Include(o=>o.Products).Where(o => o.OrderType ==0 && o.OrderDateInfo.CreateTime >= start && o.OrderDateInfo.CreateTime <= end && o.CreatedDate.Year == DateTime.Now.Year).ToList();
+                
             }
             return ordersList;
         }

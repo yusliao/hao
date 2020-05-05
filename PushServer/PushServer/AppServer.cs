@@ -188,6 +188,11 @@ namespace PushServer
 
             return Instance.ERP.ImportErpToOMS();
         }
+        public static bool ImportOMSToERP()
+        {
+
+            return Instance.ERP.ImportOMSToERP();
+        }
 
         /// <summary>
         /// 日，周，月同时发，用于CMD模式

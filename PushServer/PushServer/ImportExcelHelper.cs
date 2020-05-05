@@ -36,7 +36,16 @@ namespace PushServer
         {
              return AppServer.ImportErpToOMS();
         }
-       
+        /// <summary>
+        /// 生成ERP导入单
+        /// </summary>
+        /// <param name="isInput"></param>
+        /// <returns></returns>
+        public static bool CreateImportERPExcel(bool isInput = true)
+        {
+            return AppServer.ImportOMSToERP();
+        }
+
 
     }
 }
