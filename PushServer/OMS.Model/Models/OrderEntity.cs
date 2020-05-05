@@ -79,7 +79,7 @@ namespace OMS.Models
         /// </summary>
         public int OrderComeFrom { get; set; }
         /// <summary>
-        /// 订单类型0：销售订单，1:退换货订单,2:退货/退钱
+        /// 订单类型0：销售订单，1:退换货订单,2:退货/退钱,4:周期购订单
         /// </summary>
         public int OrderType { get; set; }
         /// <summary>

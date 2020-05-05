@@ -32,6 +32,10 @@ namespace OMS.Models
         public const string CIBVIP = "CIBVIP";
         [Description("银行-重庆兴业银行黑白金客户")]
         public const string CIBVIP_CQ = "CIBVIP_CQ";
+        [Description("银行-重庆白金客户")]
+        public const string CIBW_CQ = "CIBW_CQ";
+        [Description("银行-重庆黑金客户")]
+        public const string CIBB_CQ = "CIBB_CQ";
         [Description("客情-周期配送")]
         public const string FRIEND = "FRIEND";
         [Description("客情-非周期配送")]
