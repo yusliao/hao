@@ -11,8 +11,17 @@ namespace OMS.Models.DTO
     {
         public string productName { get; set; }
         public string productsku { get; set; }
+        /// <summary>
+        /// 单价
+        /// </summary>
         public Decimal pricePerUnit { get; set; }
+        /// <summary>
+        /// 让利金额
+        /// </summary>
         public Decimal discountFee { get; set; }
+        /// <summary>
+        /// 实付金额
+        /// </summary>
         public Decimal totalAmount { get; set; }
         public string fileName { get; set; }
         public string sourceSN { get; set; }

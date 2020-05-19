@@ -17,6 +17,11 @@ namespace OMS.Models
 
         public ExceptionType ErrorCode { get; set; }
         public DateTime CreateTime { get; set; }
+        /// <summary>
+        /// 记录状态 0：未处理，1：已处理
+        /// </summary>
+        public int RecordState { get; set; }
+        public DateTime UpdateTime { get; set; } = DateTime.Now;
 
     }
     public enum ExceptionType

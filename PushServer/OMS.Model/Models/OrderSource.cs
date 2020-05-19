@@ -54,6 +54,8 @@ namespace OMS.Models
         public const string BANK_JINWEN = "BANK_JINWEN";
         [Description("银行-金文（工行代发）")]
         public const string ICBC_JINWEN = "ICBC_JINWEN";
+        [Description("电商-金文网络")]
+        public const string JINWEN = "JINWEN";
         [Description("水清清官方优品农铺")]
         public const string TAOBAO = "TAOBAO";
         [Description("电商-天猫商城旗舰店")]
