@@ -32,7 +32,7 @@ namespace PushServer
         /// </summary>
         public readonly Dictionary<string, Configuration.IClientConfig> ConfigDictionary = new Dictionary<string, Configuration.IClientConfig>();
 
-        internal static bool CreateYearReport(int year)
+        public static bool CreateYearReport(int year)
         {
             return StatisticServer.Instance.CreateYearReport(year);
         }
@@ -138,7 +138,14 @@ namespace PushServer
             //将部件（part）和宿主程序添加到组合容器
             container.ComposeParts(this);
         }
-        public  static bool ImportToOMS()
+        #region OrderOption
+
+      
+        /// <summary>
+        /// EXCEL订单导入OMS系统
+        /// </summary>
+        /// <returns></returns>
+        public static bool ImportToOMS()
         {
             var lst = AppServer.Instance.OrderOptSet.ToList();
             foreach (var item in lst)
@@ -182,24 +189,35 @@ namespace PushServer
             }
             return true;
         }
-       
+       /// <summary>
+       /// ERP订单导入OMS
+       /// </summary>
+       /// <returns></returns>
         public static bool ImportErpToOMS()
         {
 
             return Instance.ERP.ImportErpToOMS();
         }
+        /// <summary>
+        /// OMS订单导入ERP系统（生成最近一周的ERP导入单）
+        /// </summary>
+        /// <returns></returns>
         public static bool ImportOMSToERP()
         {
 
             return Instance.ERP.ImportOMSToERP();
         }
+        
+        #endregion
+        #region ReportOption
+
 
         /// <summary>
         /// 日，周，月同时发，用于CMD模式
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
-        public  static bool PushReport(DateTime dateTime,int reportType)
+        public static bool PushReport(DateTime dateTime,int reportType)
         {
             var serverNames = Instance.ConfigDictionary.Values.Where(i => i.Enabled == true).Select(i=>i.Name).ToArray();
             return StatisticServer.Instance.PushReport(serverNames, dateTime,Util.Helpers.Enum.Parse<StatisticType>(reportType));
@@ -223,19 +241,19 @@ namespace PushServer
             return StatisticServer.Instance.PushMonthlyReport(serverNames, dateTime);
 
         }
-        /// <summary>
-        /// 发布盘点报告
-        /// </summary>
-        /// <param name="monthNum">月份</param>
-        /// <param name="ordersource">订单来源</param>
-        /// <returns></returns>
-        public  bool PushPandianReport(int monthNum)
-        {
-            return StatisticServer.Instance.PushPandianReport(monthNum, Instance.ERP.clientConfig.ExcelOrderFolder);
-         
-           
-            
-        }
+        ///// <summary>
+        ///// 发布盘点报告
+        ///// </summary>
+        ///// <param name="monthNum">月份</param>
+        ///// <param name="ordersource">订单来源</param>
+        ///// <returns></returns>
+        //public bool PushPandianReport(int monthNum)
+        //{
+        //    return StatisticServer.Instance.PushPandianReport(monthNum, Instance.ERP.clientConfig.ExcelOrderFolder);
+
+
+
+        //}
         public static bool CreateReport(DateTime dateTime)
         {
             return StatisticServer.Instance.CreateReport(dateTime);
@@ -245,12 +263,12 @@ namespace PushServer
         {
             return StatisticServer.Instance.CreateHistoryReport(month, year);
         }
-        public static bool CreatePandianReport(int monthNum)
-        {
-           return StatisticServer.Instance.CreatePandianReport(monthNum);
+        //public static bool CreatePandianReport(int monthNum)
+        //{
+        //   return StatisticServer.Instance.CreatePandianReport(monthNum);
             
-        }
-
+        //}
+        #endregion
 
     }
 }

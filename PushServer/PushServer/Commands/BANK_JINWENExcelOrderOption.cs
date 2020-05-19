@@ -321,11 +321,11 @@ namespace PushServer.Commands
 
                 try
                 {
-                    orderDTO.productName = Convert.ToString(row["产品名称"]); //商品名称
+                    orderDTO.productName = Convert.ToString(row[2]); //商品名称
                 }
                 catch (Exception)
                 {
-                    orderDTO.productName = Convert.ToString(row["商品名称"]); //商品名称
+                    orderDTO.productName = Convert.ToString(row[2]); //商品名称
                    
                 }
                
@@ -342,7 +342,7 @@ namespace PushServer.Commands
 
                     try
                     {
-                        orderDTO.count = Convert.ToInt32(row["产品数量"]); //商品名称
+                        orderDTO.count = Convert.ToInt32(row[3]); //商品名称
                     }
                     catch (Exception)
                     {
@@ -458,7 +458,7 @@ namespace PushServer.Commands
 
                     try
                     {
-                        orderDTO.count = Convert.ToInt32(row["产品数量"]); //商品名称
+                        orderDTO.count = Convert.ToInt32(row[3]); //商品名称
                     }
                     catch (Exception)
                     {

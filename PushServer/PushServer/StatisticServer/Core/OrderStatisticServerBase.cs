@@ -16,6 +16,7 @@ namespace PushServer.Service
     public abstract class OrderStatisticServerBase : IOrderStatisticServer
     {
         public  abstract string ServerName { get; }
+        public abstract string ServerDesc { get; }
         public static event Action<string> UIMessageEventHandle;
         protected virtual void OnUIMessageEventHandle(string msg)
         {
@@ -35,6 +36,7 @@ namespace PushServer.Service
                     
                     switch (statisticType)
                     {
+                        //过滤订单，过滤掉退换货订单（1）和周期购订单（4）
                         case StatisticType.Day:
                             DateTime start = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
                             DateTime end = start.AddDays(1);
@@ -396,10 +398,13 @@ namespace PushServer.Service
 
 
         public override string ServerName => Name;
-        private String Name { get; set; }
-        public OrderStatisticServerCommon(string name)
+        public override string ServerDesc => Desc;
+        private String Name;
+        private string Desc;
+        public OrderStatisticServerCommon(string name, string desc)
         {
             Name = name;
+            Desc = desc;
         }
 
     }

@@ -16,16 +16,16 @@ namespace PushServer.Service
 {
     public class StatisticServer
     {
-        [ImportMany(typeof(IProductStatisticServer))]
-        private IEnumerable<IProductStatisticServer> ProductStatisticServerOptSet { get; set; }
-        [ImportMany(typeof(IDistrictStatisticServer))]
-        private IEnumerable<IDistrictStatisticServer> DistrictStatisticServerOptSet { get; set; }
-        [ImportMany(typeof(IOrderStatisticServer))]
-        private IEnumerable<IOrderStatisticServer> OrderStatisticServerOptSet { get; set; }
-        [ImportMany(typeof(ICustomerStatisticServer))]
-        private IEnumerable<ICustomerStatisticServer> CustomerStatisticServerOptSet { get; set; }
-        [ImportMany(typeof(IPandianServer))]
-        private IEnumerable<IPandianServer> PandianStatisticServerOptSet { get; set; }
+        //[ImportMany(typeof(IProductStatisticServer))]
+        //private IEnumerable<IProductStatisticServer> ProductStatisticServerOptSet { get; set; }
+        //[ImportMany(typeof(IDistrictStatisticServer))]
+        //private IEnumerable<IDistrictStatisticServer> DistrictStatisticServerOptSet { get; set; }
+        //[ImportMany(typeof(IOrderStatisticServer))]
+        //private IEnumerable<IOrderStatisticServer> OrderStatisticServerOptSet { get; set; }
+        //[ImportMany(typeof(ICustomerStatisticServer))]
+        //private IEnumerable<ICustomerStatisticServer> CustomerStatisticServerOptSet { get; set; }
+        //[ImportMany(typeof(IPandianServer))]
+        //private IEnumerable<IPandianServer> PandianStatisticServerOptSet { get; set; }
         private static readonly StatisticServer statisticServer = new StatisticServer();
         public static StatisticServer Instance { get { return statisticServer; } }
         public  event Action<string> ShowMessageEventHandle;
@@ -83,13 +83,13 @@ namespace PushServer.Service
             //加载所有渠道
             foreach (var item in AppServer.Instance.ConfigDictionary.Values)
             {
-                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name,item.Tag);
                 pcomm.CreateDailyReport(dateTime);
-                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
                 ocomm.CreateDailyReport(dateTime);
-                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name, item.Tag);
                 dcomm.CreateDistrictDailyReport(dateTime);
-                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name, item.Tag);
                 ccomm.CreateDailyReport(dateTime);
 
             }
@@ -116,13 +116,13 @@ namespace PushServer.Service
 
             foreach (var item in AppServer.Instance.ConfigDictionary.Values)
             {
-                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name, item.Tag);
                 pcomm.CreateWeekReport(weeknum, year);
-                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
                 ocomm.CreateWeekReport(weeknum, year);
-                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name, item.Tag);
                 dcomm.CreateDistrictWeekReport(weeknum, year);
-                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name, item.Tag);
                 ccomm.CreateWeekReport(weeknum, year);
 
             }
@@ -140,13 +140,13 @@ namespace PushServer.Service
             {
                 foreach (var item in AppServer.Instance.ConfigDictionary.Values)
                 {
-                    ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                    ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name, item.Tag);
                     pcomm.CreateYearReport(year);
-                    OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                    OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
                     ocomm.CreateYearReport(year);
-                    DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                    DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name, item.Tag);
                     dcomm.CreateDistrictYearReport(year);
-                    CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                    CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name, item.Tag);
                     ccomm.CreateYearReport(year);
                 }
                 Util.Logs.Log.GetLog(nameof(StatisticServer)).Info($"{year}创建年报表任务已提交");
@@ -190,13 +190,13 @@ namespace PushServer.Service
 
             foreach (var item in AppServer.Instance.ConfigDictionary.Values)
             {
-                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name);
+                ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name, item.Tag);
                 pcomm.CreateMonthReport(monthnum, year);
-                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
                 ocomm.CreateMonthReport(monthnum, year);
-                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name);
+                DistrictStatisticServerCommon dcomm = new DistrictStatisticServerCommon(item.Name, item.Tag);
                 dcomm.CreateDistrictMonthReport(monthnum, year);
-                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name);
+                CustomerStatisticServerCommon ccomm = new CustomerStatisticServerCommon(item.Name, item.Tag);
                 ccomm.CreateMonthReport(monthnum, year);
 
             }
@@ -283,52 +283,52 @@ namespace PushServer.Service
         }
        
 
-        public  bool PushPandianReport(int monthNum,string pandianFolder)
-        {
-            var lst = Instance.PandianStatisticServerOptSet.ToList();
-            foreach (var item in lst)
-            {
+        //public  bool PushPandianReport(int monthNum,string pandianFolder)
+        //{
+        //    var lst = Instance.PandianStatisticServerOptSet.ToList();
+        //    foreach (var item in lst)
+        //    {
 
-                System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                {
-                    var dt = item.PushMonthReport(monthNum, DateTime.Now.Year);
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        var filename = System.IO.Path.Combine(pandianFolder, "pandian", $"ERP-{item.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
-                        NPOIExcel.Export(dt, filename);
-                        if (Environment.UserInteractive)
-                        {
-                            Console.WriteLine($"ERP-{item.ServerName}-{monthNum}月份盘点订单生成成功。文件名:{filename}");
-                        }
-                    }
-                });
-            }
-                //按渠道生成对账单
-            var prolst = Instance.ProductStatisticServerOptSet.ToList();
-            foreach (var pro in prolst)
-            {
+        //        System.Threading.ThreadPool.QueueUserWorkItem(o =>
+        //        {
+        //            var dt = item.PushMonthReport(monthNum, DateTime.Now.Year);
+        //            if (dt != null && dt.Rows.Count > 0)
+        //            {
+        //                var filename = System.IO.Path.Combine(pandianFolder, "pandian", $"ERP-{item.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
+        //                NPOIExcel.Export(dt, filename);
+        //                if (Environment.UserInteractive)
+        //                {
+        //                    Console.WriteLine($"ERP-{item.ServerName}-{monthNum}月份盘点订单生成成功。文件名:{filename}");
+        //                }
+        //            }
+        //        });
+        //    }
+        //        //按渠道生成对账单
+        //    var prolst = Instance.ProductStatisticServerOptSet.ToList();
+        //    foreach (var pro in prolst)
+        //    {
 
-                System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                {
-                    var dt = pro.PushMonthReport(monthNum, DateTime.Now.Year);
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        var filename = System.IO.Path.Combine(pandianFolder, "pandian", $"ERP-{pro.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
-                        NPOIExcel.Export(dt, filename);
-                        if (Environment.UserInteractive)
-                        {
-                            Console.WriteLine($"ERP-{pro.ServerName}-{monthNum}月份盘点订单生成成功。文件名:{filename}");
-                        }
-
-
-                    }
-                });
-
-            }
+        //        System.Threading.ThreadPool.QueueUserWorkItem(o =>
+        //        {
+        //            var dt = pro.PushMonthReport(monthNum, DateTime.Now.Year);
+        //            if (dt != null && dt.Rows.Count > 0)
+        //            {
+        //                var filename = System.IO.Path.Combine(pandianFolder, "pandian", $"ERP-{pro.ServerName}-{monthNum}月份盘点订单{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx");
+        //                NPOIExcel.Export(dt, filename);
+        //                if (Environment.UserInteractive)
+        //                {
+        //                    Console.WriteLine($"ERP-{pro.ServerName}-{monthNum}月份盘点订单生成成功。文件名:{filename}");
+        //                }
 
 
-            return true;
-        }
+        //            }
+        //        });
+
+        //    }
+
+
+        //    return true;
+        //}
         /// <summary>
         /// 报表推送
         /// </summary>
@@ -342,12 +342,22 @@ namespace PushServer.Service
              * 如果今天是周一，推送上周的周报表
              * 如果今天是月初，推送上月月报表
              */ 
-            foreach (var item in serverNames)
+
+            //foreach (var item in serverNames)
+            //{
+            //    if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
+            //        continue;
+            //    var dt = dateTime;
+            //    OrderStatisticServerOptSet.FirstOrDefault(i=>i.ServerName==item)?.PushDailyReport(dt);
+
+            //}
+            var lst = AppServer.Instance.ConfigDictionary.Where(p => serverNames.Contains(p.Key)).Select(p=>p.Value);
+            foreach (var item in lst)
             {
-                if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
-                    continue;
-                var dt = dateTime;
-                OrderStatisticServerOptSet.FirstOrDefault(i=>i.ServerName==item)?.PushDailyReport(dt);
+                if (item.Name == OrderSource.CIB)//CIB与CIBAPP合并发送
+                      continue;
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
+                ocomm.PushDailyReport(dateTime);
 
             }
             return true;
@@ -360,13 +370,24 @@ namespace PushServer.Service
              * 如果今天是周一，推送上周的周报表
              * 如果今天是月初，推送上月月报表
              */
-            foreach (var item in serverNames)
+
+            //foreach (var item in serverNames)
+            //{
+            //    if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
+            //        continue;
+            //    var dt = dateTime;
+
+            //    OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
+
+            //}
+
+            var lst = AppServer.Instance.ConfigDictionary.Where(p => serverNames.Contains(p.Key)).Select(p => p.Value);
+            foreach (var item in lst)
             {
-                if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
+                if (item.Name == OrderSource.CIB)//CIB与CIBAPP合并发送
                     continue;
-                var dt = dateTime;
-                   
-                OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushWeekReport(Util.Helpers.Time.GetWeekNum(dt), dt.Year);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
+                ocomm.PushWeekReport(Util.Helpers.Time.GetWeekNum(dateTime), dateTime.Year);
 
             }
             return true;
@@ -379,15 +400,28 @@ namespace PushServer.Service
              * 如果今天是周一，推送上周的周报表
              * 如果今天是月初，推送上月月报表
              */
-            foreach (var item in serverNames)
+
+            //foreach (var item in serverNames)
+            //{
+            //    if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
+            //        continue;
+            //    var dt = dateTime;
+
+            //    OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushMonthReport(dt.Month, dt.Year);
+
+            //}
+
+            var lst = AppServer.Instance.ConfigDictionary.Where(p => serverNames.Contains(p.Key)).Select(p => p.Value);
+            foreach (var item in lst)
             {
-                if (item == OrderSource.CIB)//CIB与CIBAPP合并发送
+                if (item.Name == OrderSource.CIB)//CIB与CIBAPP合并发送
                     continue;
                 var dt = dateTime;
-                    
-                OrderStatisticServerOptSet.FirstOrDefault(i => i.ServerName == item)?.PushMonthReport(dt.Month, dt.Year);
+                OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
+                ocomm.PushMonthReport(dt.Month, dt.Year);
 
             }
+
             return true;
         }
         public bool PushReport(string[] serverNames, DateTime dateTime,StatisticType statisticType)
@@ -414,30 +448,30 @@ namespace PushServer.Service
             return true;
         }
 
-        public  bool CreatePandianReport(int monthNum)
-        {
-            var lst = Instance.PandianStatisticServerOptSet.ToList();
-            foreach (var item in lst)
-            {
-                System.Threading.ThreadPool.QueueUserWorkItem(o =>
-                {
-                    try
-                    {
-                        item.CreateMonthReport(monthNum, DateTime.Now.Year);
-                    }
-                    catch (Exception ex)
-                    {
-                        Util.Logs.Log.GetLog($"生成盘点报表失败，来源:{item.ServerName},message:{ex.Message},StackTrace:{ex.StackTrace}");
+        //public  bool CreatePandianReport(int monthNum)
+        //{
+        //    var lst = Instance.PandianStatisticServerOptSet.ToList();
+        //    foreach (var item in lst)
+        //    {
+        //        System.Threading.ThreadPool.QueueUserWorkItem(o =>
+        //        {
+        //            try
+        //            {
+        //                item.CreateMonthReport(monthNum, DateTime.Now.Year);
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                Util.Logs.Log.GetLog($"生成盘点报表失败，来源:{item.ServerName},message:{ex.Message},StackTrace:{ex.StackTrace}");
 
-                    }
+        //            }
 
-                });
-            }
+        //        });
+        //    }
 
-            return true;
+        //    return true;
 
 
-        }
+        //}
     }
     public enum StatisticType
     {

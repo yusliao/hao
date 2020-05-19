@@ -136,7 +136,7 @@ namespace PushServer.Commands
 
                 orderDTO.productName = Convert.ToString(row[3]); //商品名称
                 orderDTO.productsku = Convert.ToString(row[2]); //商品编号
-              
+                orderDTO.count = Convert.ToInt32(row[4]); //数量
 
 
                 orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
@@ -145,7 +145,7 @@ namespace PushServer.Commands
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    orderDTO.count = Convert.ToInt32(row[4]); //数量
+                    
                    // var productProps = Convert.ToString(row[5]); //商品属性
 
 

@@ -16,6 +16,7 @@ using OMS.Models.DTO;
 using System.ComponentModel;
 namespace PushServer.Commands
 {
+    
     public abstract class OrderOptionBase : IOrderOption
     {
         
@@ -420,6 +421,7 @@ namespace PushServer.Commands
                     }
                     else
                     {
+                        
                         InputProductInfoWithSaveChange(db, orderDTO, foo1);
 
                     }
@@ -588,6 +590,7 @@ namespace PushServer.Commands
                         db.BulkInsert<OrderLogisticsDetail>(lst.SelectMany(o => o.OrderLogistics));
                         stopwatch.Stop();
                         OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单物流表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+
                        
                     }
                     return true;
@@ -596,6 +599,9 @@ namespace PushServer.Commands
                 {
                    
                     Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"BulkInsert插入订单数据出错，订单数量:{lst.Count} ,content:{ex.Message}");
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"StackTrace:{ex.StackTrace}");
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"出错的数据源:{Util.Helpers.Json.ToJson(lst)}");
+                   
                     return false;
                 }
                 finally

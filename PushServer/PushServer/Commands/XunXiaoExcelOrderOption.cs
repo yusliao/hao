@@ -115,8 +115,7 @@ namespace PushServer.Commands
 
                 orderDTO.source = this.Name;
                 orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(this.Name);
-
-               
+                orderDTO.count = Convert.ToInt32(row["数量"]); //数量
 
 
                 orderDTO.productName = Convert.ToString(row["商品名称"]); //商品名称
@@ -130,7 +129,7 @@ namespace PushServer.Commands
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                  
 
 
 

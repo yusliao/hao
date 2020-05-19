@@ -13,7 +13,7 @@ namespace PushServer.Service
     public abstract class ProductStatisticServerBase : IProductStatisticServer
     {
         public abstract string ServerName { get; }
-        
+        public abstract string ServerDesc { get; }
 
         public static event Action<string> UIMessageEventHandle;
         protected virtual void OnUIMessageEventHandle(string msg)
@@ -279,13 +279,16 @@ namespace PushServer.Service
     }
     public class ProductStatisticServerCommon : ProductStatisticServerBase
     {
-       
+
 
         public override string ServerName => Name;
-        private String Name { get; set; }
-        public ProductStatisticServerCommon(string name)
+        public override string ServerDesc => Desc;
+        private String Name;
+        private string Desc;
+        public ProductStatisticServerCommon(string name, string desc)
         {
             Name = name;
+            Desc = desc;
         }
 
     }

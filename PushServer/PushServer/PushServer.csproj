@@ -6,7 +6,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CCC98316-299E-4259-BB91-52DDC65D60E5}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>PushServer</RootNamespace>
     <AssemblyName>PushServer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -148,8 +148,8 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
-    <Reference Include="Z.EntityFramework.Extensions, Version=4.0.68.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Z.EntityFramework.Extensions.4.0.68\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
+    <Reference Include="Z.EntityFramework.Extensions, Version=4.0.71.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Z.EntityFramework.Extensions.4.0.71\lib\net45\Z.EntityFramework.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Z.EntityFramework.Plus.EF6, Version=1.12.4.0, Culture=neutral, PublicKeyToken=59b66d028979105b, processorArchitecture=MSIL">
       <HintPath>..\packages\Z.EntityFramework.Plus.EF6.1.12.4\lib\net45\Z.EntityFramework.Plus.EF6.dll</HintPath>
@@ -174,6 +174,7 @@
     <Compile Include="Commands\FriendExcelOrderOption.cs" />
     <Compile Include="Commands\Core\IOrderOption.cs" />
     <Compile Include="Commands\JDExcelOrderOption.cs" />
+    <Compile Include="Commands\JINWENExcelOrderOption.cs" />
     <Compile Include="Commands\OfflineExcelOrderOption.cs" />
     <Compile Include="Commands\Core\OrderOptionBase.cs" />
     <Compile Include="Commands\RetailExcelOrderOption.cs" />
@@ -185,11 +186,14 @@
     <Compile Include="Configuration\ClientListSection.cs" />
     <Compile Include="ImportExcelHelper.cs" />
     <Compile Include="JobServer\PushJob.cs" />
+    <Compile Include="Migrations\202005070623167_UpdateExceptionOrder.cs" />
+    <Compile Include="Migrations\202005070623167_UpdateExceptionOrder.designer.cs">
+      <DependentUpon>202005070623167_UpdateExceptionOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Migrations\OMSContext.cs" />
     <Compile Include="ModelServer\OrderEntityService.cs" />
     <Compile Include="NPOIExcel.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -197,7 +201,6 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PushReportHelper.cs" />
     <Compile Include="PushServer.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -206,19 +209,6 @@
     </Compile>
     <Compile Include="ReportHelper.cs" />
     <Compile Include="SelfInstaller.cs" />
-    <Compile Include="StatisticServer\BLL\ALLStatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\CIBAPPStatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\CIBCQstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\CIBVIPStatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\CIBPCStatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\CMBstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\FriendstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\JDstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\JINWENstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\RetailstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\TMstatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\XunXiaostatisticServer.cs" />
-    <Compile Include="StatisticServer\BLL\YouZanstatisticServer.cs" />
     <Compile Include="StatisticServer\Core\CustomerStatisticServerBase.cs" />
     <Compile Include="StatisticServer\Core\DistrictStatisticServerBase.cs" />
     <Compile Include="StatisticServer\Core\ICustomerStatisticServer.cs" />
@@ -244,6 +234,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\202005070623167_UpdateExceptionOrder.resx">
+      <DependentUpon>202005070623167_UpdateExceptionOrder.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>

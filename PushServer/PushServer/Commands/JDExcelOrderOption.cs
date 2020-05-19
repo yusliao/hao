@@ -69,7 +69,7 @@ namespace PushServer.Commands
         /// <param name="items">已解析订单集合</param>
         protected void ResolveOrders(CsvReader csv, string file, ref List<OrderEntity> items)
         {
-            System.Collections.Concurrent.ConcurrentDictionary<long, int> orderProductCountDic = new System.Collections.Concurrent.ConcurrentDictionary<long, int>();
+           
             csv.Read();
             csv.ReadHeader();
          
@@ -79,12 +79,6 @@ namespace PushServer.Commands
             csv.Configuration.BadDataFound = context => badRecord.Add(context.RawRecord);
             while (csv.Read())
             {
-                /*处理逻辑：
-                 * 平台单号是否为空
-                 * 销售订单 平台单号是否存在数据库中
-                 * 
-                 */
-
                 using (var db = new OMSContext())
                 {
                     var desc = csv.GetField<string>("店铺名称").Trim();
@@ -109,7 +103,11 @@ namespace PushServer.Commands
                         continue;
                     }
                     string ordertype = csv.GetField<string>("订单类型").Trim();
-
+                  
+                    orderDTO.fileName = file;
+                    orderDTO.source = config.Name;
+                    orderDTO.sourceDesc = desc;
+                    orderDTO.sourceSN = csv.GetField<string>("平台单号").Trim();
 
                     switch (ordertype)
                     {
@@ -132,13 +130,17 @@ namespace PushServer.Commands
                             break;
                     }
 
-                    var order = db.OrderSet.Include(o => o.OrderLogistics.Select(l => l.LogisticsProducts)).Include(o => o.Products).FirstOrDefault(o => o.SourceSn == orderDTO.sourceSN);
+                    var order = db.OrderSet.FirstOrDefault(o => o.SourceSn == orderDTO.sourceSN);
                     
                     if (order==null)//新增订单信息
                     {
                         // Util.Logs.Log.GetLog(nameof(AppServer)).Error($"ERP导出单：{file}。该文件中订单编号：{sn}在OMS系统中不存在");
 
-                        ResolveOrdersFromERPExcel(csv, file, items);
+                        ResolveOrdersFromERPExcel(csv, orderDTO, items);
+
+                    }
+                    else
+                    {
 
                     }
                     OnUIMessageEventHandle($"ERP导出单：{file}。该文件中订单编号：{orderDTO.sourceSN}解析完毕");
@@ -165,25 +167,8 @@ namespace PushServer.Commands
         /// <param name="file"></param>
         /// <param name="items">已解析订单集合</param>
         /// <returns></returns>
-        private OrderEntity ResolveOrdersFromERPExcel(CsvReader csv, string file, List<OrderEntity> items)
+        private OrderEntity ResolveOrdersFromERPExcel(CsvReader csv, OrderDTO orderDTO, List<OrderEntity> items)
         {
-            var desc = csv.GetField<string>("店铺名称").Trim();
-            // var opt = this.OrderOptSet.FirstOrDefault(o => Util.Helpers.Reflection.GetDescription<OrderSource>(o.clientConfig.Name.ToUpper()) == desc);
-            var config = AppServer.Instance.ConfigDictionary.Values.FirstOrDefault(c => c.Tag.Contains(desc));
-            if (config == null)
-            {
-                OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
-
-                return null;
-            }
-            
-            OrderDTO orderDTO = new OrderDTO();
-            orderDTO.fileName = file;
-            orderDTO.source = config.Name;
-            orderDTO.sourceDesc = desc;
-            orderDTO.sourceSN = csv.GetField<string>("平台单号").Trim();
-            if (string.IsNullOrEmpty(orderDTO.sourceSN))
-                return null;
 
             orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, DateTime.Now.ToString("yyyyMMdd"));
             var orderDate = csv.GetField<string>("付款时间");
@@ -199,7 +184,10 @@ namespace PushServer.Commands
             decimal weight = csv.GetField<string>("总重量").ToInt();
             orderDTO.consigneeName = csv.GetField<string>("收货人").Trim();
             orderDTO.consigneePhone = csv.GetField<string>("收货人手机").Trim();
-           
+            //京东天猫订单独有的金额信息
+            orderDTO.pricePerUnit = csv.GetField<decimal>("实际单价");
+            orderDTO.totalAmount = csv.GetField<decimal>("让利后金额");
+            orderDTO.discountFee = csv.GetField<decimal>("让利金额");
            
             orderDTO.consigneeAddress = csv.GetField<string>("收货地址").Trim();
            
@@ -218,29 +206,15 @@ namespace PushServer.Commands
 
 
             string ordertype = csv.GetField<string>("订单类型").Trim();
-            orderDTO.OrderComeFrom = 2;
-            switch (ordertype)
-            {
-                case "销售订单":
-                    orderDTO.orderType = 0;
-                    orderDTO.orderStatus = OrderStatus.Delivered;
-                    break;
-                case "换货订单":
-                case "补发货订单":
-                    orderDTO.orderType = 1;
-                    orderDTO.orderStatus = OrderStatus.Delivered;
-                    break;
-                case "退货退钱订单":
-                    orderDTO.orderType = 2;
-                    orderDTO.orderStatus = OrderStatus.Cancelled;
-                    break;
-                default:
-                    orderDTO.orderType = 0;
-                    break;
-            }
+            orderDTO.OrderComeFrom = 0;
 
-            //这里的订单都是数据库中没有的订单
-            //已解析集合中查找，没找到就新增对象，找到就关联新的商品
+
+            /* 生成订单对象，从items集合中查找是否已经录入该订单对象
+            * 如果items中已经有该订单对象则创建商品子对象及物流商品对象
+            * 如果items中没有该订单对象则创建并关联各个子对象，将订单对象录入items
+            * 重要提示：本方法解析csv对象，并转化为全新的订单对象，需要将订单的所有内容（重点是商品对象）都完整录入OMS系统中
+            * 
+            */
             var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
             if (item == null)//集合中不存在该订单对象
             {
@@ -271,13 +245,6 @@ namespace PushServer.Commands
                         {
                             return null;
                         }
-
-                        OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
-                        orderLogisticsDetail.OrderSn = orderItem.OrderSn;
-
-
-
-
 
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
@@ -351,6 +318,66 @@ namespace PushServer.Commands
             }
             return dt;
             
+        }
+        protected override bool InputProductInfoWithoutSaveChange(OMSContext db, OrderDTO orderDTO, OrderEntity item)
+        {
+
+            if (string.IsNullOrEmpty(orderDTO.productsku))//京东订单的productsku===sku,若值为null ,意味着用户取消了订单，这个订单不计入OMS
+                return false;
+            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == orderDTO.productsku);
+
+
+
+           
+            if (foo == null)
+            {
+                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");
+                InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                return false;
+            }
+            /*
+             * 订单来源是ERP，同时商品SKU是周期购商品的SKU，判定为周期购日常发货订单
+             * 周期购日常发货订单不纳入日常统计中，为了和客户下的周期购订单区分开
+             * 统计报表中只统计销售订单
+             * 
+             */
+            if (foo.sku == "S0010030002" || foo.sku == "S0010040002")//标识该订单是周期购订单
+                item.OrderType += 4;
+            var bar = item.Products.FirstOrDefault(p => p.sku == foo.sku);
+            decimal weight = foo == null ? 0 : foo.QuantityPerUnit * orderDTO.count;
+            if (bar == null)
+            {
+
+                OrderProductInfo orderProductInfo = new OrderProductInfo()
+                {
+                    ProductPlatId = orderDTO.productsku,
+                    ProductPlatName = orderDTO.productName,
+                    //   Warehouse = item.OrderLogistics.Logistics,
+                    MonthNum = orderDTO.createdDate.Month,
+                    weightCode = foo.weightModel == null ? 0 : foo.weightModel.Code,
+                    weightCodeDesc = foo.weightModel == null ? string.Empty : $"{foo.weightModel.Value}g",
+                    OrderSn = orderDTO.orderSN,
+                    TotalAmount = orderDTO.totalAmount,
+                    DiscountFee = orderDTO.discountFee,
+                    AmounPerUnit = orderDTO.pricePerUnit,
+                    ProductCount = orderDTO.count,
+                    ProductWeight = weight,
+                    Source = orderDTO.source,
+                    sku = foo.sku
+                };
+                item.Products.Add(orderProductInfo);
+
+            }
+            else
+            {
+                bar.ProductWeight += weight;
+                bar.ProductCount += orderDTO.count;
+            }
+
+
+
+            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
+            return true;
         }
     }
 }

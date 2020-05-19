@@ -8,6 +8,9 @@ using OMS.Models;
 using PushServer.Configuration;
 namespace PushServer.Commands
 {
+    /// <summary>
+    /// 订单操作
+    /// </summary>
     interface IOrderOption
     {
         IClientConfig clientConfig { get; }

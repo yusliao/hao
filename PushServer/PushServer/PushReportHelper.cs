@@ -18,10 +18,10 @@ namespace PushServer
            
 
         }
-        public static bool PushPandianReport(int monthNum)
-        {
-            return AppServer.Instance.PushPandianReport(monthNum);
-        }
+        //public static bool PushPandianReport(int monthNum)
+        //{
+        //    return AppServer.Instance.PushPandianReport(monthNum);
+        //}
         public static bool CreateReport()
         {
             return AppServer.CreateReport(DateTime.Now.AddDays(-1));
@@ -38,9 +38,9 @@ namespace PushServer
         {
             return AppServer.CreateHistoryReport(month, DateTime.Now.Year);
         }
-        public static bool CreatePandianReport(int monthNum)
-        {
-            return AppServer.CreatePandianReport(monthNum);
-        }
+        //public static bool CreatePandianReport(int monthNum)
+        //{
+        //    return AppServer.CreatePandianReport(monthNum);
+        //}
     }
 }

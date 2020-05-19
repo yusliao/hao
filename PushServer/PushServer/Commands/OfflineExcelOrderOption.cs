@@ -139,14 +139,14 @@ namespace PushServer.Commands
                 orderDTO.productsku = Convert.ToString(row["单价"]); //商品编号
                 orderDTO.productsku = Convert.ToString(row["优惠金额"]); //商品编号
                 orderDTO.productsku = Convert.ToString(row["金额"]); //商品编号
-
+                orderDTO.count = Convert.ToInt32(row["数量"]); //数量
                 orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
                 if (CheckOrderInDataBase(orderDTO))
                     continue;
                 var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
                 if (item == null)
                 {
-                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                   
                    
 
 

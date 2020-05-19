@@ -17,6 +17,7 @@ namespace PushServer.Service
     public abstract class CustomerStatisticServerBase : ICustomerStatisticServer
     {
         public  abstract string ServerName { get; }
+        public abstract string ServerDesc { get; }
         public static event Action<string> UIMessageEventHandle;
         protected virtual void OnUIMessageEventHandle(string msg)
         {
@@ -207,10 +208,13 @@ namespace PushServer.Service
 
 
         public override string ServerName => Name;
-        private String Name { get; set; }
-        public CustomerStatisticServerCommon(string name)
+        public override string ServerDesc => Desc;
+        private String Name;
+        private string Desc;
+        public CustomerStatisticServerCommon(string name,string desc)
         {
             Name = name;
+            Desc = desc;
         }
 
     }

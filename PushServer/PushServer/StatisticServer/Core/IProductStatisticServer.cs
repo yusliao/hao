@@ -27,6 +27,14 @@ namespace PushServer.Service
     }
     interface IServerName
     {
+        /// <summary>
+        /// 渠道名称 exp:ICBC
+        /// </summary>
         string ServerName { get; }
+        /// <summary>
+        /// 渠道描述: 农业银行
+        /// </summary>
+        
+        string ServerDesc { get; }
     }
 }

@@ -18,13 +18,13 @@ using Util.Files;
 namespace PushServer.Commands
 {
     /// <summary>
-    /// 银行-金文（工行代发）
+    /// 金文订单都用这个管道解析20200519
     /// </summary>
     [Export(typeof(IOrderOption))]
-    public class ICBC_JINWENENExcelOrderOption : OrderOptionBase
+    public class JINWENENExcelOrderOption : OrderOptionBase
     {
-        public override string Name => OMS.Models.OrderSource.ICBC_JINWEN;
-        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.ICBC_JINWEN);
+        public override string Name => OMS.Models.OrderSource.JINWEN;
+        private string NameDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.JINWEN);
 
 
         public override IClientConfig clientConfig => AppServer.Instance.ConfigDictionary[Name];
@@ -99,11 +99,24 @@ namespace PushServer.Commands
             {
                 var row = excelTable.Rows[i];
 
-                
-                orderDTO.createdDate = file.FileDate;
-
-                orderDTO.source = this.Name;
-                orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(this.Name);
+                var orderDateStr = Convert.ToString(row["制单时间"]); //订单创建时间
+                orderDTO.createdDate = DateTime.Parse(orderDateStr);
+               // orderDTO.createdDate = file.FileDate;
+                /*金文的订单整合在一个EXCEL中。
+                 * 根据店铺名称解析为银行-金文科技代发和银行-金文（工行代发）
+                */
+                string shopName = Convert.ToString(row["店铺"]);
+                if(shopName== "金文网络-中国工商银行积分商城")
+                {
+                    orderDTO.source = OrderSource.ICBC_JINWEN;
+                    orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.ICBC_JINWEN);
+                }
+                else
+                {
+                    orderDTO.source = OrderSource.BANK_JINWEN;
+                    orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.BANK_JINWEN);
+                }
+              
 
                 orderDTO.sourceSN = Convert.ToString(row["交易号"]); //订单号
                 if (string.IsNullOrEmpty(orderDTO.sourceSN))
@@ -113,16 +126,16 @@ namespace PushServer.Commands
                 }
 
 
-                orderDTO.productName = Convert.ToString(row[2]); //商品名称
+                orderDTO.productName = Convert.ToString(row["商品名称"]); //商品名称
                                                                  // orderDTO.productsku = Convert.ToString(row[2]); //商品编号
 
                 try
                 {
-                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                    orderDTO.count = Convert.ToInt32(row["通知数量"]); //数量
                 }
                 catch (Exception)
                 {
-                    orderDTO.count = Convert.ToInt32(row["通知数量"]); //数量
+                    orderDTO.count = Convert.ToInt32(row["数量"]); //数量
 
                 }
 
@@ -193,11 +206,11 @@ namespace PushServer.Commands
 
                     try
                     {
-                        orderDTO.count = Convert.ToInt32(row["数量"]); //数量
+                        orderDTO.count = Convert.ToInt32(row["通知数量"]); //数量
                     }
                     catch (Exception)
                     {
-                        orderDTO.count = Convert.ToInt32(row["通知数量"]); //数量
+                        orderDTO.count = Convert.ToInt32(row["数量"]); //数量
 
                     }
 

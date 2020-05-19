@@ -262,6 +262,8 @@ namespace PushServer.Commands
                             {
                                 OrderFileName = file,
                                 OrderInfo = Util.Helpers.Json.ToJson(orderItem),
+                                ErrorCode = ExceptionType.PhoneNumOrPersonNameIsNull,
+                                ErrorMessage = Util.Helpers.Enum.GetDescription<ExceptionType>(ExceptionType.PhoneNumOrPersonNameIsNull),
                                 Source = this.Name
                             };
                             db.ExceptionOrders.Add(exceptionOrder);

@@ -137,7 +137,7 @@ namespace PushServer.Commands
         /// <param name="items">已解析订单集合</param>
         protected void ResolveOrders(CsvReader csv, string file, ref List<OrderEntity> items)
         {
-            System.Collections.Concurrent.ConcurrentDictionary<long, int> orderProductCountDic = new System.Collections.Concurrent.ConcurrentDictionary<long, int>();
+            Dictionary<long, (int value, OrderDTO order)> orderProductCountDic = new Dictionary<long, (int value, OrderDTO order)>();
             csv.Read();
             csv.ReadHeader();
             List<OrderEntity> newOrderlst = new List<OrderEntity>();
@@ -148,8 +148,9 @@ namespace PushServer.Commands
             while (csv.Read())
             {
                 /*处理逻辑：
-                 * 平台单号是否为空
-                 * 销售订单 平台单号是否存在数据库中
+                 * 跳过平台单号为空的
+                 * 找到OMS系统中对应的订单，更新物流信息
+                 * 找不到OMS系统对应的订单，插入新订单，插入物流信息
                  * 
                  */ 
 
@@ -201,52 +202,43 @@ namespace PushServer.Commands
                         string warehouse = orderDTO.Warehouse = csv.GetField<string>("仓库名称");
                         string pcode =orderDTO.productsku = csv.GetField<string>("商品代码").Trim();//ERP标识的商品编码
                         decimal weight = csv.GetField<string>("总重量").ToInt();
-                        int count =orderDTO.count = csv.GetField<string>("数量").ToInt();
+                        orderDTO.count = csv.GetField<string>("数量").ToInt(); //该条记录商品数量
                         /*根据数量来判定是否数量上漏发了商品
+                         * 订单的OrderProductInfo中记录了该商品的总数量
+                         * 总数量减去该条CSV记录项中商品的数量
+                         * 方法结束的时候如果总数量不为零，则判定商品漏发
+                         * 暂不考虑订单的扩展对象中的商品总数量。
                          */
-                        #region 漏发商品处理
+                        #region 判定是否漏发商品
                         if (orderDTO.orderType == 0)
                         {
-
-
-                            System.Threading.ThreadPool.QueueUserWorkItem(o =>
+                           
+                            var curproduct = order.Products.FirstOrDefault(p => p.sku == pcode);
+                            if (curproduct != null)
                             {
-                                var curproduct = order.Products.FirstOrDefault(p => p.sku == pcode);
-                                if (curproduct != null)
-                                {
-                                    if (orderProductCountDic.ContainsKey(curproduct.Id))
-                                    {
-                                        if (orderProductCountDic[curproduct.Id] >= count)
-                                        {
-                                            int c = orderProductCountDic[curproduct.Id] - count;
-                                            orderProductCountDic.AddOrUpdate(curproduct.Id, l => c, (l, i) => i - count);
-                                            
-                                        }
-                                        else if (orderProductCountDic[curproduct.Id] < count)
-                                        {
-                                            InputExceptionOrder(orderDTO, ExceptionType.ProductCountError);
-                                        }
 
-                                    }
-                                    else
-                                    {
-                                        if (curproduct.ProductCount != count)
-                                        {
-                                            if (curproduct.ProductCount > count)
-                                            {
-                                                int c = curproduct.ProductCount - count;
-                                                orderProductCountDic.AddOrUpdate(curproduct.Id, c, (l, i) => i - count);
-                                               
-                                            }
-                                            
-                                        }
-                                    }
+                                if (orderProductCountDic.ContainsKey(curproduct.Id))
+                                {
+
+                                    int c = orderProductCountDic[curproduct.Id].value - orderDTO.count;
+                                    orderProductCountDic[curproduct.Id] = (value: c, order: orderDTO);
+                                    
                                 }
                                 else
                                 {
-                                   // InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+
+                                    if (curproduct.ProductCount > orderDTO.count)
+                                    {
+                                        int c = curproduct.ProductCount - orderDTO.count;
+                                        orderProductCountDic.Add(curproduct.Id,(value:c,order:orderDTO));
+                                    }
                                 }
-                            });
+                            }
+                            else//订单中的商品和实际发货商品不一致的情况不考虑
+                            {
+                                // InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                            }
+                           
                         }
                         #endregion
                         order.OrderType = orderDTO.orderType;
@@ -273,7 +265,7 @@ namespace PushServer.Commands
                                     orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
                                 LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
                                 {
-                                    ProductCount = count,
+                                    ProductCount = orderDTO.count,
                                     ProductPlatId = pcode,
                                     ProductPlatName = csv.GetField<string>("商品名称").Trim(),
                                     ProductWeight = weight,
@@ -285,7 +277,6 @@ namespace PushServer.Commands
                                 orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
                                 db.LogisticsProductInfos.Add(logisticsProductInfo);
                             }
-                            
                                 
                         }
                         else
@@ -322,8 +313,19 @@ namespace PushServer.Commands
                 {
                     Util.Logs.Log.GetLog(nameof(ERPExcelOrderOption)).Debug(item);
                 }
-               
             }
+            Task.Run(() =>
+            {
+                foreach (var item in orderProductCountDic)
+                {
+                    if (item.Value.value > 0 || item.Value.value < 0)
+                    {
+                        InputExceptionOrder(item.Value.order, ExceptionType.ProductCountError);
+                    }
+                }
+               
+            });
+            
 
 
         }
@@ -363,6 +365,11 @@ namespace PushServer.Commands
 
             orderDTO.productName = csv.GetField<string>("平台商品名称").Trim();
             orderDTO.productsku = csv.GetField<string>("商品代码").Trim();
+            if (string.IsNullOrEmpty(orderDTO.productsku.Trim()))
+            {
+                InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+                return null;
+            }
             var quantity = orderDTO.count=  csv.GetField<string>("数量").ToInt();
             decimal weight  = csv.GetField<string>("总重量").ToInt();
             orderDTO.consigneeName = csv.GetField<string>("收货人").Trim();
@@ -404,8 +411,12 @@ namespace PushServer.Commands
                     break;
             }
            
-            //这里的订单都是数据库中没有的订单
-            //已解析集合中查找，没找到就新增对象，找到就关联新的商品
+            /* 生成订单对象，从items集合中查找是否已经录入该订单对象
+             * 如果items中已经有该订单对象则创建商品子对象及物流商品对象
+             * 如果items中没有该订单对象则创建并关联各个子对象，将订单对象录入items
+             * 重要提示：本方法解析csv对象，并转化为全新的订单对象，需要将订单的所有内容（重点是商品对象）都完整录入OMS系统中
+             * 
+             */
             var item = items.Find(o => o.OrderSn == orderDTO.orderSN);
             if (item == null)//集合中不存在该订单对象
             {
@@ -802,8 +813,13 @@ namespace PushServer.Commands
             }
             else
             {
+                
                 using (var db = new OMSContext())
                 {
+                    if (!InputProductInfoWithoutSaveChange(db, orderDTO, item))
+                    {
+                        return null;
+                    }
                     OrderLogisticsDetail orderLogisticsDetail = new OrderLogisticsDetail();
                     orderLogisticsDetail.OrderSn = item.OrderSn;
                     orderLogisticsDetail.Logistics = csv.GetField<string>("物流公司");
@@ -951,32 +967,35 @@ namespace PushServer.Commands
         /// <param name="item"></param>
         protected override bool InputProductInfoWithoutSaveChange(OMSContext db, OrderDTO orderDTO,OrderEntity item)
         {
-            ProductDictionary pd = null;
-            pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductCode.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
-            if (pd == null)
-            {
-                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
-                InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
-                if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
-                {
-                    ProductDictionary productDictionary = new ProductDictionary()
-                    {
-                        ProductCode = orderDTO.productsku,
-                        ProductNameInPlatform = orderDTO.productName,
-                        Source = orderDTO.source
-
-                    };
-                    db.ProductDictionarySet.Add(productDictionary);
-                    db.SaveChanges();
-                }
+            //ProductDictionary pd = null;
+            if (string.IsNullOrEmpty(orderDTO.productsku))//productsku===sku,若值为null ,意味着用户取消了订单，这个订单不计入OMS
                 return false;
-            }
-           
+            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == orderDTO.productsku);
 
 
-            // var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == "S0010040003\t".Trim());
-            string temp = pd.ProductCode.Trim();//"S0010040003\t"
-            var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == temp);
+
+        //pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductCode.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
+        //    if (pd == null)
+        //    {
+        //        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+        //        InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
+        //        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+        //        {
+        //            ProductDictionary productDictionary = new ProductDictionary()
+        //            {
+        //                ProductCode = orderDTO.productsku,
+        //                ProductNameInPlatform = orderDTO.productName,
+        //                Source = orderDTO.source
+
+        //            };
+        //            db.ProductDictionarySet.Add(productDictionary);
+        //            db.SaveChanges();
+        //        }
+        //        return false;
+        //    }
+        //        // var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == "S0010040003\t".Trim());
+        //    string temp = pd.ProductCode.Trim();//"S0010040003\t"
+        //    var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == temp);
             if (foo == null)
             {
                 OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");
