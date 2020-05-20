@@ -1183,9 +1183,10 @@ namespace PushServer.Commands
             cib_dt.Columns.Add("物流编号");
             cib_dt.Columns.Add("物流单号");
             int taskcount = glst.Count;//任务计数
+            var cmds = AppServer.Instance.ConfigDictionary.Values.Where(c => c.CreateLogisticsExcel == true).Select(c=>c.Name);//需要导出物流单的渠道
             foreach (var item in glst)
             {
-                var option = OrderOptSet.FirstOrDefault(i => i.clientConfig.Name == item.Key);
+                var option =  OrderOptSet.FirstOrDefault(i => i.clientConfig.Name == item.Key&&cmds.Any(s=>s==item.Key));
                 if (option != null)//过滤出需要生成物流导出单的渠道
                 {
                     System.Threading.ThreadPool.QueueUserWorkItem(o =>

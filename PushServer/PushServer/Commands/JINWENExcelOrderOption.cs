@@ -68,7 +68,7 @@ namespace PushServer.Commands
             {
                 using (var excel = new NPOIExcel(file.FullName))
                 {
-                    var table = excel.ExcelToDataTable(null, true);
+                    var table = excel.jinwenExcelToDataTable(null, true);
                     if (table != null)
                         this.ResolveOrders(table, file, ordersList);
                     else
