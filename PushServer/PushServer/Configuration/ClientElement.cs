@@ -47,13 +47,13 @@ namespace PushServer.Configuration
             set { this["LastSyncDate"] = value; }
         }
 
-        [ConfigurationProperty("AppKey", IsRequired = false)]
-        public string AppKey
+        [ConfigurationProperty("CreateLogisticsExcel", IsRequired = false)]
+        public bool? CreateLogisticsExcel
         {
-            get { return this["AppKey"] as string; }
+            get { return this["CreateLogisticsExcel"] as bool?; }
         }
-        [ConfigurationProperty("AppSecret", IsRequired = false)]
-        public string AppSecret => this["AppSecret"] as string;
+        [ConfigurationProperty("CreateReport", IsRequired = false)]
+        public bool? CreateReport => this["CreateReport"] as bool?;
 
         [ConfigurationProperty("SessionKey", IsRequired = false)]
         public string SessionKey =>this["SessionKey"] as string; 
@@ -73,8 +73,8 @@ namespace PushServer.Configuration
         string Tag { get;}
         string ExcelOrderFolder { get; }
         string LastSyncDate { get; set; }
-        string AppKey { get;  }
-        string AppSecret { get; }
+        bool? CreateLogisticsExcel { get;  }
+        bool? CreateReport { get; }
         string SessionKey { get; }
         string ServerUrl { get; }
         /// <summary>
