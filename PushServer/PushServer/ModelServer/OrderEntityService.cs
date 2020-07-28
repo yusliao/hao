@@ -16,8 +16,17 @@ namespace PushServer.ModelServer
     {
         public static void InputConsigneeInfo(OrderEntity orderItem, OMSContext db)
         {
-
-            var s = db.CustomersSet.Include<CustomerEntity, ICollection<AddressEntity>>(c => c.Addresslist).FirstOrDefault(c => c.Name == orderItem.Consignee.Name && c.Phone == orderItem.Consignee.Phone);
+            CustomerEntity s;
+            if (string.IsNullOrEmpty(orderItem.Consignee.PersonCard))
+            {
+                s = db.CustomersSet.Include<CustomerEntity, ICollection<AddressEntity>>(c => c.Addresslist)
+                    .FirstOrDefault(c => c.Name == orderItem.Consignee.Name && c.Phone == orderItem.Consignee.Phone);
+            }
+            else
+            {
+                s = db.CustomersSet.Include<CustomerEntity, ICollection<AddressEntity>>(c => c.Addresslist)
+                    .FirstOrDefault(c => c.Name == orderItem.Consignee.Name && c.PersonCard == orderItem.Consignee.PersonCard);
+            }
             if (s != null)//通过姓名和手机号匹配是否是老用户
             {
 
@@ -49,6 +58,7 @@ namespace PushServer.ModelServer
                     addr.Province = orderItem.ConsigneeAddress.Province;
 
                     orderItem.ConsigneeAddress = addr;//替换地址对象
+                    db.Set<AddressEntity>().Attach(addr);
                     db.Entry<AddressEntity>(addr).State = EntityState.Modified;
 
                 }
