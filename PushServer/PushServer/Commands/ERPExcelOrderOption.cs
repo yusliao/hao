@@ -343,7 +343,16 @@ namespace PushServer.Commands
             var config = AppServer.Instance.ConfigDictionary.Values.FirstOrDefault(c => c.Tag.Contains(desc));
             if (config == null)
             {
-                OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
+                /*识别周期购PB系统订单
+                 * 周期购PB 系统订单，EXCEL中店铺名称以正常店铺名称+PB作为标识，平台单号信息==配送ID
+                 */
+                string shopname = desc.Substring(0,desc.Length - 2);
+                if (desc.Substring(desc.Length-2,2).ToLower()=="pb")
+                {
+                    ResolvePBOrder(csv, shopname);
+                }
+                else
+                    OnUIMessageEventHandle($"ERP导出单：{file}。未识别的订单渠道：{desc}");
                 
                 return null;
             }
@@ -871,7 +880,65 @@ namespace PushServer.Commands
             }
 
         }
+        /// <summary>
+        /// 解析从ERP过来的周期购订单，将带有物流单号的配货单更新状态为已发货
+        /// </summary>
+        /// <param name="csv"></param>
+        /// <param name="shopName"></param>
+        private void ResolvePBOrder(CsvReader csv,string shopName)
+        {
+            if (string.IsNullOrEmpty(shopName))
+                return;
+            var config = AppServer.Instance.ConfigDictionary.Values.FirstOrDefault(c => c.Tag.Contains(shopName));
 
+           
+
+            string ordertype = csv.GetField<string>("订单类型").Trim();
+            DeliveryData deliveryData = new DeliveryData();
+            string sourceid = csv.GetField<string>("平台单号").Trim();
+            deliveryData.Product = new ProductData();
+            deliveryData.Product.SKU = csv.GetField<string>("商品代码").Trim();
+
+
+            switch (ordertype)
+            {
+                case "销售订单":
+                    deliveryData.OrderId = Guid.Parse(sourceid.Substring(0, sourceid.LastIndexOf('_')));
+                    deliveryData.Num = int.Parse(sourceid.Substring(sourceid.LastIndexOf('_') + 1,(sourceid.LastIndexOf('#')-sourceid.LastIndexOf('_')-1)));
+                    
+                    break;
+                case "换货订单":
+                case "补发货订单":
+                    //TODO:sourceid= 订单号+批次号+补发次数字符串
+                    deliveryData.OrderId = Guid.Parse(sourceid.Substring(0, sourceid.LastIndexOf('_')));
+                    deliveryData.Num = int.Parse(sourceid.Substring(sourceid.LastIndexOf('_') + 1));
+                    break;
+                case "退货退钱订单":
+                    
+                    break;
+                default:
+                    
+                    break;
+            }
+            deliveryData.Logistics = csv.GetField<string>("物流公司");
+            deliveryData.LogisticsNo = csv.GetField<string>("物流单号").Trim();
+            if(string.IsNullOrEmpty(deliveryData.LogisticsNo))
+            {
+                return;
+            }
+            else
+            {
+                Task.Run(async () =>
+                {
+                    var result = await new Util.Webs.Clients.WebClient()
+                    //.Post(System.Configuration.ConfigurationManager.AppSettings["PBDeliveryUrl"].ToString())
+                    .Post(System.Configuration.ConfigurationManager.AppSettings["PBDeliveryUrl"])
+                    .JsonData<DeliveryData>(deliveryData)
+                    .ResultAsync();
+                });
+            }
+
+        }
         private OrderEntity InputOrderSubRecordInfo(CsvReader csv, OrderDTO orderDTO, int quantity, decimal weight, OrderEntity orderItem, OMSContext db, OrderEntity sourceorder)
         {
             if (sourceorder.OrderOptionRecords == null)
@@ -974,28 +1041,7 @@ namespace PushServer.Commands
 
 
 
-        //pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductCode.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
-        //    if (pd == null)
-        //    {
-        //        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
-        //        InputExceptionOrder(orderDTO, ExceptionType.ProductCodeUnKnown);
-        //        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
-        //        {
-        //            ProductDictionary productDictionary = new ProductDictionary()
-        //            {
-        //                ProductCode = orderDTO.productsku,
-        //                ProductNameInPlatform = orderDTO.productName,
-        //                Source = orderDTO.source
-
-        //            };
-        //            db.ProductDictionarySet.Add(productDictionary);
-        //            db.SaveChanges();
-        //        }
-        //        return false;
-        //    }
-        //        // var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == "S0010040003\t".Trim());
-        //    string temp = pd.ProductCode.Trim();//"S0010040003\t"
-        //    var foo = db.ProductsSet.Include(p => p.weightModel).FirstOrDefault(p => p.sku.Trim() == temp);
+        
             if (foo == null)
             {
                 OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）对应ERP商品记录未找到");

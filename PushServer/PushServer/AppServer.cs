@@ -145,7 +145,7 @@ namespace PushServer
         /// EXCEL订单导入OMS系统
         /// </summary>
         /// <returns></returns>
-        public static bool ImportToOMS()
+        public static bool ImportExcelToOMS()
         {
             var lst = AppServer.Instance.OrderOptSet.ToList();
             foreach (var item in lst)
@@ -159,7 +159,7 @@ namespace PushServer
                             Console.ForegroundColor = ConsoleColor.White;
                             Console.WriteLine($"{item.clientConfig.Tag}开始导入".PadRight(30,'>'));
                         }
-                        item.ImportToOMS();
+                        item.ExcelToOMS();
                         if (Environment.UserInteractive)
                         {
                             var commcolor = Console.ForegroundColor;
@@ -256,8 +256,16 @@ namespace PushServer
         //}
         public static bool CreateReport(DateTime dateTime)
         {
+           
             return StatisticServer.Instance.CreateReport(dateTime);
             
+        }
+        public static bool CreateDailyReport(DateTime dateTime)
+        {
+
+            StatisticServer.Instance.CreateDailyReport(dateTime);
+            return true;
+
         }
         public static bool CreateHistoryReport(int month,int year)
         {

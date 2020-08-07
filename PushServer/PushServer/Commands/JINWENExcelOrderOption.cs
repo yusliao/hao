@@ -84,8 +84,8 @@ namespace PushServer.Commands
             return ordersList;
         }
 
-       
-        protected  List<OrderEntity> ResolveOrders(DataTable excelTable,DataFileInfo file, List<OrderEntity> items)
+
+        protected List<OrderEntity> ResolveOrders(DataTable excelTable, DataFileInfo file, List<OrderEntity> items)
         {
 
             OrderDTO orderDTO = new OrderDTO();
@@ -101,12 +101,12 @@ namespace PushServer.Commands
 
                 var orderDateStr = Convert.ToString(row["制单时间"]); //订单创建时间
                 orderDTO.createdDate = DateTime.Parse(orderDateStr);
-               // orderDTO.createdDate = file.FileDate;
+                // orderDTO.createdDate = file.FileDate;
                 /*金文的订单整合在一个EXCEL中。
                  * 根据店铺名称解析为银行-金文科技代发和银行-金文（工行代发）
                 */
                 string shopName = Convert.ToString(row["店铺"]);
-                if(shopName== "金文网络-中国工商银行积分商城")
+                if (shopName == "金文网络-中国工商银行积分商城"||shopName== "金文网络-工商银行工银e生活合作项目（积分模块）".Trim())
                 {
                     orderDTO.source = OrderSource.ICBC_JINWEN;
                     orderDTO.sourceDesc = Util.Helpers.Reflection.GetDescription<OrderSource>(OrderSource.ICBC_JINWEN);

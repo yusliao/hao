@@ -188,14 +188,23 @@ namespace PushServer.Service
                 string title = string.Empty;
                 
                 List<Statistic> lst = new List<Statistic>();
-                var nameDesc =  Util.Helpers.Reflection.GetDescription<OrderSource>(ServerName);
+                var nameDesc =  this.ServerDesc;
                 switch (statisticType)
                 {
                     case StatisticType.Day:
                         
                         DateTime dateTime = new DateTime(year, 1, 1).AddDays(statisticValue - 1);
                         lst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
-                        
+                        if(ServerName==OrderSource.CIBAPP)//CIB,CIBAPP,CIBEVT合并发送
+                        {
+                            var ciblst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIB).ToList();
+                            if(ciblst.Any())
+                                lst.Concat(ciblst);
+                            var cibevtlst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIBEVT).ToList();
+                            if (cibevtlst.Any())
+                                lst.Concat(cibevtlst);
+
+                        }
                         foreach (var s in lst)
                         {
                             foo.TotalAmount += s.TotalAmount;
@@ -215,6 +224,16 @@ namespace PushServer.Service
                     case StatisticType.Week:
                        
                         lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Week && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        if (ServerName == OrderSource.CIBAPP)//CIB,CIBAPP,CIBEVT合并发送
+                        {
+                            var ciblst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIB).ToList();
+                            if (ciblst.Any())
+                                lst.Concat(ciblst);
+                            var cibevtlst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIBEVT).ToList();
+                            if (cibevtlst.Any())
+                                lst.Concat(cibevtlst);
+
+                        }
                         foreach (var s in lst)
                         {
                             foo.TotalAmount += s.TotalAmount;
@@ -234,6 +253,16 @@ namespace PushServer.Service
                     case StatisticType.Month:
 
                         lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Month && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        if (ServerName == OrderSource.CIBAPP)//CIB,CIBAPP,CIBEVT合并发送
+                        {
+                            var ciblst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIB).ToList();
+                            if (ciblst.Any())
+                                lst.Concat(ciblst);
+                            var cibevtlst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIBEVT).ToList();
+                            if (cibevtlst.Any())
+                                lst.Concat(cibevtlst);
+
+                        }
                         foreach (var s in lst)
                         {
                             foo.TotalAmount += s.TotalAmount;
@@ -253,6 +282,16 @@ namespace PushServer.Service
                     case StatisticType.Quarter:
 
                         lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Quarter && s.StatisticValue == statisticValue && s.Year == year && s.SourceDesc == nameDesc).ToList();
+                        if (ServerName == OrderSource.CIBAPP)//CIB,CIBAPP,CIBEVT合并发送
+                        {
+                            var ciblst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIB).ToList();
+                            if (ciblst.Any())
+                                lst.Concat(ciblst);
+                            var cibevtlst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIBEVT).ToList();
+                            if (cibevtlst.Any())
+                                lst.Concat(cibevtlst);
+
+                        }
                         foreach (var s in lst)
                         {
                             foo.TotalAmount += s.TotalAmount;
@@ -272,6 +311,16 @@ namespace PushServer.Service
                     case StatisticType.Year:
 
                         lst = db.StatisticSet.Where(s => s.StatisticType == (int)StatisticType.Year && s.StatisticValue == year&& s.SourceDesc == nameDesc).ToList();
+                        if (ServerName == OrderSource.CIBAPP)//CIB,CIBAPP,CIBEVT合并发送
+                        {
+                            var ciblst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIB).ToList();
+                            if (ciblst.Any())
+                                lst.Concat(ciblst);
+                            var cibevtlst = db.StatisticSet.Where(s => s.StatisticType == (int)statisticType && s.StatisticValue == statisticValue && s.Year == year && s.Source == OrderSource.CIBEVT).ToList();
+                            if (cibevtlst.Any())
+                                lst.Concat(cibevtlst);
+
+                        }
                         foreach (var s in lst)
                         {
                             foo.TotalAmount += s.TotalAmount;

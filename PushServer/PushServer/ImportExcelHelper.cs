@@ -24,7 +24,7 @@ namespace PushServer
         public static bool Dowork()
         {
            
-            return AppServer.ImportToOMS();
+            return AppServer.ImportExcelToOMS();
           
         }
         /// <summary>

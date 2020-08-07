@@ -165,6 +165,7 @@ namespace PushServer.Commands
                     ProductCount = orderDTO.count,
                     ProductWeight = weight,
                     Source = orderDTO.source,
+                    
                     sku = foo.sku
                 };
                 item.Products.Add(orderProductInfo);
@@ -498,7 +499,7 @@ namespace PushServer.Commands
 
         public abstract DataTable ExportExcel(List<OrderEntity> orders);
        
-        public virtual  bool ImportToOMS()
+        public virtual  bool ExcelToOMS()
         {
             if (IsImporting)
                 return true;
@@ -549,7 +550,7 @@ namespace PushServer.Commands
                     item.OrderExtendInfo.TotalFlatAmount = item.Products.Sum(p => p.TotalFlatAmount);
 
                     item.OrderExtendInfo.OrderSn = item.OrderSn;
-                    item.OrderExtendInfo.TotalAmount = item.Products.Sum(p => p.TotalAmount);
+                   
                     item.OrderExtendInfo.TotalProductCount = item.Products.Sum(p => p.ProductCount);
                     item.OrderExtendInfo.CreatedDate = item.CreatedDate.Date;
 

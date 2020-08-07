@@ -86,7 +86,7 @@ namespace PushServer.Commands
         {
             var excelFileList = new List<DataFileInfo>();
 
-            FileScanner.ScanAllFiles(new DirectoryInfo(clientConfig.ExcelOrderFolder), "*.xls");
+            FileScanner.ScanAllExcelFiles(new DirectoryInfo(clientConfig.ExcelOrderFolder));
             if (FileScanner.ScannedFiles.Any())
             {
                 FileScanner.ScannedFiles.ForEach(file =>

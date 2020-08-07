@@ -65,7 +65,7 @@ namespace PushServer.Service
              */
             #region 静态实现
 
-           
+
             //foreach (var item in ProductStatisticServerOptSet)
             //{
             //    var result = item.CreateDailyReport(dateTime);
@@ -81,7 +81,8 @@ namespace PushServer.Service
             #endregion
             #region 动态方式加载
             //加载所有渠道
-            foreach (var item in AppServer.Instance.ConfigDictionary.Values)
+            
+            foreach (var item in AppServer.Instance.ConfigDictionary.Values.Where(i => i.CreateReport != false))
             {
                 ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name,item.Tag);
                 pcomm.CreateDailyReport(dateTime);
@@ -114,7 +115,7 @@ namespace PushServer.Service
             //}
             #region 动态方式加载
 
-            foreach (var item in AppServer.Instance.ConfigDictionary.Values)
+            foreach (var item in AppServer.Instance.ConfigDictionary.Values.Where(i => i.CreateReport != false))
             {
                 ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name, item.Tag);
                 pcomm.CreateWeekReport(weeknum, year);
@@ -138,7 +139,7 @@ namespace PushServer.Service
 
             try
             {
-                foreach (var item in AppServer.Instance.ConfigDictionary.Values)
+                foreach (var item in AppServer.Instance.ConfigDictionary.Values.Where(i => i.CreateReport != false))
                 {
                     ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name, item.Tag);
                     pcomm.CreateYearReport(year);
@@ -188,7 +189,7 @@ namespace PushServer.Service
             //}
             #region 动态方式加载
 
-            foreach (var item in AppServer.Instance.ConfigDictionary.Values)
+            foreach (var item in AppServer.Instance.ConfigDictionary.Values.Where(i => i.CreateReport != false))
             {
                 ProductStatisticServerCommon pcomm = new ProductStatisticServerCommon(item.Name, item.Tag);
                 pcomm.CreateMonthReport(monthnum, year);
@@ -354,8 +355,8 @@ namespace PushServer.Service
             var lst = AppServer.Instance.ConfigDictionary.Where(p => serverNames.Contains(p.Key)).Select(p=>p.Value);
             foreach (var item in lst)
             {
-                if (item.Name == OrderSource.CIB)//CIB与CIBAPP合并发送
-                      continue;
+                if (item.Name == OrderSource.CIB||item.Name==OrderSource.CIBEVT)//CIB,CIBAPP,CIBEVT合并发送
+                    continue;
                 OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
                 ocomm.PushDailyReport(dateTime);
 
@@ -384,7 +385,7 @@ namespace PushServer.Service
             var lst = AppServer.Instance.ConfigDictionary.Where(p => serverNames.Contains(p.Key)).Select(p => p.Value);
             foreach (var item in lst)
             {
-                if (item.Name == OrderSource.CIB)//CIB与CIBAPP合并发送
+                if (item.Name == OrderSource.CIB || item.Name == OrderSource.CIBEVT)//CIB,CIBAPP,CIBEVT合并发送
                     continue;
                 OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
                 ocomm.PushWeekReport(Util.Helpers.Time.GetWeekNum(dateTime), dateTime.Year);
@@ -414,7 +415,7 @@ namespace PushServer.Service
             var lst = AppServer.Instance.ConfigDictionary.Where(p => serverNames.Contains(p.Key)).Select(p => p.Value);
             foreach (var item in lst)
             {
-                if (item.Name == OrderSource.CIB)//CIB与CIBAPP合并发送
+                if (item.Name == OrderSource.CIB || item.Name == OrderSource.CIBEVT)//CIB,CIBAPP,CIBEVT合并发送
                     continue;
                 var dt = dateTime;
                 OrderStatisticServerCommon ocomm = new OrderStatisticServerCommon(item.Name, item.Tag);
