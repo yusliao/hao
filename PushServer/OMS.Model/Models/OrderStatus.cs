@@ -18,7 +18,7 @@ namespace OMS.Models
 
 
         /** New Status **/
-
+        None=-1,
 
         Undefined,
         /// <summary>

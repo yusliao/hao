@@ -15,6 +15,9 @@ namespace OMS.Models
         [Key]
         public long ID { get; set; }
         public string Source { get; set; }
+        /// <summary>
+        /// 通过desc来匹配那些合并的渠道
+        /// </summary>
         public string SourceDesc { get; set; }
         
         /// <summary>

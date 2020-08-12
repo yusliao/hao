@@ -38,6 +38,7 @@ namespace OMS.Models.DTO
         public DateTime createdDate { get; set; }
         public OrderStatus orderStatus { get; set; }
         public string consigneeName { get; set; }
+        public string consigneePersonCard { get; set; }
         public string consigneePhone { get; set; }
         public string consigneeProvince { get; set; }
         public string consigneeCity { get; set; }

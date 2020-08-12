@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OMS.Models</RootNamespace>
     <AssemblyName>OMS.Models</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTO\DeliveryData.cs" />
+    <Compile Include="DTO\OrderImportSummary.cs" />
     <Compile Include="DTO\OrderDTO.cs" />
+    <Compile Include="DTO\ProductData.cs" />
+    <Compile Include="DTO\ProductDicDTO.cs" />
     <Compile Include="Models\AddressEntity.cs" />
     <Compile Include="Models\BusinessBuyers.cs" />
     <Compile Include="Models\ChinaAreaData.cs" />
