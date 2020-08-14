@@ -204,6 +204,7 @@
     <Compile Include="Files\FileScanner.cs" />
     <Compile Include="Files\IFileStore.cs" />
     <Compile Include="Files\Paths\DefaultPathGenerator.cs" />
+    <Compile Include="Files\Paths\IndexPathGenerator.cs" />
     <Compile Include="Files\Paths\IPathGenerator.cs" />
     <Compile Include="Files\Paths\PathGeneratorBase.cs" />
     <Compile Include="GraphicsTools.cs" />
@@ -211,6 +212,7 @@
     <Compile Include="Helpers\Common.cs" />
     <Compile Include="Helpers\Const.cs" />
     <Compile Include="Helpers\Convert.cs" />
+    <Compile Include="Helpers\DeepCopy.cs" />
     <Compile Include="Helpers\Encrypt.cs" />
     <Compile Include="Helpers\Enum.cs" />
     <Compile Include="Helpers\Id.cs" />

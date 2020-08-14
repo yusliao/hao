@@ -1,15 +1,37 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Util.Helpers {
     /// <summary>
     /// 随机数操作
     /// </summary>
     public class Random {
+
+        private static readonly RNGCryptoServiceProvider RNG = new RNGCryptoServiceProvider();
+
+        /// <summary>
+        /// 生成随机值，用于消息的ID
+        /// </summary>
+        public static string RNGId => GetID();
+        private static string GetID()
+        {
+            byte[] buf = new byte[6];
+            RNG.GetBytes(buf);
+            StringBuilder sb = new StringBuilder();
+            foreach (byte b in buf)
+            {
+                sb.Append(b.ToString("x2"));
+            }
+            return sb.ToString();
+
+        }
         /// <summary>
         /// 随机数
         /// </summary>
         private readonly System.Random _random;
+
 
         /// <summary>
         /// 初始化随机数

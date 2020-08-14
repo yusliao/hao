@@ -63,7 +63,7 @@ namespace Util.Files
             // list the files
             try
             {
-                foreach (FileInfo f in dir.GetFiles().Where(f=>f.Extension.EndsWith(".xlsx")||f.Extension.EndsWith(".xls")))
+                foreach (FileInfo f in dir.GetFiles().Where(f=>f.Extension.EndsWith(".xlsx")||f.Extension.EndsWith(".xls")||f.Extension.EndsWith(".csv")))
                 {
                     //Console.WriteLine("File {0}", f.FullName);
                     _scannedFiles.Add(f);

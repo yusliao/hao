@@ -60,7 +60,7 @@ namespace Util.Files.Paths {
         /// <summary>
         /// 获取文件名
         /// </summary>
-        private string GetFileName( string fileName ) {
+        private  string GetFileName( string fileName ) {
             var name = Path.GetFileNameWithoutExtension( fileName );
             var extension = Path.GetExtension( fileName ).TrimStart( '.' );
             if( string.IsNullOrWhiteSpace( extension ) ) {
@@ -71,5 +71,6 @@ namespace Util.Files.Paths {
                 name = _randomGenerator.Generate();
             return $"{name}.{extension}";
         }
+       
     }
 }

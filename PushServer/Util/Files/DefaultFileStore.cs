@@ -1,4 +1,5 @@
-﻿using Util.Files.Paths;
+﻿using System.IO;
+using Util.Files.Paths;
 
 namespace Util.Files {
     /// <summary>
@@ -28,5 +29,7 @@ namespace Util.Files {
             stream.ToFile( path );
             return path;
         }
+        
+        
     }
 }
