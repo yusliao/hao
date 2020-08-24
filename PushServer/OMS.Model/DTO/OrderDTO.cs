@@ -9,7 +9,13 @@ namespace OMS.Models.DTO
 {
     public class OrderDTO
     {
+        /// <summary>
+        /// 渠道商品名称
+        /// </summary>
         public string productName { get; set; }
+        /// <summary>
+        /// 渠道商品编号
+        /// </summary>
         public string productsku { get; set; }
         /// <summary>
         /// 单价
@@ -24,9 +30,18 @@ namespace OMS.Models.DTO
         /// </summary>
         public Decimal totalAmount { get; set; }
         public string fileName { get; set; }
+        /// <summary>
+        /// 渠道订单号
+        /// </summary>
         public string sourceSN { get; set; }
-
+        
+        /// <summary>
+        /// 购买商品数量
+        /// </summary>
         public int count { get; set; }
+        /// <summary>
+        /// 渠道名称
+        /// </summary>
         public string source { get; set; }
         public string sourceDesc { get; set; }
         public string orderSN { get; set; }

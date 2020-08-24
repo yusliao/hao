@@ -72,7 +72,12 @@ namespace OMS.Models
         Integral,//积分
         Money,//自付
         IntegralAndMoney,//积分+自付金
-        installments //分期付款
+        installments, //分期付款,
+        WeChatPay, //微信支付
+        MidouPay, //米豆支付
+        cashPay, //余额支付
+        WeChatAndMidou, //微信+米豆
+        CashAndMidou //余额+米豆
     }
    
 
