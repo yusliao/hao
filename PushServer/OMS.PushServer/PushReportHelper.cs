@@ -29,7 +29,7 @@ namespace OMS.PushServer
         }
         public static bool CreateDayReport(DateTime dateTime)
         {
-            return AppServer.CreateReport(dateTime);
+            return AppServer.CreateDailyReport(dateTime);
         }
         public static bool CreateYearReport(int year)
         {
