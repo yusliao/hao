@@ -101,7 +101,7 @@ namespace PushServer.Commands
                 var orderDate = csv.GetField<string>("行权日期");
                 var orderTime = csv.GetField<string>("行权时间");
                 orderDTO.createdDate = DateTime.ParseExact(string.Format("{0}{1}", orderDate, orderTime), "yyyyMMddHHmmss", CultureInfo.InvariantCulture);
-                orderDTO.orderSN_old = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN); //订单SN=来源+原来的SN
+               // orderDTO.orderSN_old = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN); //订单SN=来源+原来的SN
                 orderDTO.orderSN = string.Format("{0}-{1}_{2}", orderDTO.source, orderDTO.sourceSN, orderDTO.createdDate.ToString("yyyyMMdd"));
 
                 orderDTO.orderStatus = OrderStatus.Confirmed;

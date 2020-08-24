@@ -256,13 +256,11 @@ namespace PushServer.Commands
                         if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
                         {
                             var templ = order.OrderLogistics.FirstOrDefault(o => o.LogisticsNo == orderLogisticsDetail.LogisticsNo);//是否已经存在该物流信息，防止重复添加
-                            if (templ == null|| templ.LogisticsProducts.FirstOrDefault(l=>l.ProductPlatId==pcode)==null)
+                            
+                            if(templ==null)//没有物流信息
                             {
                                 db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
                                 order.OrderLogistics.Add(orderLogisticsDetail);
-                                //关联物流商品信息
-                                if (orderLogisticsDetail.LogisticsProducts == null)
-                                    orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
                                 LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
                                 {
                                     ProductCount = orderDTO.count,
@@ -274,8 +272,30 @@ namespace PushServer.Commands
                                     weightCode = csv.GetField<string>("规格代码").ToInt(),
                                     weightCodeDesc = csv.GetField<string>("规格名称").Trim()
                                 };
+                                if (orderLogisticsDetail.LogisticsProducts == null)
+                                    orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
                                 orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
                                 db.LogisticsProductInfos.Add(logisticsProductInfo);
+                            }
+                            else
+                            {
+                                if(templ.LogisticsProducts.FirstOrDefault(l=>l.sku==pcode)==null)
+                                {
+                                    LogisticsProductInfo logisticsProductInfo = new LogisticsProductInfo()
+                                    {
+                                        ProductCount = orderDTO.count,
+                                        ProductPlatId = pcode,
+                                        ProductPlatName = csv.GetField<string>("商品名称").Trim(),
+                                        ProductWeight = weight,
+                                        sku = pcode,
+                                        Warehouse = warehouse,
+                                        weightCode = csv.GetField<string>("规格代码").ToInt(),
+                                        weightCodeDesc = csv.GetField<string>("规格名称").Trim()
+                                    };
+
+                                    templ.LogisticsProducts.Add(logisticsProductInfo);
+                                    db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                }
                             }
                                 
                         }

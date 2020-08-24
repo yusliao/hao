@@ -171,7 +171,7 @@ namespace PushServer.Commands
                     customerPhone = orderDTO.consigneePhone;//NOTE: no necessery!
                 //兑换流水+下单日期+手机号+商品编号
                 var sourceSN = $"{id.Trim()}_{orderDTO.createdDate.ToString("yyyyMMdd")}_{customerPhone}_{orderDTO.productsku}";
-                orderDTO.orderSN_old= string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
+              //  orderDTO.orderSN_old= string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN);
                 orderDTO.sourceSN = Util.Helpers.Encrypt.Md5By16(sourceSN);
                 orderDTO.orderSN = string.Format("{0}-{1}", orderDTO.source, orderDTO.sourceSN); //订单SN=来源+原来的SN
 
