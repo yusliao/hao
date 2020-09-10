@@ -181,7 +181,8 @@ namespace PushServer.Commands
                 using (var db = new OMSContext())
                 {
 
-                    orderDTO.sourceSN = csv.GetField<string>("订单号").Trim();
+                    orderDTO.sourceSN = csv.GetField<string>("订单号").Trim();//京东订单号已科学计数的格式显示，需要变回数值
+                    orderDTO.sourceSN = decimal.Parse(orderDTO.sourceSN, NumberStyles.Float).ToString();
                     var status = csv.GetField<string>("订单状态").Trim();
 
                     if (string.IsNullOrEmpty(orderDTO.sourceSN))

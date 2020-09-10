@@ -113,25 +113,52 @@ namespace PushServer.Commands
                     break;
     
                 default:
-                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
-                    if (pd == null)
+                    if (string.IsNullOrEmpty(orderDTO.productsku))
                     {
-                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
-                        InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
-                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                        pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null && p.ProductCode != null);
+                        if (pd == null)
                         {
-                            ProductDictionary productDictionary = new ProductDictionary()
+                            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productName}）录入失败");
+                            InputExceptionOrder(orderDTO, ExceptionType.ProductNameUnKnown);
+                            if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == orderDTO.productName) == null)
                             {
-                                ProductId = orderDTO.productsku,
-                                Source = orderDTO.source,
-                                ProductNameInPlatform = orderDTO.productName.Trim()
-                            };
-                            db.ProductDictionarySet.Add(productDictionary);
-                            int i = db.SaveChanges();
+                                ProductDictionary productDictionary = new ProductDictionary()
+                                {
+                                    ProductId = orderDTO.productsku,
+                                    Source = orderDTO.source,
+                                    ProductNameInPlatform = orderDTO.productName.Trim()
+                                };
+                                db.ProductDictionarySet.Add(productDictionary);
+                                db.SaveChanges();
+                            }
+                            return false;
                         }
-                        return false;
+                       
+                    }
+                    else
+                    {
+                        pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
+                        if (pd == null)
+                        {
+                            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+                            InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
+                            if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                            {
+                                ProductDictionary productDictionary = new ProductDictionary()
+                                {
+                                    ProductId = orderDTO.productsku,
+                                    Source = orderDTO.source,
+                                    ProductNameInPlatform = orderDTO.productName.Trim()
+                                };
+                                db.ProductDictionarySet.Add(productDictionary);
+                                db.SaveChanges();
+                            }
+                            return false;
+                        }
                     }
                     break;
+
+                    
             }
 
 
@@ -176,6 +203,7 @@ namespace PushServer.Commands
             OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）解析完毕");
             return true;
         }
+      
         protected virtual bool InputProductInfoWithSaveChange(OMSContext db,OrderDTO orderDTO, OrderEntity item,string oldordersn=null)
         {
             ProductDictionary pd = null;
@@ -232,25 +260,51 @@ namespace PushServer.Commands
                     break;
 
                 default:
-                    pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
-                    if (pd == null)
+                    if(string.IsNullOrEmpty(orderDTO.productsku))
                     {
-                        OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
-                        InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
-                        if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                        pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform.Trim() == orderDTO.productName.Trim() && orderDTO.productName != null && p.ProductCode != null);
+                        if (pd == null)
                         {
-                            ProductDictionary productDictionary = new ProductDictionary()
+                            OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productName}）录入失败");
+                            InputExceptionOrder(orderDTO, ExceptionType.ProductNameUnKnown);
+                            if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductNameInPlatform == orderDTO.productName) == null)
                             {
-                                ProductId = orderDTO.productsku,
-                                Source = orderDTO.source,
-                                ProductNameInPlatform = orderDTO.productName.Trim()
-                            };
-                            db.ProductDictionarySet.Add(productDictionary);
-                            db.SaveChanges();
+                                ProductDictionary productDictionary = new ProductDictionary()
+                                {
+                                    ProductId = orderDTO.productsku,
+                                    Source = orderDTO.source,
+                                    ProductNameInPlatform = orderDTO.productName.Trim()
+                                };
+                                db.ProductDictionarySet.Add(productDictionary);
+                                db.SaveChanges();
+                            }
+                            return false;
                         }
-                        return false;
+                        else
+                        {
+                            pd = db.ProductDictionarySet.FirstOrDefault(p => p.ProductId.Trim() == orderDTO.productsku.Trim() && orderDTO.productsku != null && p.ProductCode != null);
+                            if (pd == null)
+                            {
+                                OnUIMessageEventHandle($"订单文件：{orderDTO.fileName}中平台单号：{orderDTO.sourceSN}（{orderDTO.productsku}）录入失败");
+                                InputExceptionOrder(orderDTO, ExceptionType.ProductIdUnKnown);
+                                if (db.ProductDictionarySet.FirstOrDefault(p => p.ProductId == orderDTO.productsku) == null)
+                                {
+                                    ProductDictionary productDictionary = new ProductDictionary()
+                                    {
+                                        ProductId = orderDTO.productsku,
+                                        Source = orderDTO.source,
+                                        ProductNameInPlatform = orderDTO.productName.Trim()
+                                    };
+                                    db.ProductDictionarySet.Add(productDictionary);
+                                    db.SaveChanges();
+                                }
+                                return false;
+                            }
+                        }
                     }
                     break;
+               
+                  
             }
 
 
@@ -589,6 +643,11 @@ namespace PushServer.Commands
                     {
                         db.Set<OrderLogisticsDetail>().AddRange(lst.SelectMany<OrderEntity, OrderLogisticsDetail>(o => o.OrderLogistics));
                         db.BulkInsert<OrderLogisticsDetail>(lst.SelectMany(o => o.OrderLogistics));
+                        db.Set<LogisticsProductInfo>()
+                            .AddRange(lst.SelectMany<OrderEntity, OrderLogisticsDetail>(o => o.OrderLogistics)
+                            .SelectMany<OrderLogisticsDetail,LogisticsProductInfo>(t => t.LogisticsProducts));
+                        // db.BulkInsert<LogisticsProductInfo>(lst.SelectMany(o => o.OrderLogistics).SelectMany(o => o.LogisticsProducts));
+                        db.SaveChanges();
                         stopwatch.Stop();
                         OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单物流表】耗时ms:{stopwatch.ElapsedMilliseconds}");
 
@@ -611,6 +670,95 @@ namespace PushServer.Commands
                 }
                
                
+            }
+        }
+        protected virtual bool InsertDBBySaveChanges(List<OrderEntity> lst)
+        {
+            using (var db = new OMSContext())
+            {
+                System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+                var adc = db.Configuration.AutoDetectChangesEnabled;
+                stopwatch.Start();
+                foreach (var item in lst.AsParallel())
+                {
+
+                    item.OrderExtendInfo = new OrderExtendInfo();
+                    item.OrderExtendInfo.DiscountFee = item.Products.Sum(p => p.DiscountFee);
+                    item.OrderExtendInfo.IsPromotional = item.Products.Any(p => p.DiscountFee > 0) ? true : false;
+                    item.OrderExtendInfo.TotalAmount = item.Products.Sum(p => p.TotalAmount);
+                    item.OrderExtendInfo.TotalCostPrice = item.Products.Sum(p => p.TotalCostPrice);
+                    item.OrderExtendInfo.TotalFlatAmount = item.Products.Sum(p => p.TotalFlatAmount);
+
+                    item.OrderExtendInfo.OrderSn = item.OrderSn;
+
+                    item.OrderExtendInfo.TotalProductCount = item.Products.Sum(p => p.ProductCount);
+                    item.OrderExtendInfo.CreatedDate = item.CreatedDate.Date;
+
+                    item.OrderExtendInfo.TotalWeight = item.Products.Sum(p => p.ProductWeight);
+
+                }
+                
+                //db.OrderExtendInfoSet.a.addr<OrderExtendInfo>(lst.Select(o => o.OrderExtendInfo));
+                db.Set<OrderExtendInfo>().AddRange(lst.Select(o => o.OrderExtendInfo));
+             
+               // db.OrderExtendInfoSet.AddRange(lst.Select(o => o.OrderExtendInfo));
+                stopwatch.Stop();
+                OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单扩展表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+
+                try
+                {
+
+                    stopwatch.Start();
+
+                    db.Set<OrderEntity>().AddRange(lst);
+                    stopwatch.Stop();
+                    OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+
+                    if (exceptionOrders.Any())
+                        db.Set<ExceptionOrder>().AddRange(exceptionOrders);
+
+                    stopwatch.Start();
+                    db.Set<OrderProductInfo>().AddRange(lst.SelectMany<OrderEntity, OrderProductInfo>(o => o.Products));
+
+                 //   db.BulkInsert<OrderProductInfo>(lst.SelectMany(o => o.Products));
+                    stopwatch.Stop();
+                    OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单商品表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+
+                    stopwatch.Start();
+
+                    var templst = lst.SelectMany(o => o.OrderLogistics ?? new List<OrderLogisticsDetail>());
+                    if (templst != null && templst.Any())
+                    {
+                        db.Set<OrderLogisticsDetail>().AddRange(lst.SelectMany<OrderEntity, OrderLogisticsDetail>(o => o.OrderLogistics));
+                     //   db.BulkInsert<OrderLogisticsDetail>(lst.SelectMany(o => o.OrderLogistics));
+                        db.Set<LogisticsProductInfo>()
+                            .AddRange(lst.SelectMany<OrderEntity, OrderLogisticsDetail>(o => o.OrderLogistics)
+                            .SelectMany<OrderLogisticsDetail, LogisticsProductInfo>(t => t.LogisticsProducts));
+                        // db.BulkInsert<LogisticsProductInfo>(lst.SelectMany(o => o.OrderLogistics).SelectMany(o => o.LogisticsProducts));
+                       
+                        stopwatch.Stop();
+                        OnUIMessageEventHandle($"订单数量:{lst.Count} 批量插入【订单物流表】耗时ms:{stopwatch.ElapsedMilliseconds}");
+
+
+                    }
+                    db.SaveChanges();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"BulkInsert插入订单数据出错，订单数量:{lst.Count} ,content:{ex.Message}");
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"StackTrace:{ex.StackTrace}");
+                    Util.Logs.Log.GetLog(nameof(OrderOptionBase)).Error($"出错的数据源:{Util.Helpers.Json.ToJson(lst)}");
+
+                    return false;
+                }
+                finally
+                {
+                    db.Configuration.AutoDetectChangesEnabled = adc;
+                }
+
+
             }
         }
         public void Dispose()

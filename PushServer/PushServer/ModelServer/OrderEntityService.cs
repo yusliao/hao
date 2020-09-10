@@ -183,6 +183,7 @@ namespace PushServer.ModelServer
                     Name = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneeName),
                     Phone = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneePhone),
                     Phone2 = Util.Helpers.Encrypt.AesEncrypt(orderDTO.consigneePhone2),
+                    PersonCard = orderDTO.consigneePersonCard,
                     CreateDate = orderDTO.createdDate
                 },
                 ConsigneeAddress = new AddressEntity()

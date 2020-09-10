@@ -98,25 +98,25 @@ namespace PushServer.Service
                         }
                      
                         
-                            var q2 = plst.GroupBy(p => new { p.ConsigneeAddress.Province, p.ConsigneeAddress.City });//按省份，地级市统计
-                            foreach (var item in q2)
+                        var q2 = plst.GroupBy(p => new { p.ConsigneeAddress.Province, p.ConsigneeAddress.City });//按省份，地级市统计
+                        foreach (var item in q2)
+                        {
+                            var cad = db.ChinaAreaDatas.FirstOrDefault(a => a.MergerName.Contains(item.Key.City) && a.MergerName.Contains(item.Key.Province));
+                            if (cad == null)
+                                cad = db.ChinaAreaDatas.Find(100000);//中国
+                            StatisticDistrictItem statistic = new StatisticDistrictItem()
                             {
-                                var cad = db.ChinaAreaDatas.FirstOrDefault(a => a.MergerName.Contains(item.Key.City) && a.MergerName.Contains(item.Key.Province));
-                                if (cad == null)
-                                    cad = db.ChinaAreaDatas.Find(100000);//中国
-                                StatisticDistrictItem statistic = new StatisticDistrictItem()
-                                {
-                                    CreateDate = createDate,
-                                    DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
-                                    TotalOrders = item.Count(),
-                                    TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
-                                    TotalProductCount = item.Sum(a => a.OrderExtendInfo.TotalProductCount),
-                                    TotalWeight = item.Sum(a => a.OrderExtendInfo.TotalWeight),
-                                    AddressID = cad
+                                CreateDate = createDate,
+                                DiscountFee = item.Sum(a => a.OrderExtendInfo.DiscountFee),
+                                TotalOrders = item.Count(),
+                                TotalAmount = item.Sum(a => a.OrderExtendInfo.TotalAmount),
+                                TotalProductCount = item.Sum(a => a.OrderExtendInfo.TotalProductCount),
+                                TotalWeight = item.Sum(a => a.OrderExtendInfo.TotalWeight),
+                                AddressID = cad
 
-                                };
-                                cityitems.Add(statistic);
-                            }
+                            };
+                            cityitems.Add(statistic);
+                        }
                       
                       
                         StatisticDistrict statisticDistrict = new StatisticDistrict()

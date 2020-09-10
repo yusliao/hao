@@ -25,7 +25,7 @@ namespace OMS.Models
 
         public IDbSet<Statistic> StatisticSet { get; set; }
         public IDbSet<OrderProductInfo> OrderProductSet { get; set; }
-        public IDbSet<OrderExtendInfo> OrderExtendInfoSet { get; set; }
+        public virtual DbSet<OrderExtendInfo> OrderExtendInfoSet { get; set; }
         public IDbSet<ProductDictionary> ProductDictionarySet { get; set; }
         public IDbSet<WeightCode> WeightCodeSet { get; set; }
         public IDbSet<LogisticsInfo> logisticsInfoSet { get; set; }

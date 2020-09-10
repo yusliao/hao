@@ -275,7 +275,9 @@ namespace PushServer.Commands
                                 if (orderLogisticsDetail.LogisticsProducts == null)
                                     orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
                                 orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
+                             
                                 db.LogisticsProductInfos.Add(logisticsProductInfo);
+                               
                             }
                             else
                             {
@@ -305,7 +307,7 @@ namespace PushServer.Commands
                         }
 
                         
-                        db.SaveChanges();
+                     
                         items.Add(order);
 
                     }
@@ -320,12 +322,13 @@ namespace PushServer.Commands
                        
 
                     }
+                    db.SaveChanges();
                     OnUIMessageEventHandle($"ERP导出单：{file}。该文件中订单编号：{orderDTO.sourceSN}解析完毕");
                    
                 }
             }
             if(newOrderlst.Any())
-                InsertDB(newOrderlst);
+                InsertDBBySaveChanges(newOrderlst);
 
             if (badRecord.Count>0)
             {
@@ -480,7 +483,7 @@ namespace PushServer.Commands
                                 {
                                     if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
                                     {
-                                        //db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                                       
                                         targetorder.OrderLogistics.Add(orderLogisticsDetail);
                                         if (orderLogisticsDetail.LogisticsProducts == null)
                                             orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
@@ -495,8 +498,10 @@ namespace PushServer.Commands
                                             weightCode = orderDTO.weightCode,
                                             weightCodeDesc = orderDTO.weightCodeDesc
                                         };
+                                        if (orderLogisticsDetail.LogisticsProducts == null)
+                                            orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
                                         orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
-                                        db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                      
                                     }
 
                                 }
@@ -514,7 +519,7 @@ namespace PushServer.Commands
                                         weightCodeDesc = orderDTO.weightCodeDesc
                                     };
                                     templ.LogisticsProducts.Add(logisticsProductInfo);
-                                    db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                    
                                 }
 
                                 db.SaveChanges();
@@ -638,7 +643,7 @@ namespace PushServer.Commands
                                 {
                                     if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
                                     {
-                                        //db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                                       
                                         targetorder.OrderLogistics.Add(orderLogisticsDetail);
                                         if (orderLogisticsDetail.LogisticsProducts == null)
                                             orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
@@ -655,6 +660,7 @@ namespace PushServer.Commands
                                         };
                                         orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
                                         db.LogisticsProductInfos.Add(logisticsProductInfo);
+                                        db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
                                     }
 
                                 }
@@ -804,7 +810,7 @@ namespace PushServer.Commands
                             orderItem.OrderLogistics = new List<OrderLogisticsDetail>();
                         if (!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))//物流单号为空，不保存此信息
                         {
-                            //     db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                           
                             if (orderLogisticsDetail.LogisticsProducts == null)
                                 orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
 
@@ -821,7 +827,7 @@ namespace PushServer.Commands
                                 weightCodeDesc = orderDTO.weightCodeDesc
                             };
                             orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
-                            // db.LogisticsProductInfos.Add(logisticsProductInfo);
+                           
                         }
 
 
@@ -830,7 +836,7 @@ namespace PushServer.Commands
                         db.OrderRepurchases.Add(orderItem.OrderRepurchase);
                         db.OrderDateInfos.Add(orderItem.OrderDateInfo);
 
-                        //  db.OrderProductSet.Add(orderProductInfo);
+                       
                         db.SaveChanges();
                         items.Add(orderItem);
                         return orderItem;
@@ -861,7 +867,7 @@ namespace PushServer.Commands
                     if (templ == null)
                     {
                        
-                        //db.OrderLogisticsDetailSet.Add(orderLogisticsDetail);
+                       
                         item.OrderLogistics.Add(orderLogisticsDetail);
                         if (orderLogisticsDetail.LogisticsProducts == null)
                             orderLogisticsDetail.LogisticsProducts = new List<LogisticsProductInfo>();
@@ -877,7 +883,7 @@ namespace PushServer.Commands
                             weightCodeDesc = orderDTO.weightCodeDesc
                         };
                         orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
-
+                       
                     }
                     else if(!string.IsNullOrEmpty(orderLogisticsDetail.LogisticsNo))
                     {
@@ -893,6 +899,7 @@ namespace PushServer.Commands
                             weightCodeDesc = orderDTO.weightCodeDesc
                         };
                         templ.LogisticsProducts.Add(logisticsProductInfo);
+                        
                     }
 
                 }
@@ -1038,6 +1045,7 @@ namespace PushServer.Commands
                     weightCode = orderDTO.weightCode,
                     weightCodeDesc = orderDTO.weightCodeDesc
                 };
+               
                 orderLogisticsDetail.LogisticsProducts.Add(logisticsProductInfo);
                 db.LogisticsProductInfos.Add(logisticsProductInfo);
             }
