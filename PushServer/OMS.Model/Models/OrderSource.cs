@@ -98,6 +98,14 @@ namespace OMS.Models
         public const string DAMI = "DAMI";
         [Description("渠道-聂亚峰")]
         public const string NIEYAFENG = "NIEYAFENG";
+        [Description("电商-尖叫严选")]
+        public const string JJYANXUAN = "JJYANXUAN";
+        [Description("电商-单维")]
+        public const string DANWEI = "DANWEI";
+        [Description("电商-奇异果电子商务")]
+        public const string QIYIGUO = "QIYIGUO";
+        [Description("电商-团爆品")]
+        public const string TUANBAOPIN = "TUANBAOPIN";
 
     }
 
