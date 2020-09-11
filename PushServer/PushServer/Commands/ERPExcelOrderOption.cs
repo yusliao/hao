@@ -1218,7 +1218,7 @@ namespace PushServer.Commands
                         dr["商品代码"] = productInfo.sku;
                         dr["规格代码"] = productInfo.weightCode == 0 ? string.Empty : productInfo.weightCode.ToString();
                         dr["数量"] = productInfo.ProductCount.ToString();
-                        dr["价格"] = productInfo.TotalAmount.ToString();
+                        dr["价格"] = productInfo.AmounPerUnit.ToString();
                         dr["商品备注"] = item.Remarks;
                         dr["订单付款时间"] = item.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss");
                         dr["收货人"] = Util.Helpers.Encrypt.AesDecrypt(item.Consignee.Name);
